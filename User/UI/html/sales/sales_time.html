@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選擇時間 - Sales Order</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        .picker-column {
+            height: 240px;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .picker-column::-webkit-scrollbar {
+            display: none;
+        }
+
+        .picker-item {
+            scroll-snap-align: center;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .picker-overlay {
+            pointer-events: none;
+            background: linear-gradient(to bottom,
+                    rgba(255, 255, 255, 0.9) 0%,
+                    rgba(255, 255, 255, 0) 20%,
+                    rgba(255, 255, 255, 0) 80%,
+                    rgba(255, 255, 255, 0.9) 100%);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <!-- Status Bar -->
+    <div class="bg-gray-700 text-white px-4 py-2 flex items-center justify-between text-sm">
+        <div class="flex items-center gap-2">
+            <span>8:53</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3z" />
+            </svg>
+            <span>···</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span>🔵</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+            </svg>
+            <span class="px-1.5 py-0.5 border border-white rounded text-xs">100</span>
+            <span class="text-green-400">●</span>
+        </div>
+    </div>
+
+    <!-- Dimmed Background Content -->
+    <div class="relative">
+        <div class="opacity-40">
+            <!-- Header -->
+            <div class="bg-gray-100 px-4 py-4 flex items-center justify-between border-b border-gray-200">
+                <button class="text-2xl">✕</button>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-medium">銷售單</span>
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="w-6"></div>
+            </div>
+
+            <!-- Form Content -->
+            <div class="bg-white mx-3 mt-4 rounded-xl shadow-sm">
+                <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+                    <div class="flex items-center gap-1">
+                        <span class="text-red-500">*</span>
+                        <span class="text-gray-800 text-lg">客戶</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-800">批發客戶</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+                    <span class="text-gray-800 text-lg">貨幣</span>
+                    <span class="text-gray-800">人民幣</span>
+                </div>
+
+                <div class="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+                    <span class="text-gray-800 text-lg">時間</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-800">2025-12-25</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between px-4 py-4">
+                    <span class="text-gray-800 text-lg">業務員</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-800">老闆</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="grid grid-cols-2 gap-3 px-3 mt-4">
+                <button class="bg-white rounded-xl py-4 flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <svg class="w-7 h-7 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span class="text-gray-700">選擇商品</span>
+                </button>
+                <button class="bg-white rounded-xl py-4 flex flex-col items-center justify-center gap-2 shadow-sm">
+                    <svg class="w-7 h-7 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span class="text-gray-700">掃碼添加</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Picker Bottom Sheet -->
+    <div class="fixed inset-x-0 bottom-0 bg-white rounded-t-2xl shadow-2xl" style="padding-bottom: 48px;">
+        <!-- Action Buttons -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <button class="text-cyan-500 text-lg">取消</button>
+            <button class="text-cyan-500 text-lg font-medium">確定</button>
+        </div>
+
+        <!-- Picker -->
+        <div class="relative">
+            <div class="grid grid-cols-3 px-4 py-4">
+                <!-- Year Column -->
+                <div class="picker-column text-center">
+                    <div class="picker-item text-gray-400 text-sm">2023</div>
+                    <div class="picker-item text-gray-400">2024</div>
+                    <div class="picker-item text-black text-xl font-bold">2025</div>
+                    <div class="picker-item text-gray-400">2026</div>
+                    <div class="picker-item text-gray-400 text-sm">2027</div>
+                </div>
+
+                <!-- Month Column -->
+                <div class="picker-column text-center">
+                    <div class="picker-item text-gray-400 text-sm">7</div>
+                    <div class="picker-item text-gray-400">8</div>
+                    <div class="picker-item text-gray-400">9</div>
+                    <div class="picker-item text-black text-xl font-bold">10</div>
+                    <div class="picker-item text-gray-400">11</div>
+                    <div class="picker-item text-gray-400">12</div>
+                    <div class="picker-item text-gray-400 text-sm">1</div>
+                </div>
+
+                <!-- Day Column -->
+                <div class="picker-column text-center">
+                    <div class="picker-item text-gray-400 text-sm">22</div>
+                    <div class="picker-item text-gray-400">23</div>
+                    <div class="picker-item text-gray-400">24</div>
+                    <div class="picker-item text-black text-xl font-bold">25</div>
+                    <div class="picker-item text-gray-400">26</div>
+                    <div class="picker-item text-gray-400">27</div>
+                    <div class="picker-item text-gray-400">28</div>
+                </div>
+            </div>
+
+            <!-- Selection Highlight -->
+            <div class="absolute inset-x-0 pointer-events-none" style="top: 50%; transform: translateY(-50%);">
+                <div class="mx-4 h-12 border-t border-b border-gray-300"></div>
+            </div>
+
+            <!-- Gradient Overlay -->
+            <div class="absolute inset-0 picker-overlay pointer-events-none"></div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-black h-12 flex items-center justify-around">
+        <div class="w-12 h-1 bg-gray-600 rounded-full"></div>
+        <div class="w-12 h-12 rounded-full border-2 border-gray-600"></div>
+        <div class="w-0 h-0 border-l-8 border-r-0 border-b-8 border-l-transparent border-r-transparent border-b-gray-600"
+            style="transform: rotate(-90deg);"></div>
+    </div>
+
+</body>
+
+</html>

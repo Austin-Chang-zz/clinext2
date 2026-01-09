@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinext 醫美預約系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        .logo-tap {
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="max-w-md mx-auto bg-white min-h-screen relative pb-20">
+
+        <div class="bg-blue-100 px-4 py-2 flex justify-between items-center text-sm">
+            <div class="flex items-center gap-2">
+                <img src="/img/logo_light.png" alt="Clinext Logo" class="h-8 w-auto logo-tap" id="appLogo"
+                    title="Clinext">
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="font-semibold">17:35</span>
+                <div class="border border-gray-400 rounded px-2 py-0.5 text-xs">76</div>
+            </div>
+        </div>
+
+        <div class="relative h-80 bg-gradient-to-br from-blue-200 to-blue-100 overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200"></div>
+
+            <div class="relative z-10 px-6 pt-6">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">歡迎您!</h1>
+                <p class="text-xl text-gray-700 mb-6">需要預約醫美服務嗎?</p>
+                <a href="login.html"
+                    class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-8 py-3 rounded-lg shadow-md">
+                    登入
+                </a>
+            </div>
+        </div>
+
+        <div class="relative -mt-8 px-6 mb-8">
+            <div class="flex items-center gap-3">
+                <div class="bg-green-700 rounded-full p-3 shadow-lg relative">
+                    <svg class="w-6 h-6 text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    <div class="absolute -bottom-1 -right-1 bg-white rounded-full p-1">
+                        <svg class="w-3 h-3 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                                d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="flex-1 bg-white rounded-full shadow-lg px-4 py-3 flex items-center">
+                    <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input type="text" placeholder="尋找醫生，專科 ..."
+                        class="flex-1 outline-none text-gray-600 placeholder-gray-400">
+                </div>
+
+                <div class="bg-white rounded-full p-3 shadow-lg relative">
+                    <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">快速連結</h2>
+            <div class="grid grid-cols-3 gap-4">
+                <a href="dept_list.html"
+                    class="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center text-center">
+                    <div class="bg-yellow-50 rounded-full p-4 mb-3">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-800">醫療團隊</span>
+                </a>
+
+                <a href="med_service.html"
+                    class="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center text-center">
+                    <div class="bg-yellow-50 rounded-full p-4 mb-3">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-800">專科服務</span>
+                </a>
+
+                <a href="#" class="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center text-center">
+                    <div class="bg-yellow-50 rounded-full p-4 mb-3">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-800">健康資訊</span>
+                </a>
+
+                <a href="service_fee.html"
+                    class="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center text-center">
+                    <div class="bg-yellow-50 rounded-full p-4 mb-3">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-800">服務收費</span>
+                </a>
+
+                <a href="#" class="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center text-center">
+                    <div class="bg-yellow-50 rounded-full p-4 mb-3">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-800">技術設備</span>
+                </a>
+
+                <a href="chat.html" class="bg-white rounded-2xl p-4 shadow-md flex flex-col items-center text-center">
+                    <div class="bg-yellow-50 rounded-full p-4 mb-3">
+                        <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-800">討論聊天</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="px-6 mb-24">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-gray-800">最新消息</h2>
+                <a href="#" class="text-sm text-gray-500 hover:text-gray-700">查看全部</a>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden flex">
+                <div class="w-32 h-32 bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-purple-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                </div>
+                <div class="p-4 flex-1">
+                    <p class="text-sm text-gray-700 leading-relaxed mb-2">
+                        冬季醫美優惠：皮秒蜂巢雷射特惠方案，讓肌膚煥發光彩
+                    </p>
+                    <p class="text-xs text-gray-400">25/12</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed bottom-20 right-6">
+            <a href="reservation.html" class="block bg-yellow-50 rounded-full p-4 shadow-lg">
+                <svg class="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </a>
+        </div>
+
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 max-w-md mx-auto">
+            <div class="grid grid-cols-5 relative">
+                <a href="home.html" class="flex flex-col items-center py-2 text-green-600">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                    </svg>
+                    <span class="text-xs mt-1 font-medium">首頁</span>
+                </a>
+
+                <a href="#" class="flex flex-col items-center py-2 text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-xs mt-1">我的預約</span>
+                </a>
+
+                <a href="reservation.html" class="flex flex-col items-center -mt-6">
+                    <div class="bg-green-600 rounded-full p-4 shadow-lg">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <span class="text-xs mt-1 text-gray-700">預約</span>
+                </a>
+
+                <a href="#" class="flex flex-col items-center py-2 text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span class="text-xs mt-1">我的紀錄</span>
+                </a>
+
+                <a href="#" class="flex flex-col items-center py-2 text-gray-500">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                            d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                    <span class="text-xs mt-1">更多</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tapCount = 0;
+        let tapTimer = null;
+        const logo = document.getElementById('appLogo');
+
+        logo.addEventListener('click', function () {
+            tapCount++;
+
+            if (tapTimer) {
+                clearTimeout(tapTimer);
+            }
+
+            tapTimer = setTimeout(function () {
+                tapCount = 0;
+            }, 2000);
+
+            if (tapCount >= 5 && tapCount <= 7) {
+                window.location.href = 'login.html?mode=staff';
+            }
+        });
+    </script>
+</body>
+
+</html>

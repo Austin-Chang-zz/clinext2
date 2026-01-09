@@ -1,0 +1,1469 @@
+<!-- Caution :
+    clean Chrome local storage to preview all data of webpage on vs code by using following CLI command:
+    >>rmdir /s /q "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Local Storage\leveldb\" -->
+
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>庫存管理 - Clinext</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        .inventory-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #10b981;
+        }
+
+        .inventory-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-充足 {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-低庫存 {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-缺貨 {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-過期 {
+            background-color: #fecaca;
+            color: #7f1d1d;
+        }
+
+        .status-即將過期 {
+            background-color: #fed7aa;
+            color: #9a3412;
+        }
+
+        .category-badge {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .material-badge {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin: 2px;
+        }
+
+        .sortable-header {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sortable-header:hover {
+            background-color: #f0f9ff;
+        }
+
+        .sort-asc::after {
+            content: " ↑";
+            font-weight: bold;
+        }
+
+        .sort-desc::after {
+            content: " ↓";
+            font-weight: bold;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .expiration-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .expiration-normal {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .expiration-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .expiration-expired {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 pb-20">
+    <div
+        class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-3">
+            <a href="../staff/dashboard.html" class="text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 class="text-lg font-medium">庫存總覽</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="searchBtn" class="text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+            <button id="addItemBtn"
+                class="bg-white text-green-700 hover:bg-gray-100 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-plus"></i>
+                <span>新增品項</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 搜尋與篩選區塊 -->
+    <div class="px-4 py-4 bg-white border-b border-gray-200">
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <!-- 搜尋框 -->
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="搜尋品項名稱、批號或描述..."
+                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            </div>
+
+            <!-- 排序選擇 -->
+            <div class="flex gap-2">
+                <select id="sortSelect"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <option value="name_asc">品項名稱 (A-Z)</option>
+                    <option value="name_desc">品項名稱 (Z-A)</option>
+                    <option value="category_asc">類別 (A-Z)</option>
+                    <option value="category_desc">類別 (Z-A)</option>
+                    <option value="stock_asc">庫存量 (低到高)</option>
+                    <option value="stock_desc">庫存量 (高到低)</option>
+                    <option value="status">庫存狀態</option>
+                    <option value="expiration_asc">有效期限 (近到遠)</option>
+                    <option value="expiration_desc">有效期限 (遠到近)</option>
+                    <option value="updated_desc">最近更新</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 篩選按鈕 -->
+        <div class="flex gap-2 overflow-x-auto pb-2">
+            <button
+                class="filter-btn px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium whitespace-nowrap"
+                data-category="全部">全部</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="注射類">注射類</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="儀器耗材">儀器耗材</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="護理產品">護理產品</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="消耗品">消耗品</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="低庫存">低庫存</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="即將過期">即將過期</button>
+            <button class="filter-btn px-4 py-2 bg-white text-gray-700 rounded-full text-sm whitespace-nowrap"
+                data-category="已過期">已過期</button>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="px-4 py-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                    </div>
+                    <span class="text-sm text-gray-500">總品項</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800" id="totalItems">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm text-gray-500">低庫存</span>
+                </div>
+                <p class="text-2xl font-bold text-orange-600" id="lowStockItems">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <span class="text-sm text-gray-500">即將過期</span>
+                </div>
+                <p class="text-2xl font-bold text-yellow-600" id="expiringSoonItems">0</p>
+            </div>
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <span class="text-sm text-gray-500">已過期</span>
+                </div>
+                <p class="text-2xl font-bold text-red-600" id="expiredItems">0</p>
+            </div>
+        </div>
+
+        <!-- 庫存項目列表 -->
+        <div id="inventoryList" class="space-y-3">
+            <!-- 項目將由 JavaScript 動態生成 -->
+        </div>
+    </div>
+
+    <!-- 新增/編輯庫存項目模態框 -->
+    <div id="inventoryModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-xl">
+            <!-- 模態框標頭 -->
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800" id="modalTitle">新增庫存品項</h3>
+                        <p class="text-sm text-gray-500 mt-1">填寫庫存品項詳細資訊</p>
+                    </div>
+                    <button id="closeModalBtn"
+                        class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 表單內容 -->
+            <div class="overflow-y-auto max-h-[70vh] p-6 custom-scrollbar">
+                <form id="inventoryForm" class="space-y-6">
+                    <!-- 基本資訊 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-info-circle text-green-600"></i>
+                            基本資訊
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">品項名稱 *</label>
+                                <input type="text" id="itemName" name="itemName" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="例: 美國肉毒桿菌素">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">英文/學名</label>
+                                <input type="text" id="itemEnglishName" name="itemEnglishName"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="例: Botulinum Toxin Type A">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">類別 *</label>
+                                <select id="itemCategory" name="itemCategory" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="">選擇類別</option>
+                                    <option value="注射類">注射類</option>
+                                    <option value="儀器耗材">儀器耗材</option>
+                                    <option value="護理產品">護理產品</option>
+                                    <option value="消耗品">消耗品</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">批號</label>
+                                <input type="text" id="batchNumber" name="batchNumber"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="例: BTX-2025-001">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 庫存資訊 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-boxes text-green-600"></i>
+                            庫存資訊
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">當前庫存 *</label>
+                                <input type="number" id="currentStock" name="currentStock" required min="0"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">單位 *</label>
+                                <select id="itemUnit" name="itemUnit" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                    <option value="">選擇單位</option>
+                                    <option value="瓶">瓶</option>
+                                    <option value="支">支</option>
+                                    <option value="個">個</option>
+                                    <option value="組">組</option>
+                                    <option value="盒">盒</option>
+                                    <option value="包">包</option>
+                                    <option value="毫升">毫升</option>
+                                    <option value="條">條</option>
+                                    <option value="發">發</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">低庫存閾值</label>
+                                <input type="number" id="lowStockThreshold" name="lowStockThreshold" min="0"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="自動計算">
+                                <p class="text-xs text-gray-500 mt-1">低於此數量時標記為低庫存</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">規格描述</label>
+                            <input type="text" id="itemSpec" name="itemSpec"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                placeholder="例: 100U/瓶, 500ml/瓶, 30G/27G 混裝">
+                        </div>
+                    </div>
+
+                    <!-- 有效期限 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-calendar-alt text-green-600"></i>
+                            有效期限管理
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">有效期限</label>
+                                <input type="date" id="expirationDate" name="expirationDate"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">藥品/材料有效期限 (可選)</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">提前警示天數</label>
+                                <input type="number" id="expirationAlertDays" name="expirationAlertDays" min="0"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="預設: 30 天">
+                                <p class="text-xs text-gray-500 mt-1">距離到期前幾天開始警示</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 相關治療項目 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-syringe text-green-600"></i>
+                            相關治療項目
+                        </h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">關聯治療項目</label>
+                            <div id="treatmentsContainer" class="space-y-2 mb-4">
+                                <!-- 治療項目將由 JavaScript 動態生成 -->
+                            </div>
+                            <button type="button" id="addTreatmentBtn"
+                                class="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-2">
+                                <i class="fas fa-plus"></i>
+                                <span>添加治療項目關聯</span>
+                            </button>
+                            <p class="text-xs text-gray-500 mt-2">選擇使用此庫存品項的治療項目</p>
+                        </div>
+                    </div>
+
+                    <!-- 備註 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-sticky-note text-green-600"></i>
+                            備註
+                        </h4>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">備註說明</label>
+                            <textarea id="itemNotes" name="itemNotes" rows="3"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                placeholder="輸入備註..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 模態框底部 -->
+            <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                <button type="button" id="cancelModalBtn"
+                    class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                    取消
+                </button>
+                <button type="button" id="saveItemBtn"
+                    class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                    儲存品項
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刪除確認模態框 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">確認刪除</h3>
+                        <p class="text-sm text-gray-500">此操作無法復原</p>
+                    </div>
+                </div>
+
+                <p class="text-gray-700 mb-6" id="deleteConfirmText">
+                    您確定要刪除這個庫存品項嗎？
+                </p>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelDeleteBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        取消
+                    </button>
+                    <button type="button" id="confirmDeleteBtn"
+                        class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                        確認刪除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部導航 -->
+    <div
+        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex items-center justify-around">
+        <a href="../staff/dashboard.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            <span class="text-xs">首頁</span>
+        </a>
+        <a href="inventory.html" class="flex flex-col items-center gap-1 text-green-600">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="text-xs font-medium">庫存</span>
+        </a>
+        <a href="../sales/new_order.html" class="flex flex-col items-center -mt-6">
+            <div class="bg-green-600 rounded-full p-4 shadow-lg">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+            </div>
+            <span class="text-xs mt-1 text-gray-700">新單</span>
+        </a>
+        <a href="../sales/customers.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span class="text-xs">客戶</span>
+        </a>
+        <a href="../sales/reports.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span class="text-xs">報表</span>
+        </a>
+    </div>
+
+    <script>
+        // 庫存項目資料 - 從 localStorage 讀取或初始化
+        let inventoryItems = JSON.parse(localStorage.getItem('inventoryItems')) || [
+            {
+                id: generateId(),
+                name: "美國肉毒桿菌素",
+                englishName: "Botulinum Toxin Type A",
+                category: "注射類",
+                currentStock: 25,
+                unit: "瓶",
+                spec: "100U/瓶",
+                batchNumber: "BTX-2025-001",
+                lowStockThreshold: 10,
+                expirationDate: "2025-12-31",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["BOT_MASSETER"],
+                notes: "",
+                created_at: "2025-01-15",
+                updated_at: "2025-03-20"
+            },
+            {
+                id: generateId(),
+                name: "韓國肉毒桿菌素",
+                englishName: "Nabota 100U",
+                category: "注射類",
+                currentStock: 5,
+                unit: "瓶",
+                spec: "100U/瓶",
+                batchNumber: "NAB-2025-012",
+                lowStockThreshold: 10,
+                expirationDate: "2025-04-15",
+                expirationAlertDays: 30,
+                status: "低庫存",
+                expirationStatus: "即將過期",
+                treatments: ["NABOTA_100U"],
+                notes: "需要補貨",
+                created_at: "2025-02-10",
+                updated_at: "2025-03-18"
+            },
+            {
+                id: generateId(),
+                name: "薇貝拉玻尿酸",
+                englishName: "Versa HA Filler 1cc",
+                category: "注射類",
+                currentStock: 42,
+                unit: "支",
+                spec: "1cc/支",
+                batchNumber: "VRS-2025-008",
+                lowStockThreshold: 15,
+                expirationDate: "2026-03-30",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["VERSA_HA_1CC"],
+                notes: "",
+                created_at: "2025-01-20",
+                updated_at: "2025-03-15"
+            },
+            {
+                id: generateId(),
+                name: "韓國玻尿酸",
+                englishName: "Korean HA Dermal Filler",
+                category: "注射類",
+                currentStock: 36,
+                unit: "支",
+                spec: "1cc/支",
+                batchNumber: "KHA-2025-015",
+                lowStockThreshold: 15,
+                expirationDate: "2026-03-30",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["KOREAN_HA_FILLER"],
+                notes: "",
+                created_at: "2025-02-05",
+                updated_at: "2025-03-15"
+            },
+            {
+                id: generateId(),
+                name: "海芙音波探頭",
+                englishName: "HIFU Cartridge 1000發",
+                category: "儀器耗材",
+                currentStock: 12,
+                unit: "個",
+                spec: "3.0mm/4.5mm",
+                batchNumber: "",
+                lowStockThreshold: 5,
+                expirationDate: "2025-10-01",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["HIFU_1000"],
+                notes: "",
+                created_at: "2025-02-05",
+                updated_at: "2025-03-10"
+            },
+            {
+                id: generateId(),
+                name: "鳳凰電波探頭",
+                englishName: "RF Thermage 900發",
+                category: "儀器耗材",
+                currentStock: 3,
+                unit: "個",
+                spec: "",
+                batchNumber: "THR-2025-003",
+                lowStockThreshold: 5,
+                expirationDate: "2025-03-10",
+                expirationAlertDays: 30,
+                status: "低庫存",
+                expirationStatus: "已過期",
+                treatments: ["THERMAGE_900"],
+                notes: "熱門品項，需要盡快補貨",
+                created_at: "2025-01-30",
+                updated_at: "2025-03-12"
+            },
+            {
+                id: generateId(),
+                name: "皮秒蜂巢透鏡",
+                englishName: "Pico Laser Focus Lens",
+                category: "儀器耗材",
+                currentStock: 8,
+                unit: "個",
+                spec: "",
+                batchNumber: "PCL-2025-006",
+                lowStockThreshold: 5,
+                expirationDate: "2025-12-31",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["PICO_LASER"],
+                notes: "",
+                created_at: "2025-02-20",
+                updated_at: "2025-03-10"
+            },
+            {
+                id: generateId(),
+                name: "傳導凝膠",
+                englishName: "Ultrasound Gel 500ml",
+                category: "消耗品",
+                currentStock: 48,
+                unit: "瓶",
+                spec: "500ml/瓶",
+                batchNumber: "",
+                lowStockThreshold: 20,
+                expirationDate: "2025-08-20",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["HIFU_1000", "THERMAGE_900"],
+                notes: "",
+                created_at: "2025-01-25",
+                updated_at: "2025-03-05"
+            },
+            {
+                id: generateId(),
+                name: "注射針頭組",
+                englishName: "Injection Needle Set",
+                category: "消耗品",
+                currentStock: 50,
+                unit: "組",
+                spec: "30G/27G 混裝",
+                batchNumber: "",
+                lowStockThreshold: 100,
+                expirationDate: "2025-05-01",
+                expirationAlertDays: 30,
+                status: "低庫存",
+                expirationStatus: "即將過期",
+                treatments: ["BOT_MASSETER", "VERSA_HA_1CC", "NABOTA_100U", "KOREAN_HA_FILLER"],
+                notes: "常用耗材，需大量備貨",
+                created_at: "2025-02-15",
+                updated_at: "2025-03-08"
+            },
+            {
+                id: generateId(),
+                name: "保濕修護面膜",
+                englishName: "Hydrating Repair Mask",
+                category: "護理產品",
+                currentStock: 24,
+                unit: "片",
+                spec: "25ml/片",
+                batchNumber: "HRM-2025-020",
+                lowStockThreshold: 10,
+                expirationDate: "2025-11-30",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["SKIN_CARE"],
+                notes: "術後修復專用",
+                created_at: "2025-02-28",
+                updated_at: "2025-03-18"
+            },
+            {
+                id: generateId(),
+                name: "修復精華液",
+                englishName: "Repair Serum",
+                category: "護理產品",
+                currentStock: 18,
+                unit: "瓶",
+                spec: "30ml/瓶",
+                batchNumber: "RS-2025-025",
+                lowStockThreshold: 8,
+                expirationDate: "2025-09-15",
+                expirationAlertDays: 30,
+                status: "充足",
+                expirationStatus: "正常",
+                treatments: ["SKIN_CARE"],
+                notes: "高濃度修復配方",
+                created_at: "2025-03-01",
+                updated_at: "2025-03-15"
+            }
+        ];
+
+        // 治療項目資料 (從治療目錄取得)
+        let treatments = JSON.parse(localStorage.getItem('treatments')) || [
+            { treatment_code: "BOT_MASSETER", treatment_name: "肉毒瘦臉" },
+            { treatment_code: "NABOTA_100U", treatment_name: "韓國肉毒100單位" },
+            { treatment_code: "VERSA_HA_1CC", treatment_name: "薇貝拉玻尿酸1cc" },
+            { treatment_code: "KOREAN_HA_FILLER", treatment_name: "韓國玻尿酸填充" },
+            { treatment_code: "HIFU_1000", treatment_name: "海芙音波1000發" },
+            { treatment_code: "THERMAGE_900", treatment_name: "鳳凰電波900發" },
+            { treatment_code: "PICO_LASER", treatment_name: "皮秒雷射" },
+            { treatment_code: "SKIN_CARE", treatment_name: "基礎護理" }
+        ];
+
+        // 當前排序設定
+        let currentSort = "name_asc";
+        let currentFilter = "全部";
+        let searchTerm = "";
+
+        // 生成唯一 ID
+        function generateId() {
+            return 'inv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // 計算庫存狀態
+        function calculateStatus(item) {
+            if (item.currentStock <= 0) {
+                return "缺貨";
+            } else if (item.lowStockThreshold && item.currentStock <= item.lowStockThreshold) {
+                return "低庫存";
+            } else {
+                return "充足";
+            }
+        }
+
+        // 計算有效期限狀態
+        function calculateExpirationStatus(item) {
+            if (!item.expirationDate) return "無期限";
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const expDate = new Date(item.expirationDate);
+            expDate.setHours(0, 0, 0, 0);
+
+            const alertDays = item.expirationAlertDays || 30;
+            const alertDate = new Date(expDate);
+            alertDate.setDate(expDate.getDate() - alertDays);
+
+            if (expDate < today) {
+                return "已過期";
+            } else if (alertDate <= today) {
+                return "即將過期";
+            } else {
+                return "正常";
+            }
+        }
+
+        // 格式化日期顯示
+        function formatDate(dateString) {
+            if (!dateString) return "無期限";
+
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        // 計算剩餘天數
+        function getDaysUntilExpiration(expirationDate) {
+            if (!expirationDate) return null;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const expDate = new Date(expirationDate);
+            expDate.setHours(0, 0, 0, 0);
+
+            const diffTime = expDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays;
+        }
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function () {
+            renderInventoryItems();
+            setupEventListeners();
+            updateStatistics();
+        });
+
+        // 渲染庫存項目
+        function renderInventoryItems() {
+            const container = document.getElementById('inventoryList');
+            container.innerHTML = '';
+
+            // 篩選和排序項目
+            let filteredItems = [...inventoryItems];
+
+            // 搜尋篩選
+            if (searchTerm) {
+                filteredItems = filteredItems.filter(item =>
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    (item.englishName && item.englishName.toLowerCase().includes(searchTerm)) ||
+                    (item.batchNumber && item.batchNumber.toLowerCase().includes(searchTerm)) ||
+                    (item.notes && item.notes.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // 類別篩選
+            if (currentFilter !== "全部") {
+                if (currentFilter === "低庫存") {
+                    filteredItems = filteredItems.filter(item => item.status === "低庫存" || item.status === "缺貨");
+                } else if (currentFilter === "即將過期") {
+                    filteredItems = filteredItems.filter(item => item.expirationStatus === "即將過期");
+                } else if (currentFilter === "已過期") {
+                    filteredItems = filteredItems.filter(item => item.expirationStatus === "已過期");
+                } else {
+                    filteredItems = filteredItems.filter(item => item.category === currentFilter);
+                }
+            }
+
+            // 排序
+            filteredItems.sort((a, b) => {
+                switch (currentSort) {
+                    case 'name_asc':
+                        return a.name.localeCompare(b.name);
+                    case 'name_desc':
+                        return b.name.localeCompare(a.name);
+                    case 'category_asc':
+                        return a.category.localeCompare(b.category) || a.name.localeCompare(b.name);
+                    case 'category_desc':
+                        return b.category.localeCompare(a.category) || a.name.localeCompare(b.name);
+                    case 'stock_asc':
+                        return a.currentStock - b.currentStock;
+                    case 'stock_desc':
+                        return b.currentStock - a.currentStock;
+                    case 'status':
+                        return a.status.localeCompare(b.status) || a.name.localeCompare(b.name);
+                    case 'expiration_asc':
+                        if (!a.expirationDate && !b.expirationDate) return a.name.localeCompare(b.name);
+                        if (!a.expirationDate) return 1;
+                        if (!b.expirationDate) return -1;
+                        return new Date(a.expirationDate) - new Date(b.expirationDate);
+                    case 'expiration_desc':
+                        if (!a.expirationDate && !b.expirationDate) return a.name.localeCompare(b.name);
+                        if (!a.expirationDate) return 1;
+                        if (!b.expirationDate) return -1;
+                        return new Date(b.expirationDate) - new Date(a.expirationDate);
+                    case 'updated_desc':
+                        return new Date(b.updated_at) - new Date(a.updated_at);
+                    default:
+                        return a.name.localeCompare(b.name);
+                }
+            });
+
+            // 按類別分組
+            const itemsByCategory = {};
+            filteredItems.forEach(item => {
+                if (!itemsByCategory[item.category]) {
+                    itemsByCategory[item.category] = [];
+                }
+                itemsByCategory[item.category].push(item);
+            });
+
+            // 渲染每個類別
+            Object.keys(itemsByCategory).forEach(category => {
+                if (itemsByCategory[category].length > 0) {
+                    // 類別標題
+                    const categoryHeader = document.createElement('div');
+                    categoryHeader.className = 'flex items-center justify-between mb-3';
+                    categoryHeader.innerHTML = `
+                        <h2 class="text-lg font-bold text-gray-800">${category}</h2>
+                        <span class="text-sm text-gray-500">${itemsByCategory[category].length} 項</span>
+                    `;
+                    container.appendChild(categoryHeader);
+
+                    // 類別項目
+                    const categoryItems = document.createElement('div');
+                    categoryItems.className = 'space-y-3 mb-6';
+
+                    itemsByCategory[category].forEach(item => {
+                        const itemCard = createInventoryCard(item);
+                        categoryItems.appendChild(itemCard);
+                    });
+
+                    container.appendChild(categoryItems);
+                }
+            });
+
+            // 如果沒有項目
+            if (filteredItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-box-open text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">沒有找到庫存項目</h3>
+                        <p class="text-gray-500">試試不同的搜尋條件或添加新項目</p>
+                    </div>
+                `;
+            }
+
+            updateStatistics();
+        }
+
+        // 創建庫存項目卡片
+        function createInventoryCard(item) {
+            const card = document.createElement('div');
+            card.className = 'inventory-card bg-white rounded-xl p-4 shadow-sm animate-fade-in';
+
+            // 取得治療項目名稱
+            const treatmentNames = item.treatments.map(treatmentId => {
+                const treatment = treatments.find(t => t.treatment_code === treatmentId);
+                return treatment ? treatment.treatment_name : treatmentId;
+            });
+
+            // 計算有效期限顯示
+            let expirationDisplay = '';
+            let expirationClass = '';
+            let daysUntilExpiration = null;
+
+            if (item.expirationDate) {
+                daysUntilExpiration = getDaysUntilExpiration(item.expirationDate);
+                const formattedDate = formatDate(item.expirationDate);
+
+                if (item.expirationStatus === "已過期") {
+                    expirationClass = 'expiration-expired';
+                    expirationDisplay = `已過期 (${formattedDate})`;
+                } else if (item.expirationStatus === "即將過期") {
+                    expirationClass = 'expiration-warning';
+                    expirationDisplay = `${daysUntilExpiration}天後過期 (${formattedDate})`;
+                } else {
+                    expirationClass = 'expiration-normal';
+                    expirationDisplay = `${daysUntilExpiration}天後過期 (${formattedDate})`;
+                }
+            }
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-2">
+                    <div class="flex-1">
+                        <h3 class="font-medium text-gray-900">${item.name}</h3>
+                        ${item.englishName ? `<p class="text-sm text-gray-500">${item.englishName}</p>` : ''}
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-medium status-${item.status}">${item.status}</span>
+                </div>
+
+                <div class="flex justify-between items-center mb-3">
+                    <div class="text-sm text-gray-600">
+                        <span>庫存：</span>
+                        <span class="font-semibold ${item.status === '低庫存' ? 'text-orange-600' : item.status === '缺貨' ? 'text-red-600' : 'text-gray-800'}">
+                            ${item.currentStock} ${item.unit}
+                        </span>
+                        ${item.spec ? `<span class="text-gray-400 ml-2">(${item.spec})</span>` : ''}
+                    </div>
+                    ${item.batchNumber ? `<span class="text-sm text-gray-500">批號: ${item.batchNumber}</span>` : ''}
+                </div>
+
+                ${expirationDisplay ? `
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-500 mb-1">有效期限：</div>
+                        <span class="expiration-badge ${expirationClass}">${expirationDisplay}</span>
+                    </div>
+                ` : ''}
+
+                ${treatmentNames.length > 0 ? `
+                    <div class="mb-3">
+                        <div class="text-xs text-gray-500 mb-1">相關治療：</div>
+                        <div class="flex flex-wrap">
+                            ${treatmentNames.map(name => `<span class="material-badge">${name}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+
+                ${item.notes ? `<div class="text-xs text-gray-500 mb-3 border-l-2 border-gray-200 pl-2">${item.notes}</div>` : ''}
+
+                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="category-badge">${item.category}</span>
+                        <span class="text-xs text-gray-500">更新: ${item.updated_at}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="edit-btn text-blue-600 hover:text-blue-800 p-1" data-id="${item.id}" title="編輯">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                        <button class="delete-btn text-red-600 hover:text-red-800 p-1" data-id="${item.id}" title="刪除">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // 更新統計數據
+        function updateStatistics() {
+            const totalItems = inventoryItems.length;
+            const lowStockItems = inventoryItems.filter(item => item.status === "低庫存" || item.status === "缺貨").length;
+            const expiringSoonItems = inventoryItems.filter(item => item.expirationStatus === "即將過期").length;
+            const expiredItems = inventoryItems.filter(item => item.expirationStatus === "已過期").length;
+
+            document.getElementById('totalItems').textContent = totalItems;
+            document.getElementById('lowStockItems').textContent = lowStockItems;
+            document.getElementById('expiringSoonItems').textContent = expiringSoonItems;
+            document.getElementById('expiredItems').textContent = expiredItems;
+        }
+
+        // 新增庫存項目
+        function addInventoryItem() {
+            // 重置表單
+            document.getElementById('inventoryForm').reset();
+            document.getElementById('modalTitle').textContent = '新增庫存品項';
+
+            // 清空治療項目容器
+            document.getElementById('treatmentsContainer').innerHTML = '';
+            addTreatmentField(); // 添加一個空的治療項目欄位
+
+            // 顯示模態框
+            document.getElementById('inventoryModal').classList.remove('hidden');
+            document.getElementById('inventoryModal').classList.add('flex');
+
+            // 設定儲存按鈕功能
+            document.getElementById('saveItemBtn').onclick = function () {
+                saveNewInventoryItem();
+            };
+        }
+
+        // 編輯庫存項目
+        function editInventoryItem(itemId) {
+            const item = inventoryItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            // 填充表單
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemEnglishName').value = item.englishName || '';
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('batchNumber').value = item.batchNumber || '';
+            document.getElementById('currentStock').value = item.currentStock;
+            document.getElementById('itemUnit').value = item.unit;
+            document.getElementById('itemSpec').value = item.spec || '';
+            document.getElementById('lowStockThreshold').value = item.lowStockThreshold || '';
+            document.getElementById('expirationDate').value = item.expirationDate || '';
+            document.getElementById('expirationAlertDays').value = item.expirationAlertDays || 30;
+            document.getElementById('itemNotes').value = item.notes || '';
+
+            // 填充治療項目
+            const treatmentsContainer = document.getElementById('treatmentsContainer');
+            treatmentsContainer.innerHTML = '';
+
+            if (item.treatments && item.treatments.length > 0) {
+                item.treatments.forEach(treatmentId => {
+                    addTreatmentField(treatmentId);
+                });
+            } else {
+                addTreatmentField();
+            }
+
+            // 更新模態框標題
+            document.getElementById('modalTitle').textContent = '編輯庫存品項';
+
+            // 顯示模態框
+            document.getElementById('inventoryModal').classList.remove('hidden');
+            document.getElementById('inventoryModal').classList.add('flex');
+
+            // 設定儲存按鈕功能
+            document.getElementById('saveItemBtn').onclick = function () {
+                saveEditedInventoryItem(itemId);
+            };
+        }
+
+        // 新增治療項目欄位
+        function addTreatmentField(value = '') {
+            const container = document.getElementById('treatmentsContainer');
+            const treatmentDiv = document.createElement('div');
+            treatmentDiv.className = 'flex gap-2 items-center';
+
+            // 創建選擇器
+            const select = document.createElement('select');
+            select.className = 'flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent';
+            select.innerHTML = '<option value="">選擇治療項目</option>';
+
+            // 添加治療項目選項
+            treatments.forEach(treatment => {
+                const option = document.createElement('option');
+                option.value = treatment.treatment_code;
+                option.textContent = `${treatment.treatment_name} (${treatment.treatment_code})`;
+                if (treatment.treatment_code === value) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            treatmentDiv.innerHTML = `
+                ${select.outerHTML}
+                <button type="button" class="remove-treatment-btn text-red-600 hover:text-red-800 p-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+            container.appendChild(treatmentDiv);
+
+            // 綁定移除按鈕事件
+            treatmentDiv.querySelector('.remove-treatment-btn').addEventListener('click', function () {
+                if (container.children.length > 1) {
+                    container.removeChild(treatmentDiv);
+                }
+            });
+        }
+
+        // 儲存新庫存項目
+        function saveNewInventoryItem() {
+            // 驗證表單
+            if (!validateInventoryForm()) return;
+
+            // 收集治療項目
+            const treatmentSelects = document.querySelectorAll('#treatmentsContainer select');
+            const treatmentsList = Array.from(treatmentSelects)
+                .map(select => select.value)
+                .filter(val => val.trim() !== '');
+
+            // 創建新項目
+            const newItem = {
+                id: generateId(),
+                name: document.getElementById('itemName').value.trim(),
+                englishName: document.getElementById('itemEnglishName').value.trim(),
+                category: document.getElementById('itemCategory').value,
+                currentStock: parseInt(document.getElementById('currentStock').value),
+                unit: document.getElementById('itemUnit').value,
+                spec: document.getElementById('itemSpec').value.trim(),
+                batchNumber: document.getElementById('batchNumber').value.trim(),
+                lowStockThreshold: document.getElementById('lowStockThreshold').value ?
+                    parseInt(document.getElementById('lowStockThreshold').value) : null,
+                expirationDate: document.getElementById('expirationDate').value || null,
+                expirationAlertDays: document.getElementById('expirationAlertDays').value ?
+                    parseInt(document.getElementById('expirationAlertDays').value) : 30,
+                treatments: treatmentsList,
+                notes: document.getElementById('itemNotes').value.trim(),
+                created_at: new Date().toISOString().split('T')[0],
+                updated_at: new Date().toISOString().split('T')[0]
+            };
+
+            // 計算狀態
+            newItem.status = calculateStatus(newItem);
+            newItem.expirationStatus = calculateExpirationStatus(newItem);
+
+            // 添加到陣列
+            inventoryItems.push(newItem);
+
+            // 儲存到 localStorage
+            localStorage.setItem('inventoryItems', JSON.stringify(inventoryItems));
+
+            // 關閉模態框
+            document.getElementById('inventoryModal').classList.add('hidden');
+            document.getElementById('inventoryModal').classList.remove('flex');
+
+            // 重新渲染
+            renderInventoryItems();
+
+            // 顯示成功訊息
+            showToast('庫存品項已成功新增！', 'success');
+        }
+
+        // 儲存編輯的庫存項目
+        function saveEditedInventoryItem(itemId) {
+            // 驗證表單
+            if (!validateInventoryForm()) return;
+
+            // 收集治療項目
+            const treatmentSelects = document.querySelectorAll('#treatmentsContainer select');
+            const treatmentsList = Array.from(treatmentSelects)
+                .map(select => select.value)
+                .filter(val => val.trim() !== '');
+
+            // 更新項目
+            const index = inventoryItems.findIndex(i => i.id === itemId);
+            if (index !== -1) {
+                inventoryItems[index] = {
+                    ...inventoryItems[index],
+                    name: document.getElementById('itemName').value.trim(),
+                    englishName: document.getElementById('itemEnglishName').value.trim(),
+                    category: document.getElementById('itemCategory').value,
+                    currentStock: parseInt(document.getElementById('currentStock').value),
+                    unit: document.getElementById('itemUnit').value,
+                    spec: document.getElementById('itemSpec').value.trim(),
+                    batchNumber: document.getElementById('batchNumber').value.trim(),
+                    lowStockThreshold: document.getElementById('lowStockThreshold').value ?
+                        parseInt(document.getElementById('lowStockThreshold').value) : null,
+                    expirationDate: document.getElementById('expirationDate').value || null,
+                    expirationAlertDays: document.getElementById('expirationAlertDays').value ?
+                        parseInt(document.getElementById('expirationAlertDays').value) : 30,
+                    treatments: treatmentsList,
+                    notes: document.getElementById('itemNotes').value.trim(),
+                    updated_at: new Date().toISOString().split('T')[0]
+                };
+
+                // 重新計算狀態
+                inventoryItems[index].status = calculateStatus(inventoryItems[index]);
+                inventoryItems[index].expirationStatus = calculateExpirationStatus(inventoryItems[index]);
+
+                // 儲存到 localStorage
+                localStorage.setItem('inventoryItems', JSON.stringify(inventoryItems));
+
+                // 關閉模態框
+                document.getElementById('inventoryModal').classList.add('hidden');
+                document.getElementById('inventoryModal').classList.remove('flex');
+
+                // 重新渲染
+                renderInventoryItems();
+
+                // 顯示成功訊息
+                showToast('庫存品項已成功更新！', 'success');
+            }
+        }
+
+        // 驗證表單
+        function validateInventoryForm() {
+            const requiredFields = [
+                'itemName',
+                'itemCategory',
+                'currentStock',
+                'itemUnit'
+            ];
+
+            for (const fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.focus();
+                    field.classList.add('border-red-500');
+                    showToast(`請填寫 ${field.labels[0].textContent}`, 'error');
+                    return false;
+                }
+                field.classList.remove('border-red-500');
+            }
+
+            // 驗證數字欄位
+            const stock = parseInt(document.getElementById('currentStock').value);
+            if (isNaN(stock) || stock < 0) {
+                document.getElementById('currentStock').classList.add('border-red-500');
+                showToast('庫存量必須是有效的正數', 'error');
+                return false;
+            }
+
+            const threshold = document.getElementById('lowStockThreshold').value;
+            if (threshold && (isNaN(parseInt(threshold)) || parseInt(threshold) < 0)) {
+                document.getElementById('lowStockThreshold').classList.add('border-red-500');
+                showToast('低庫存閾值必須是有效的正數', 'error');
+                return false;
+            }
+
+            const alertDays = document.getElementById('expirationAlertDays').value;
+            if (alertDays && (isNaN(parseInt(alertDays)) || parseInt(alertDays) < 0)) {
+                document.getElementById('expirationAlertDays').classList.add('border-red-500');
+                showToast('提前警示天數必須是有效的正數', 'error');
+                return false;
+            }
+
+            // 驗證有效期限（如果填寫）
+            const expirationDate = document.getElementById('expirationDate').value;
+            if (expirationDate) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const expDate = new Date(expirationDate);
+
+                if (expDate < today) {
+                    showToast('有效期限不能是過去的日期', 'error');
+                    document.getElementById('expirationDate').classList.add('border-red-500');
+                    return false;
+                }
+                document.getElementById('expirationDate').classList.remove('border-red-500');
+            }
+
+            return true;
+        }
+
+        // 確認刪除
+        function confirmDelete(itemId) {
+            const item = inventoryItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('deleteConfirmText').textContent =
+                `您確定要刪除「${item.name}」這個庫存品項嗎？此操作無法復原。`;
+
+            // 顯示刪除確認模態框
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+
+            // 設定確認刪除按鈕功能
+            document.getElementById('confirmDeleteBtn').onclick = function () {
+                deleteInventoryItem(itemId);
+            };
+        }
+
+        // 刪除庫存項目
+        function deleteInventoryItem(itemId) {
+            // 從陣列中移除
+            inventoryItems = inventoryItems.filter(i => i.id !== itemId);
+
+            // 儲存到 localStorage
+            localStorage.setItem('inventoryItems', JSON.stringify(inventoryItems));
+
+            // 關閉刪除確認模態框
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.getElementById('deleteModal').classList.remove('flex');
+
+            // 重新渲染
+            renderInventoryItems();
+
+            // 顯示成功訊息
+            showToast('庫存品項已成功刪除！', 'success');
+        }
+
+        // 顯示提示訊息
+        function showToast(message, type = 'info') {
+            // 創建 toast 元素
+            const toast = document.createElement('div');
+            toast.className = `fixed top-20 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-fade-in ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            // 3秒後移除
+            setTimeout(() => {
+                toast.classList.remove('animate-fade-in');
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 設定事件監聽器
+        function setupEventListeners() {
+            // 新增品項按鈕
+            document.getElementById('addItemBtn').addEventListener('click', addInventoryItem);
+
+            // 搜尋輸入
+            document.getElementById('searchInput').addEventListener('input', function () {
+                searchTerm = this.value.toLowerCase();
+                renderInventoryItems();
+            });
+
+            // 排序選擇
+            document.getElementById('sortSelect').addEventListener('change', function () {
+                currentSort = this.value;
+                renderInventoryItems();
+            });
+
+            // 篩選按鈕
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    // 更新按鈕樣式
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('bg-green-600', 'text-white');
+                        b.classList.add('bg-white', 'text-gray-700');
+                    });
+                    this.classList.remove('bg-white', 'text-gray-700');
+                    this.classList.add('bg-green-600', 'text-white');
+
+                    // 更新篩選
+                    currentFilter = this.dataset.category;
+                    renderInventoryItems();
+                });
+            });
+
+            // 模態框關閉按鈕
+            document.getElementById('closeModalBtn').addEventListener('click', function () {
+                document.getElementById('inventoryModal').classList.add('hidden');
+                document.getElementById('inventoryModal').classList.remove('flex');
+            });
+
+            document.getElementById('cancelModalBtn').addEventListener('click', function () {
+                document.getElementById('inventoryModal').classList.add('hidden');
+                document.getElementById('inventoryModal').classList.remove('flex');
+            });
+
+            // 添加治療項目按鈕
+            document.getElementById('addTreatmentBtn').addEventListener('click', function () {
+                addTreatmentField();
+            });
+
+            // 刪除確認模態框關閉
+            document.getElementById('cancelDeleteBtn').addEventListener('click', function () {
+                document.getElementById('deleteModal').classList.add('hidden');
+                document.getElementById('deleteModal').classList.remove('flex');
+            });
+
+            // 委派編輯和刪除按鈕事件（用於動態生成的元素）
+            document.addEventListener('click', function (e) {
+                // 編輯按鈕
+                if (e.target.closest('.edit-btn')) {
+                    const itemId = e.target.closest('.edit-btn').dataset.id;
+                    editInventoryItem(itemId);
+                }
+
+                // 刪除按鈕
+                if (e.target.closest('.delete-btn')) {
+                    const itemId = e.target.closest('.delete-btn').dataset.id;
+                    confirmDelete(itemId);
+                }
+            });
+
+            // 如果沒有治療項目數據，嘗試從治療目錄加載
+            if (treatments.length === 0) {
+                const storedTreatments = localStorage.getItem('treatments');
+                if (storedTreatments) {
+                    treatments = JSON.parse(storedTreatments);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

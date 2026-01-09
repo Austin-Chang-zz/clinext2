@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增傳票 - 醫美診所管理系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8b5cf6',
+                        'primary-dark': '#7c3aed',
+                        secondary: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #c7d2fe transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background-color: #c7d2fe;
+            border-radius: 20px;
+        }
+
+        /* 自動編號動畫 */
+        @keyframes pulse-gentle {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .pulse-gentle {
+            animation: pulse-gentle 2s infinite;
+        }
+
+        /* 附件圖片樣式 */
+        .attachment-image {
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        /* 相機預覽樣式 */
+        #cameraPreview {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #cameraPreview video {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 40px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .camera-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .capture-btn {
+            background: white;
+            color: black;
+        }
+
+        .close-camera-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* 裁切區域樣式 */
+        .crop-area {
+            position: absolute;
+            border: 2px dashed #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- 頂部導航欄 -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center space-x-4">
+                        <a href="voucher.html" class="text-gray-500 hover:text-primary">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <div class="bg-primary p-2 rounded-lg">
+                            <i class="fas fa-file-invoice-dollar text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-800">醫美診所傳票管理系統</h1>
+                            <p class="text-gray-500 text-sm">新增傳票</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="hidden md:block">
+                            <div class="text-right">
+                                <p class="font-medium">張美華 會計</p>
+                                <p class="text-sm text-gray-500" id="currentDate">2024年1月20日</p>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <img src="https://ui-avatars.com/api/?name=張美華&background=8b5cf6&color=fff"
+                                class="w-10 h-10 rounded-full border-2 border-primary" alt="使用者頭像">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主內容區 -->
+        <main class="px-4 py-6 md:px-6">
+            <div class="max-w-6xl mx-auto">
+                <!-- 狀態指示條 -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-lg font-bold text-gray-700">傳票建立進度</div>
+                        <div class="text-sm text-gray-500">步驟 2/4</div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-primary h-2 rounded-full" style="width: 50%"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-sm">
+                        <div class="text-primary font-bold">1. 基本資訊</div>
+                        <div class="text-primary font-bold">2. 傳票明細</div>
+                        <div class="text-gray-400">3. 附件管理</div>
+                        <div class="text-gray-400">4. 確認儲存</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- 左側：傳票基本資訊 -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-white rounded-xl shadow-sm border p-5 mb-6">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-info-circle text-primary mr-2"></i> 傳票基本資訊
+                            </h2>
+
+                            <div class="space-y-4">
+                                <!-- 傳票編號 -->
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-sm text-gray-500">傳票編號</div>
+                                            <div class="text-xl font-mono font-bold text-primary" id="voucherNumber">
+                                                REV-20240120-001</div>
+                                        </div>
+                                        <div class="text-green-500">
+                                            <i class="fas fa-check-circle text-2xl"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-500 mt-2">
+                                        <i class="fas fa-info-circle mr-1"></i> 系統自動產生，可手動修改
+                                    </div>
+                                </div>
+
+                                <!-- 傳票類型 -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-tag mr-1"></i> 傳票類型 *
+                                    </label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <label class="relative flex cursor-pointer">
+                                            <input type="radio" name="voucherType" value="income" class="sr-only"
+                                                checked>
+                                            <div
+                                                class="w-full p-3 border rounded-lg text-center transition-all duration-200 hover:bg-green-50 income-option">
+                                                <i class="fas fa-arrow-down text-green-500 mb-1"></i>
+                                                <div class="font-medium">收入傳票</div>
+                                                <div class="text-xs text-gray-500">療程收入、產品銷售</div>
+                                            </div>
+                                            <div class="absolute top-2 right-2 hidden">
+                                                <i class="fas fa-check-circle text-green-500"></i>
+                                            </div>
+                                        </label>
+                                        <label class="relative flex cursor-pointer">
+                                            <input type="radio" name="voucherType" value="expense" class="sr-only">
+                                            <div
+                                                class="w-full p-3 border rounded-lg text-center transition-all duration-200 hover:bg-red-50 expense-option">
+                                                <i class="fas fa-arrow-up text-red-500 mb-1"></i>
+                                                <div class="font-medium">支出傳票</div>
+                                                <div class="text-xs text-gray-500">進貨、費用支出</div>
+                                            </div>
+                                            <div class="absolute top-2 right-2 hidden">
+                                                <i class="fas fa-check-circle text-green-500"></i>
+                                            </div>
+                                        </label>
+                                        <label class="relative flex cursor-pointer">
+                                            <input type="radio" name="voucherType" value="transfer" class="sr-only">
+                                            <div
+                                                class="w-full p-3 border rounded-lg text-center transition-all duration-200 hover:bg-blue-50 transfer-option">
+                                                <i class="fas fa-exchange-alt text-blue-500 mb-1"></i>
+                                                <div class="font-medium">轉帳傳票</div>
+                                                <div class="text-xs text-gray-500">銀行轉帳、資金調度</div>
+                                            </div>
+                                            <div class="absolute top-2 right-2 hidden">
+                                                <i class="fas fa-check-circle text-green-500"></i>
+                                            </div>
+                                        </label>
+                                        <label class="relative flex cursor-pointer">
+                                            <input type="radio" name="voucherType" value="adjustment" class="sr-only">
+                                            <div
+                                                class="w-full p-3 border rounded-lg text-center transition-all duration-200 hover:bg-yellow-50 adjustment-option">
+                                                <i class="fas fa-adjust text-yellow-500 mb-1"></i>
+                                                <div class="font-medium">調整傳票</div>
+                                                <div class="text-xs text-gray-500">月底調整、更正</div>
+                                            </div>
+                                            <div class="absolute top-2 right-2 hidden">
+                                                <i class="fas fa-check-circle text-green-500"></i>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- 傳票日期 -->
+                                <div>
+                                    <label for="voucherDate" class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="far fa-calendar-alt mr-1"></i> 傳票日期 *
+                                    </label>
+                                    <div class="relative">
+                                        <input type="date" id="voucherDate" name="voucherDate"
+                                            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            value="2024-01-20">
+                                        <div class="absolute right-3 top-3 text-gray-400">
+                                            <i class="fas fa-calendar-day"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 傳票說明 -->
+                                <div>
+                                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="far fa-comment-dots mr-1"></i> 傳票說明
+                                    </label>
+                                    <textarea id="description" name="description" rows="3"
+                                        class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                        placeholder="請輸入傳票說明...">音波拉提療程收入</textarea>
+                                </div>
+
+                                <!-- 關聯療程/銷售 -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                                        <i class="fas fa-link mr-1"></i> 關聯項目 (選填)
+                                    </label>
+                                    <div class="space-y-2">
+                                        <select id="relatedType" name="relatedType"
+                                            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="">選擇關聯類型</option>
+                                            <option value="service" selected>療程服務</option>
+                                            <option value="product">產品銷售</option>
+                                            <option value="purchase">進貨單</option>
+                                            <option value="salary">薪資發放</option>
+                                        </select>
+
+                                        <div class="relative" id="relatedSearchContainer">
+                                            <input type="text" id="relatedSearch"
+                                                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                                placeholder="搜尋關聯項目...">
+                                            <div class="absolute right-3 top-3 text-gray-400">
+                                                <i class="fas fa-search"></i>
+                                            </div>
+                                        </div>
+
+                                        <div id="relatedInfo"
+                                            class="bg-blue-50 border border-blue-200 rounded-lg p-3 hidden">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <div class="font-medium">音波拉提療程</div>
+                                                    <div class="text-sm text-gray-600">客戶: 林小美 | 醫師: 王醫師</div>
+                                                    <div class="text-sm text-gray-600">金額: NT$ 50,000</div>
+                                                </div>
+                                                <button type="button" onclick="clearRelated()"
+                                                    class="text-gray-400 hover:text-gray-600">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 附件管理區塊 -->
+                        <div class="bg-white rounded-xl shadow-sm border p-5 mb-6">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-paperclip text-primary mr-2"></i> 憑證附件
+                            </h2>
+
+                            <div class="mb-4">
+                                <p class="text-gray-600 text-sm mb-3">
+                                    請上傳與此傳票相關的憑證（發票、收據、合約等），支援手機拍照上傳。
+                                </p>
+
+                                <!-- 附件上傳按鈕 -->
+                                <div class="grid grid-cols-2 gap-3 mb-4">
+                                    <!-- 標準方式：使用原生相機App (de facto standard) -->
+                                    <div class="text-center">
+                                        <input type="file" id="cameraInput" accept="image/*" capture="environment"
+                                            class="hidden" onchange="handleCameraCapture(event)">
+                                        <button type="button" onclick="document.getElementById('cameraInput').click()"
+                                            class="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-lg flex flex-col items-center justify-center">
+                                            <i class="fas fa-camera text-xl mb-2"></i>
+                                            <span>拍照上傳</span>
+                                            <span class="text-xs mt-1 opacity-90">(使用手機相機)</span>
+                                        </button>
+                                        <p class="text-xs text-gray-500 mt-1">使用原生相機App，高畫質</p>
+                                    </div>
+
+                                    <!-- 從相簿選擇 -->
+                                    <div class="text-center">
+                                        <input type="file" id="fileInput" accept="image/*" class="hidden"
+                                            onchange="handleFileSelect(event)" multiple>
+                                        <button type="button" onclick="document.getElementById('fileInput').click()"
+                                            class="w-full bg-secondary hover:bg-green-600 text-white py-3 rounded-lg flex flex-col items-center justify-center">
+                                            <i class="fas fa-images text-xl mb-2"></i>
+                                            <span>選擇檔案</span>
+                                            <span class="text-xs mt-1 opacity-90">(從相簿選擇)</span>
+                                        </button>
+                                        <p class="text-xs text-gray-500 mt-1">支援多選、現有照片</p>
+                                    </div>
+                                </div>
+
+                                <!-- WebRTC相機預覽方式 (備用方案) -->
+                                <div class="text-center mb-3">
+                                    <button type="button" onclick="startWebRTCCamera()"
+                                        class="w-full bg-gray-100 hover:bg-gray-200 border border-gray-300 text-gray-700 py-2 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-video mr-2"></i>
+                                        <span>即時相機預覽</span>
+                                    </button>
+                                    <p class="text-xs text-gray-500 mt-1">直接在瀏覽器內拍照 (限支援WebRTC裝置)</p>
+                                </div>
+                            </div>
+
+                            <!-- 附件清單 -->
+                            <div id="attachmentsContainer" class="space-y-3">
+                                <div class="text-center py-4 text-gray-500" id="noAttachmentsMessage">
+                                    <i class="fas fa-receipt text-3xl mb-2 opacity-50"></i>
+                                    <p>尚未添加任何憑證附件</p>
+                                    <p class="text-sm mt-1">請點擊上方按鈕拍照或選擇檔案</p>
+                                </div>
+                                <!-- 附件項目將動態添加至此 -->
+                            </div>
+
+                            <!-- 附件統計 -->
+                            <div class="mt-4 pt-3 border-t">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">附件總數:</span>
+                                    <span class="font-medium" id="attachmentCount">0 個檔案</span>
+                                </div>
+                                <div class="flex justify-between text-sm mt-1">
+                                    <span class="text-gray-600">總檔案大小:</span>
+                                    <span class="font-medium" id="totalFileSize">0 MB</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 快速科目選擇 -->
+                        <div class="bg-white rounded-xl shadow-sm border p-5">
+                            <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                                <i class="fas fa-bolt text-warning mr-2"></i> 快速科目選擇
+                            </h2>
+                            <div class="space-y-3">
+                                <button type="button" onclick="addQuickAccount('1120', '銀行存款', 'debit')"
+                                    class="w-full bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-3 text-left transition duration-200">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-medium">銀行存款</div>
+                                            <div class="text-sm text-gray-500">科目代碼: 1120</div>
+                                        </div>
+                                        <div class="text-blue-500 font-bold">借方</div>
+                                    </div>
+                                </button>
+
+                                <button type="button" onclick="addQuickAccount('4132', '音波拉提收入', 'credit')"
+                                    class="w-full bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-3 text-left transition duration-200">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-medium">音波拉提收入</div>
+                                            <div class="text-sm text-gray-500">科目代碼: 4132</div>
+                                        </div>
+                                        <div class="text-green-500 font-bold">貸方</div>
+                                    </div>
+                                </button>
+
+                                <button type="button" onclick="addQuickAccount('4210', '醫師診察費', 'credit')"
+                                    class="w-full bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-3 text-left transition duration-200">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-medium">醫師診察費</div>
+                                            <div class="text-sm text-gray-500">科目代碼: 4210</div>
+                                        </div>
+                                        <div class="text-green-500 font-bold">貸方</div>
+                                    </div>
+                                </button>
+
+                                <button type="button" onclick="addQuickAccount('5110', '藥品耗材成本', 'credit')"
+                                    class="w-full bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-3 text-left transition duration-200">
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-medium">藥品耗材成本</div>
+                                            <div class="text-sm text-gray-500">科目代碼: 5110</div>
+                                        </div>
+                                        <div class="text-green-500 font-bold">貸方</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：傳票明細 -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-xl shadow-sm border p-5 mb-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center">
+                                    <i class="fas fa-list-ol text-primary mr-2"></i> 傳票明細
+                                </h2>
+                                <button type="button" onclick="addNewDetail()"
+                                    class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg flex items-center">
+                                    <i class="fas fa-plus-circle mr-2"></i> 新增明細
+                                </button>
+                            </div>
+
+                            <!-- 傳票明細表格 -->
+                            <div class="overflow-x-auto scrollbar-thin mb-6">
+                                <table class="w-full" id="voucherDetailsTable">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="py-3 px-4 text-left text-gray-600 font-medium">會計科目</th>
+                                            <th class="py-3 px-4 text-left text-gray-600 font-medium">借方金額</th>
+                                            <th class="py-3 px-4 text-left text-gray-600 font-medium">貸方金額</th>
+                                            <th class="py-3 px-4 text-left text-gray-600 font-medium">說明</th>
+                                            <th class="py-3 px-4 text-left text-gray-600 font-medium">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="voucherDetailsBody">
+                                        <!-- 明細行將由JavaScript動態添加 -->
+                                    </tbody>
+                                    <tfoot class="bg-gray-50">
+                                        <tr>
+                                            <td class="py-3 px-4 font-bold">合計</td>
+                                            <td class="py-3 px-4 font-bold text-blue-600" id="totalDebit">NT$ 0</td>
+                                            <td class="py-3 px-4 font-bold text-green-600" id="totalCredit">NT$ 0</td>
+                                            <td class="py-3 px-4" colspan="2">
+                                                <span id="balanceStatus" class="text-sm font-medium"></span>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            <!-- 新增明細表單 -->
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4" id="newDetailForm">
+                                <h3 class="font-bold text-gray-700 mb-4 flex items-center">
+                                    <i class="fas fa-plus-circle text-primary mr-2"></i> 新增明細項目
+                                </h3>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <!-- 會計科目選擇 -->
+                                    <div>
+                                        <label for="accountSelect" class="block text-sm font-medium text-gray-700 mb-2">
+                                            會計科目 *
+                                        </label>
+                                        <div class="relative">
+                                            <select id="accountSelect"
+                                                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                                <option value="">選擇會計科目</option>
+                                                <optgroup label="資產類">
+                                                    <option value="1120">1120 - 銀行存款</option>
+                                                    <option value="1110">1110 - 庫存現金</option>
+                                                    <option value="1310">1310 - 藥品存貨</option>
+                                                </optgroup>
+                                                <optgroup label="收入類">
+                                                    <option value="4132">4132 - 音波拉提收入</option>
+                                                    <option value="4111">4111 - 肉毒桿菌收入</option>
+                                                    <option value="4121">4121 - 雷射療程收入</option>
+                                                    <option value="4210">4210 - 醫師診察費</option>
+                                                    <option value="4310">4310 - 護理服務費</option>
+                                                    <option value="4410">4410 - 保養品銷售收入</option>
+                                                </optgroup>
+                                                <optgroup label="成本類">
+                                                    <option value="5110">5110 - 藥品耗材成本</option>
+                                                    <option value="5120">5120 - 醫療耗材成本</option>
+                                                    <option value="5210">5210 - 保養品銷售成本</option>
+                                                </optgroup>
+                                                <optgroup label="費用類">
+                                                    <option value="6111">6111 - 醫師薪資</option>
+                                                    <option value="6210">6210 - 廣告費</option>
+                                                    <option value="6310">6310 - 租金支出</option>
+                                                </optgroup>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- 金額類型 -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            金額類型 *
+                                        </label>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <label class="relative flex cursor-pointer">
+                                                <input type="radio" name="amountType" value="debit" class="sr-only"
+                                                    checked>
+                                                <div
+                                                    class="w-full p-3 border border-blue-300 rounded-lg text-center transition-all duration-200 bg-blue-50">
+                                                    <div class="font-medium text-blue-600">借方</div>
+                                                    <div class="text-xs text-gray-500">增加資產/費用</div>
+                                                </div>
+                                                <div class="absolute top-2 right-2">
+                                                    <i class="fas fa-check-circle text-blue-500"></i>
+                                                </div>
+                                            </label>
+                                            <label class="relative flex cursor-pointer">
+                                                <input type="radio" name="amountType" value="credit" class="sr-only">
+                                                <div
+                                                    class="w-full p-3 border rounded-lg text-center transition-all duration-200 hover:bg-green-50">
+                                                    <div class="font-medium text-green-600">貸方</div>
+                                                    <div class="text-xs text-gray-500">增加收入/負債</div>
+                                                </div>
+                                                <div class="absolute top-2 right-2 hidden">
+                                                    <i class="fas fa-check-circle text-green-500"></i>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                    <!-- 金額輸入 -->
+                                    <div>
+                                        <label for="amount" class="block text-sm font-medium text-gray-700 mb-2">
+                                            金額 (NT$) *
+                                        </label>
+                                        <div class="relative">
+                                            <div class="absolute left-3 top-3 text-gray-500">NT$</div>
+                                            <input type="number" id="amount" min="0" step="1"
+                                                class="w-full pl-12 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                                placeholder="0">
+                                        </div>
+                                    </div>
+
+                                    <!-- 說明 -->
+                                    <div>
+                                        <label for="detailDescription"
+                                            class="block text-sm font-medium text-gray-700 mb-2">
+                                            說明
+                                        </label>
+                                        <input type="text" id="detailDescription"
+                                            class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                            placeholder="輸入說明...">
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" onclick="clearDetailForm()"
+                                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-200">
+                                        清空
+                                    </button>
+                                    <button type="button" onclick="addDetailToTable()"
+                                        class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg flex items-center">
+                                        <i class="fas fa-plus-circle mr-2"></i> 加入明細
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 底部操作按鈕 -->
+                        <div class="bg-white rounded-xl shadow-sm border p-5">
+                            <div class="flex flex-col md:flex-row justify-between items-center">
+                                <div class="mb-4 md:mb-0">
+                                    <div class="text-gray-600 mb-1">傳票狀態</div>
+                                    <div class="flex items-center">
+                                        <div class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
+                                        <span class="font-bold">草稿中</span>
+                                        <span class="ml-4 text-sm text-gray-500">最後儲存: <span
+                                                id="lastSaveTime">剛剛</span></span>
+                                    </div>
+                                </div>
+
+                                <div class="flex space-x-3">
+                                    <button type="button" onclick="saveAsDraft()"
+                                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-200 flex items-center">
+                                        <i class="far fa-save mr-2"></i> 暫存草稿
+                                    </button>
+                                    <button type="button" onclick="previewVoucher()"
+                                        class="px-6 py-3 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition duration-200 flex items-center">
+                                        <i class="far fa-eye mr-2"></i> 預覽傳票
+                                    </button>
+                                    <button type="button" onclick="submitVoucher()"
+                                        class="bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg flex items-center">
+                                        <i class="fas fa-check-circle mr-2"></i> 確認建立傳票
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部資訊 -->
+        <footer class="bg-white border-t mt-8">
+            <div class="px-6 py-4">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <div class="text-gray-500 text-sm">
+                        <p>© 2024 醫美診所傳票管理系統 | 版本 2.1.0</p>
+                    </div>
+                    <div class="flex space-x-6 mt-2 md:mt-0">
+                        <a href="#" class="text-gray-500 hover:text-primary text-sm">
+                            <i class="fas fa-question-circle mr-1"></i> 使用說明
+                        </a>
+                        <a href="#" class="text-gray-500 hover:text-primary text-sm">
+                            <i class="fas fa-history mr-1"></i> 操作記錄
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 預覽模態窗 -->
+    <div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">傳票預覽</h2>
+                    <button type="button" onclick="closePreview()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto max-h-[70vh]">
+                <!-- 預覽內容將由JavaScript動態產生 -->
+                <div id="previewContent"></div>
+            </div>
+            <div class="p-6 border-t">
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="closePreview()"
+                        class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                        關閉
+                    </button>
+                    <button type="button" onclick="printPreview()"
+                        class="bg-primary hover:bg-primary-dark text-white px-6 py-2 rounded-lg">
+                        <i class="fas fa-print mr-2"></i> 列印
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebRTC相機預覽模態窗 -->
+    <div id="cameraPreview" class="fixed inset-0 bg-black z-50 hidden">
+        <div class="relative w-full h-full flex flex-col items-center justify-center">
+            <video id="cameraStream" autoplay playsinline class="w-full max-w-2xl"></video>
+
+            <!-- 裁切區域指示器 -->
+            <div id="cropArea" class="crop-area hidden"
+                style="width: 300px; height: 200px; top: 50%; left: 50%; transform: translate(-50%, -50%);"></div>
+
+            <div class="camera-controls">
+                <button class="camera-btn close-camera-btn" onclick="closeWebRTCCamera()" title="關閉相機">
+                    <i class="fas fa-times"></i>
+                </button>
+                <button class="camera-btn capture-btn" onclick="captureFromWebRTC()" title="拍照">
+                    <i class="fas fa-camera"></i>
+                </button>
+                <button class="camera-btn close-camera-btn" onclick="toggleCropArea()" title="切換裁切模式">
+                    <i class="fas fa-crop"></i>
+                </button>
+            </div>
+
+            <div class="mt-4 text-white text-sm">
+                <p>請對準憑證，確保四角清晰可見</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化變數
+        let detailCounter = 0;
+        let voucherDetails = [];
+        let attachments = [];
+        let mediaStream = null;
+        let isCropping = false;
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function () {
+            // 更新當前日期
+            const now = new Date();
+            const dateString = now.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('currentDate').textContent = dateString;
+
+            // 設定傳票日期為今天
+            const today = now.toISOString().split('T')[0];
+            document.getElementById('voucherDate').value = today;
+
+            // 更新傳票編號
+            updateVoucherNumber();
+
+            // 初始化傳票類型選擇
+            initVoucherTypeSelection();
+
+            // 初始化金額類型選擇
+            initAmountTypeSelection();
+
+            // 預設新增一筆明細
+            addNewDetail();
+
+            // 自動儲存檢查
+            startAutoSave();
+        });
+
+        // ========== 附件管理功能 ==========
+
+        // 處理相機拍攝（使用 de facto standard: input capture="environment"）
+        function handleCameraCapture(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    processAndAddAttachment(file, '相機拍攝');
+                });
+
+                // 重置input以便再次使用
+                event.target.value = '';
+            }
+        }
+
+        // 處理檔案選擇
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length > 0) {
+                Array.from(files).forEach(file => {
+                    processAndAddAttachment(file, '檔案上傳');
+                });
+
+                // 重置input以便再次使用
+                event.target.value = '';
+            }
+        }
+
+        // 處理並添加附件
+        function processAndAddAttachment(file, source) {
+            // 檢查檔案類型
+            if (!file.type.startsWith('image/')) {
+                showToast('只能上傳圖片檔案', 'warning');
+                return;
+            }
+
+            // 檢查檔案大小（限制5MB）
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('檔案大小不能超過5MB', 'warning');
+                return;
+            }
+
+            // 建立預覽
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const attachment = {
+                    id: Date.now() + Math.random(),
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    source: source,
+                    dataUrl: e.target.result,
+                    timestamp: new Date().toLocaleString('zh-TW'),
+                    file: file
+                };
+
+                attachments.push(attachment);
+                updateAttachmentsDisplay();
+                showToast(`已添加附件: ${file.name}`, 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 更新附件顯示
+        function updateAttachmentsDisplay() {
+            const container = document.getElementById('attachmentsContainer');
+            const noAttachmentsMsg = document.getElementById('noAttachmentsMessage');
+
+            if (attachments.length === 0) {
+                noAttachmentsMsg.classList.remove('hidden');
+                container.innerHTML = '';
+                container.appendChild(noAttachmentsMsg);
+            } else {
+                noAttachmentsMsg.classList.add('hidden');
+
+                let html = '';
+                attachments.forEach((attachment, index) => {
+                    const sizeMB = (attachment.size / (1024 * 1024)).toFixed(2);
+
+                    html += `
+                        <div class="bg-gray-50 border rounded-lg p-3" id="attachment-${attachment.id}">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <div class="font-medium truncate max-w-xs">${attachment.name}</div>
+                                    <div class="text-xs text-gray-500 mt-1">
+                                        <span>${attachment.timestamp}</span>
+                                        <span class="mx-2">•</span>
+                                        <span>${sizeMB} MB</span>
+                                        <span class="mx-2">•</span>
+                                        <span>${attachment.source}</span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button type="button" onclick="previewAttachment(${index})" 
+                                            class="text-info hover:text-blue-700" title="預覽">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" onclick="removeAttachment('${attachment.id}')" 
+                                            class="text-danger hover:text-red-700" title="刪除">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <img src="${attachment.dataUrl}" alt="${attachment.name}" 
+                                     class="w-full h-32 object-contain bg-white border rounded">
+                            </div>
+
+                            <div class="mt-2 flex justify-between items-center">
+                                <div class="text-xs text-gray-500">
+                                    <i class="fas fa-image mr-1"></i> 憑證圖片
+                                </div>
+                                <div class="text-xs">
+                                    <button type="button" onclick="enhanceImage(${index})" 
+                                            class="text-primary hover:text-primary-dark">
+                                        <i class="fas fa-magic mr-1"></i> 影像增強
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            // 更新統計資訊
+            updateAttachmentStats();
+        }
+
+        // 更新附件統計
+        function updateAttachmentStats() {
+            const totalSize = attachments.reduce((sum, att) => sum + att.size, 0);
+            const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+
+            document.getElementById('attachmentCount').textContent = `${attachments.length} 個檔案`;
+            document.getElementById('totalFileSize').textContent = `${sizeMB} MB`;
+        }
+
+        // 移除附件
+        function removeAttachment(id) {
+            attachments = attachments.filter(att => att.id !== id);
+            updateAttachmentsDisplay();
+            showToast('附件已移除', 'warning');
+        }
+
+        // 預覽附件
+        function previewAttachment(index) {
+            const attachment = attachments[index];
+
+            const previewHTML = `
+                <div class="bg-white p-4 rounded-lg">
+                    <div class="text-center mb-4">
+                        <h3 class="text-lg font-bold">${attachment.name}</h3>
+                        <div class="text-sm text-gray-500 mt-1">
+                            ${attachment.timestamp} • ${(attachment.size / (1024 * 1024)).toFixed(2)} MB • ${attachment.source}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center mb-4">
+                        <img src="${attachment.dataUrl}" alt="${attachment.name}" 
+                             class="max-w-full max-h-[60vh] object-contain border rounded">
+                    </div>
+
+                    <div class="text-center">
+                        <button type="button" onclick="downloadAttachment(${index})"
+                                class="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg mr-2">
+                            <i class="fas fa-download mr-2"></i> 下載
+                        </button>
+                        <button type="button" onclick="printAttachment(${index})"
+                                class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg">
+                            <i class="fas fa-print mr-2"></i> 列印
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // 使用現有預覽模態窗
+            document.getElementById('previewContent').innerHTML = previewHTML;
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+
+        // 下載附件
+        function downloadAttachment(index) {
+            const attachment = attachments[index];
+            const link = document.createElement('a');
+            link.href = attachment.dataUrl;
+            link.download = attachment.name;
+            link.click();
+        }
+
+        // 列印附件
+        function printAttachment(index) {
+            const attachment = attachments[index];
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>列印憑證 - ${attachment.name}</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            .header { text-align: center; margin-bottom: 20px; }
+                            .image-container { text-align: center; margin: 20px 0; }
+                            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+                            img { max-width: 100%; max-height: 70vh; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <h2>醫美診所傳票憑證</h2>
+                            <p>${attachment.name}</p>
+                            <p>${attachment.timestamp}</p>
+                        </div>
+                        <div class="image-container">
+                            <img src="${attachment.dataUrl}" alt="${attachment.name}">
+                        </div>
+                        <div class="footer">
+                            <p>列印時間: ${new Date().toLocaleString('zh-TW')}</p>
+                            <p>系統自動產生 - 醫美診所傳票管理系統</p>
+                        </div>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // 影像增強（模擬功能）
+        function enhanceImage(index) {
+            const attachment = attachments[index];
+
+            // 模擬影像處理
+            showToast('影像增強處理中...', 'info');
+
+            setTimeout(() => {
+                // 這裡可以添加實際的影像處理邏輯
+                // 例如使用Canvas進行對比度調整、銳化等
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    // 簡單的影像增強：調整對比度和亮度
+                    ctx.drawImage(img, 0, 0);
+
+                    // 應用影像濾鏡
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+
+                    // 簡單的對比度增強
+                    for (let i = 0; i < data.length; i += 4) {
+                        // 調整對比度
+                        const factor = 1.2;
+                        data[i] = (data[i] - 128) * factor + 128; // R
+                        data[i + 1] = (data[i + 1] - 128) * factor + 128; // G
+                        data[i + 2] = (data[i + 2] - 128) * factor + 128; // B
+                    }
+
+                    ctx.putImageData(imageData, 0, 0);
+
+                    // 更新附件
+                    attachment.dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                    updateAttachmentsDisplay();
+                    showToast('影像增強完成', 'success');
+                };
+                img.src = attachment.dataUrl;
+            }, 1000);
+        }
+
+        // ========== WebRTC相機功能 ==========
+
+        // 啟動WebRTC相機
+        async function startWebRTCCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: "environment", // 使用後置鏡頭
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                };
+
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+                const cameraPreview = document.getElementById('cameraPreview');
+                const videoElement = document.getElementById('cameraStream');
+
+                videoElement.srcObject = mediaStream;
+                cameraPreview.classList.remove('hidden');
+
+                // 確保影片元素正確顯示
+                videoElement.onloadedmetadata = function () {
+                    videoElement.play();
+                };
+
+            } catch (error) {
+                console.error('無法訪問相機:', error);
+                showToast('無法訪問相機，請檢查權限設定', 'danger');
+
+                // 回退到標準方法
+                document.getElementById('cameraInput').click();
+            }
+        }
+
+        // 關閉WebRTC相機
+        function closeWebRTCCamera() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+                mediaStream = null;
+            }
+
+            document.getElementById('cameraPreview').classList.add('hidden');
+            document.getElementById('cropArea').classList.add('hidden');
+            isCropping = false;
+        }
+
+        // 從WebRTC拍照
+        function captureFromWebRTC() {
+            const video = document.getElementById('cameraStream');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // 設定Canvas尺寸
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // 裁切邏輯
+            if (isCropping) {
+                const cropArea = document.getElementById('cropArea');
+                const rect = cropArea.getBoundingClientRect();
+                const videoRect = video.getBoundingClientRect();
+
+                // 計算裁切區域
+                const scaleX = video.videoWidth / videoRect.width;
+                const scaleY = video.videoHeight / videoRect.height;
+
+                const cropX = (rect.left - videoRect.left) * scaleX;
+                const cropY = (rect.top - videoRect.top) * scaleY;
+                const cropWidth = rect.width * scaleX;
+                const cropHeight = rect.height * scaleY;
+
+                // 裁切並繪製
+                ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+                // 更新Canvas尺寸為裁切後的尺寸
+                canvas.width = cropWidth;
+                canvas.height = cropHeight;
+            } else {
+                // 完整拍攝
+                ctx.drawImage(video, 0, 0);
+            }
+
+            // 轉換為Blob
+            canvas.toBlob(function (blob) {
+                const file = new File([blob], `憑證_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.jpg`, {
+                    type: 'image/jpeg'
+                });
+
+                processAndAddAttachment(file, '即時拍攝');
+                closeWebRTCCamera();
+            }, 'image/jpeg', 0.9);
+        }
+
+        // 切換裁切模式
+        function toggleCropArea() {
+            const cropArea = document.getElementById('cropArea');
+            isCropping = !isCropping;
+
+            if (isCropping) {
+                cropArea.classList.remove('hidden');
+            } else {
+                cropArea.classList.add('hidden');
+            }
+        }
+
+        // ========== 原始功能保持不變 ==========
+
+        // 更新傳票編號
+        function updateVoucherNumber() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+
+            // 根據傳票類型更新編號前綴
+            const voucherType = document.querySelector('input[name="voucherType"]:checked').value;
+            let prefix = 'REV';
+
+            switch (voucherType) {
+                case 'expense': prefix = 'EXP'; break;
+                case 'transfer': prefix = 'TRA'; break;
+                case 'adjustment': prefix = 'ADJ'; break;
+                default: prefix = 'REV';
+            }
+
+            // 產生隨機序號
+            const randomNum = Math.floor(Math.random() * 999) + 1;
+            const sequence = String(randomNum).padStart(3, '0');
+
+            const voucherNumber = `${prefix}-${year}${month}${day}-${sequence}`;
+            document.getElementById('voucherNumber').textContent = voucherNumber;
+
+            // 添加動畫效果
+            const voucherNumberElement = document.getElementById('voucherNumber');
+            voucherNumberElement.classList.add('pulse-gentle');
+            setTimeout(() => {
+                voucherNumberElement.classList.remove('pulse-gentle');
+            }, 1000);
+        }
+
+        // 初始化傳票類型選擇
+        function initVoucherTypeSelection() {
+            const voucherTypeOptions = document.querySelectorAll('input[name="voucherType"]');
+
+            voucherTypeOptions.forEach(option => {
+                option.addEventListener('change', function () {
+                    // 更新所有選項的視覺狀態
+                    document.querySelectorAll('.income-option, .expense-option, .transfer-option, .adjustment-option').forEach(el => {
+                        el.classList.remove('border-primary', 'border-2');
+                        el.classList.add('border-gray-300');
+                    });
+
+                    // 更新選中選項
+                    const selectedOption = document.querySelector(`.${this.value}-option`);
+                    selectedOption.classList.add('border-primary', 'border-2');
+                    selectedOption.classList.remove('border-gray-300');
+
+                    // 更新勾選圖標
+                    document.querySelectorAll('.relative.flex.cursor-pointer .absolute i').forEach(el => {
+                        el.classList.add('hidden');
+                    });
+
+                    const checkIcon = selectedOption.parentElement.querySelector('.absolute i');
+                    if (checkIcon) {
+                        checkIcon.classList.remove('hidden');
+                    }
+
+                    // 更新傳票編號
+                    updateVoucherNumber();
+
+                    // 根據傳票類型更新相關項目顯示
+                    updateRelatedFields();
+                });
+            });
+
+            // 預設選中收入傳票
+            document.querySelector('input[name="voucherType"][value="income"]').checked = true;
+            document.querySelector('.income-option').classList.add('border-primary', 'border-2');
+            document.querySelector('.income-option').classList.remove('border-gray-300');
+            document.querySelector('.income-option').parentElement.querySelector('.absolute i').classList.remove('hidden');
+        }
+
+        // 初始化金額類型選擇
+        function initAmountTypeSelection() {
+            const amountTypeOptions = document.querySelectorAll('input[name="amountType"]');
+
+            amountTypeOptions.forEach(option => {
+                option.addEventListener('change', function () {
+                    // 更新所有選項的視覺狀態
+                    document.querySelectorAll('input[name="amountType"]').forEach(input => {
+                        const parentDiv = input.parentElement.querySelector('div');
+                        if (input.value === 'debit') {
+                            parentDiv.classList.remove('border-green-300', 'bg-green-50');
+                            parentDiv.classList.add('border-gray-300');
+                        } else {
+                            parentDiv.classList.remove('border-blue-300', 'bg-blue-50');
+                            parentDiv.classList.add('border-gray-300');
+                        }
+                    });
+
+                    // 更新選中選項
+                    const selectedDiv = this.parentElement.querySelector('div');
+                    if (this.value === 'debit') {
+                        selectedDiv.classList.add('border-blue-300', 'bg-blue-50');
+                        selectedDiv.classList.remove('border-gray-300');
+                    } else {
+                        selectedDiv.classList.add('border-green-300', 'bg-green-50');
+                        selectedDiv.classList.remove('border-gray-300');
+                    }
+
+                    // 更新勾選圖標
+                    document.querySelectorAll('input[name="amountType"]').forEach(input => {
+                        const checkIcon = input.parentElement.querySelector('.absolute i');
+                        if (checkIcon) {
+                            checkIcon.classList.add('hidden');
+                        }
+                    });
+
+                    const checkIcon = this.parentElement.querySelector('.absolute i');
+                    if (checkIcon) {
+                        checkIcon.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // 預設選中借方
+            document.querySelector('input[name="amountType"][value="debit"]').checked = true;
+            document.querySelector('input[name="amountType"][value="debit"]').parentElement.querySelector('div').classList.add('border-blue-300', 'bg-blue-50');
+            document.querySelector('input[name="amountType"][value="debit"]').parentElement.querySelector('.absolute i').classList.remove('hidden');
+        }
+
+        // 根據傳票類型更新相關項目顯示
+        function updateRelatedFields() {
+            const voucherType = document.querySelector('input[name="voucherType"]:checked').value;
+            const relatedTypeSelect = document.getElementById('relatedType');
+            const relatedSearchContainer = document.getElementById('relatedSearchContainer');
+
+            // 根據傳票類型顯示不同的關聯類型選項
+            switch (voucherType) {
+                case 'income':
+                    relatedTypeSelect.innerHTML = `
+                        <option value="">選擇關聯類型</option>
+                        <option value="service" selected>療程服務</option>
+                        <option value="product">產品銷售</option>
+                    `;
+                    document.getElementById('relatedSearch').placeholder = "搜尋療程或銷售單...";
+                    break;
+
+                case 'expense':
+                    relatedTypeSelect.innerHTML = `
+                        <option value="">選擇關聯類型</option>
+                        <option value="purchase" selected>進貨單</option>
+                        <option value="expense">費用申請</option>
+                    `;
+                    document.getElementById('relatedSearch').placeholder = "搜尋進貨單或費用申請...";
+                    break;
+
+                case 'transfer':
+                    relatedTypeSelect.innerHTML = `
+                        <option value="">選擇關聯類型</option>
+                        <option value="transfer" selected>銀行轉帳</option>
+                    `;
+                    document.getElementById('relatedSearch').placeholder = "搜尋轉帳記錄...";
+                    break;
+
+                default:
+                    relatedTypeSelect.innerHTML = `
+                        <option value="">選擇關聯類型</option>
+                        <option value="adjustment" selected>調整記錄</option>
+                    `;
+                    document.getElementById('relatedSearch').placeholder = "搜尋調整記錄...";
+            }
+        }
+
+        // 清空關聯項目
+        function clearRelated() {
+            document.getElementById('relatedInfo').classList.add('hidden');
+            document.getElementById('relatedSearch').value = '';
+        }
+
+        // 新增明細表單
+        function addNewDetail() {
+            // 滾動到新增明細表單
+            document.getElementById('newDetailForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 加入快速科目
+        function addQuickAccount(accountCode, accountName, type) {
+            // 設置科目選擇
+            document.getElementById('accountSelect').value = accountCode;
+
+            // 設置金額類型
+            if (type === 'debit') {
+                document.querySelector('input[name="amountType"][value="debit"]').checked = true;
+                document.querySelector('input[name="amountType"][value="debit"]').click();
+            } else {
+                document.querySelector('input[name="amountType"][value="credit"]').checked = true;
+                document.querySelector('input[name="amountType"][value="credit"]').click();
+            }
+
+            // 設置說明
+            document.getElementById('detailDescription').value = accountName;
+
+            // 聚焦到金額輸入框
+            document.getElementById('amount').focus();
+
+            // 滾動到新增明細表單
+            document.getElementById('newDetailForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 清空明細表單
+        function clearDetailForm() {
+            document.getElementById('accountSelect').value = '';
+            document.getElementById('amount').value = '';
+            document.getElementById('detailDescription').value = '';
+            document.querySelector('input[name="amountType"][value="debit"]').checked = true;
+            document.querySelector('input[name="amountType"][value="debit"]').click();
+        }
+
+        // 加入明細到表格
+        function addDetailToTable() {
+            // 獲取表單值
+            const accountCode = document.getElementById('accountSelect').value;
+            const accountName = getAccountName(accountCode);
+            const amountType = document.querySelector('input[name="amountType"]:checked').value;
+            const amount = document.getElementById('amount').value;
+            const description = document.getElementById('detailDescription').value;
+
+            // 驗證輸入
+            if (!accountCode) {
+                alert('請選擇會計科目');
+                return;
+            }
+
+            if (!amount || amount <= 0) {
+                alert('請輸入有效金額');
+                return;
+            }
+
+            // 建立明細對象
+            const detail = {
+                id: ++detailCounter,
+                accountCode: accountCode,
+                accountName: accountName,
+                amountType: amountType,
+                amount: parseFloat(amount),
+                description: description || accountName
+            };
+
+            // 添加到數組
+            voucherDetails.push(detail);
+
+            // 更新表格
+            updateDetailsTable();
+
+            // 清空表單
+            clearDetailForm();
+
+            // 顯示成功訊息
+            showToast('明細已加入', 'success');
+        }
+
+        // 根據科目代碼獲取科目名稱
+        function getAccountName(accountCode) {
+            const accountMap = {
+                '1120': '銀行存款',
+                '1110': '庫存現金',
+                '1310': '藥品存貨',
+                '4132': '音波拉提收入',
+                '4111': '肉毒桿菌收入',
+                '4121': '雷射療程收入',
+                '4210': '醫師診察費',
+                '4310': '護理服務費',
+                '4410': '保養品銷售收入',
+                '5110': '藥品耗材成本',
+                '5120': '醫療耗材成本',
+                '5210': '保養品銷售成本',
+                '6111': '醫師薪資',
+                '6210': '廣告費',
+                '6310': '租金支出'
+            };
+
+            return accountMap[accountCode] || '未知科目';
+        }
+
+        // 更新明細表格
+        function updateDetailsTable() {
+            const tbody = document.getElementById('voucherDetailsBody');
+            tbody.innerHTML = '';
+
+            let totalDebit = 0;
+            let totalCredit = 0;
+
+            voucherDetails.forEach(detail => {
+                const debitAmount = detail.amountType === 'debit' ? detail.amount : 0;
+                const creditAmount = detail.amountType === 'credit' ? detail.amount : 0;
+
+                totalDebit += debitAmount;
+                totalCredit += creditAmount;
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="py-3 px-4">
+                        <div class="font-medium">${detail.accountName}</div>
+                        <div class="text-sm text-gray-500">${detail.accountCode}</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        ${debitAmount > 0 ? `<div class="font-bold text-blue-600">NT$ ${debitAmount.toLocaleString()}</div>` : ''}
+                    </td>
+                    <td class="py-3 px-4">
+                        ${creditAmount > 0 ? `<div class="font-bold text-green-600">NT$ ${creditAmount.toLocaleString()}</div>` : ''}
+                    </td>
+                    <td class="py-3 px-4">${detail.description}</td>
+                    <td class="py-3 px-4">
+                        <button type="button" onclick="removeDetail(${detail.id})" class="text-danger hover:text-red-700">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+            // 更新總計
+            document.getElementById('totalDebit').textContent = `NT$ ${totalDebit.toLocaleString()}`;
+            document.getElementById('totalCredit').textContent = `NT$ ${totalCredit.toLocaleString()}`;
+
+            // 更新平衡狀態
+            const balanceStatus = document.getElementById('balanceStatus');
+            if (Math.abs(totalDebit - totalCredit) < 0.01) {
+                balanceStatus.innerHTML = '<span class="text-green-600"><i class="fas fa-check-circle mr-1"></i> 已平衡</span>';
+            } else {
+                const difference = Math.abs(totalDebit - totalCredit);
+                balanceStatus.innerHTML = `<span class="text-danger"><i class="fas fa-exclamation-triangle mr-1"></i> 不平衡 (差異: NT$ ${difference.toLocaleString()})</span>`;
+            }
+        }
+
+        // 移除明細
+        function removeDetail(id) {
+            voucherDetails = voucherDetails.filter(detail => detail.id !== id);
+            updateDetailsTable();
+            showToast('明細已移除', 'warning');
+        }
+
+        // 暫存草稿
+        function saveAsDraft() {
+            // 在這裡實現儲存草稿的邏輯
+            showToast('傳票已暫存為草稿', 'info');
+            updateLastSaveTime();
+        }
+
+        // 預覽傳票（擴充版，包含附件資訊）
+        function previewVoucher() {
+            if (voucherDetails.length === 0) {
+                alert('請至少添加一筆傳票明細');
+                return;
+            }
+
+            const totalDebit = voucherDetails.reduce((sum, detail) => {
+                return sum + (detail.amountType === 'debit' ? detail.amount : 0);
+            }, 0);
+
+            const totalCredit = voucherDetails.reduce((sum, detail) => {
+                return sum + (detail.amountType === 'credit' ? detail.amount : 0);
+            }, 0);
+
+            // 建立預覽內容
+            let previewHTML = `
+                <div class="bg-white p-6 border rounded-lg">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-bold">醫美診所傳票預覽</h2>
+                        <div class="text-lg text-gray-600 mt-2">${document.getElementById('voucherNumber').textContent}</div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="font-bold text-gray-700 mb-3">基本資訊</h3>
+                            <div class="space-y-2">
+                                <div class="flex">
+                                    <div class="w-1/3 text-gray-600">傳票類型:</div>
+                                    <div class="font-medium">${getVoucherTypeName()}</div>
+                                </div>
+                                <div class="flex">
+                                    <div class="w-1/3 text-gray-600">傳票日期:</div>
+                                    <div class="font-medium">${document.getElementById('voucherDate').value}</div>
+                                </div>
+                                <div class="flex">
+                                    <div class="w-1/3 text-gray-600">傳票說明:</div>
+                                    <div class="font-medium">${document.getElementById('description').value || '無'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-gray-700 mb-3">金額總計</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <div class="text-gray-600">借方總計:</div>
+                                    <div class="font-bold text-blue-600">NT$ ${totalDebit.toLocaleString()}</div>
+                                </div>
+                                <div class="flex justify-between">
+                                    <div class="text-gray-600">貸方總計:</div>
+                                    <div class="font-bold text-green-600">NT$ ${totalCredit.toLocaleString()}</div>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t">
+                                    <div class="font-bold">平衡狀態:</div>
+                                    <div class="font-bold ${Math.abs(totalDebit - totalCredit) < 0.01 ? 'text-green-600' : 'text-danger'}">
+                                        ${Math.abs(totalDebit - totalCredit) < 0.01 ? '已平衡' : '不平衡'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-bold text-gray-700 mb-3">傳票明細</h3>
+                    <div class="overflow-x-auto mb-6">
+                        <table class="w-full border">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-2 px-4 text-left border">會計科目</th>
+                                    <th class="py-2 px-4 text-left border">科目代碼</th>
+                                    <th class="py-2 px-4 text-left border">借方金額</th>
+                                    <th class="py-2 px-4 text-left border">貸方金額</th>
+                                    <th class="py-2 px-4 text-left border">說明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            `;
+
+            voucherDetails.forEach(detail => {
+                const debitAmount = detail.amountType === 'debit' ? detail.amount : 0;
+                const creditAmount = detail.amountType === 'credit' ? detail.amount : 0;
+
+                previewHTML += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="py-2 px-4 border">${detail.accountName}</td>
+                        <td class="py-2 px-4 border font-mono">${detail.accountCode}</td>
+                        <td class="py-2 px-4 border">${debitAmount > 0 ? `NT$ ${debitAmount.toLocaleString()}` : ''}</td>
+                        <td class="py-2 px-4 border">${creditAmount > 0 ? `NT$ ${creditAmount.toLocaleString()}` : ''}</td>
+                        <td class="py-2 px-4 border">${detail.description}</td>
+                    </tr>
+                `;
+            });
+
+            previewHTML += `
+                            </tbody>
+                            <tfoot class="bg-gray-50">
+                                <tr>
+                                    <td class="py-2 px-4 border font-bold" colspan="2">合計</td>
+                                    <td class="py-2 px-4 border font-bold text-blue-600">NT$ ${totalDebit.toLocaleString()}</td>
+                                    <td class="py-2 px-4 border font-bold text-green-600">NT$ ${totalCredit.toLocaleString()}</td>
+                                    <td class="py-2 px-4 border"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- 附件預覽區 -->
+                    <h3 class="font-bold text-gray-700 mb-3">憑證附件 (${attachments.length} 個)</h3>
+            `;
+
+            if (attachments.length > 0) {
+                previewHTML += `
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                `;
+
+                attachments.slice(0, 4).forEach((att, index) => {
+                    previewHTML += `
+                        <div class="border rounded-lg p-3">
+                            <div class="font-medium truncate mb-2">${att.name}</div>
+                            <img src="${att.dataUrl}" alt="${att.name}" 
+                                 class="w-full h-32 object-cover rounded mb-2">
+                            <div class="text-xs text-gray-500">
+                                ${att.timestamp} • ${(att.size / (1024 * 1024)).toFixed(2)} MB
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if (attachments.length > 4) {
+                    previewHTML += `
+                        <div class="border rounded-lg p-3 flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-images text-3xl text-gray-400 mb-2"></i>
+                                <div class="font-medium">還有 ${attachments.length - 4} 個附件</div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                previewHTML += `</div>`;
+            } else {
+                previewHTML += `
+                    <div class="bg-gray-50 border rounded-lg p-6 text-center mb-6">
+                        <i class="fas fa-receipt text-4xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-500">無附件憑證</p>
+                    </div>
+                `;
+            }
+
+            previewHTML += `
+                    <div class="mt-6 pt-4 border-t text-sm text-gray-500">
+                        <p>預覽時間: ${new Date().toLocaleString('zh-TW')}</p>
+                        <p>建立人員: 張美華 (會計)</p>
+                        <p>附件總數: ${attachments.length} 個檔案</p>
+                    </div>
+                </div>
+            `;
+
+            // 顯示預覽模態窗
+            document.getElementById('previewContent').innerHTML = previewHTML;
+            document.getElementById('previewModal').classList.remove('hidden');
+        }
+
+        // 獲取傳票類型名稱
+        function getVoucherTypeName() {
+            const voucherType = document.querySelector('input[name="voucherType"]:checked').value;
+            const typeNames = {
+                'income': '收入傳票',
+                'expense': '支出傳票',
+                'transfer': '轉帳傳票',
+                'adjustment': '調整傳票'
+            };
+            return typeNames[voucherType] || '未知類型';
+        }
+
+        // 關閉預覽
+        function closePreview() {
+            document.getElementById('previewModal').classList.add('hidden');
+        }
+
+        // 列印預覽
+        function printPreview() {
+            window.print();
+        }
+
+        // 提交傳票（擴充版，包含附件）
+        function submitVoucher() {
+            // 驗證傳票
+            if (!validateVoucher()) {
+                return;
+            }
+
+            // 確認提交
+            if (confirm('確定要建立此傳票嗎？建立後將無法修改。')) {
+                // 在這裡實現提交傳票的邏輯，包括附件
+                // 可以將attachments陣列與voucherDetails一起提交到伺服器
+
+                const voucherData = {
+                    voucherNumber: document.getElementById('voucherNumber').textContent,
+                    voucherType: document.querySelector('input[name="voucherType"]:checked').value,
+                    voucherDate: document.getElementById('voucherDate').value,
+                    description: document.getElementById('description').value,
+                    details: voucherDetails,
+                    attachments: attachments.map(att => ({
+                        name: att.name,
+                        size: att.size,
+                        type: att.type,
+                        source: att.source
+                    })),
+                    createdBy: '張美華',
+                    timestamp: new Date().toISOString()
+                };
+
+                console.log('傳票資料準備提交:', voucherData);
+
+                showToast('傳票已成功建立', 'success');
+
+                // 延遲後跳轉到傳票列表
+                setTimeout(() => {
+                    window.location.href = 'voucher_main.html';
+                }, 1500);
+            }
+        }
+
+        // 驗證傳票（擴充版）
+        function validateVoucher() {
+            // 檢查是否有明細
+            if (voucherDetails.length === 0) {
+                alert('請至少添加一筆傳票明細');
+                return false;
+            }
+
+            // 檢查借貸平衡
+            const totalDebit = voucherDetails.reduce((sum, detail) => {
+                return sum + (detail.amountType === 'debit' ? detail.amount : 0);
+            }, 0);
+
+            const totalCredit = voucherDetails.reduce((sum, detail) => {
+                return sum + (detail.amountType === 'credit' ? detail.amount : 0);
+            }, 0);
+
+            if (Math.abs(totalDebit - totalCredit) > 0.01) {
+                alert('傳票借貸不平衡，請檢查金額輸入');
+                return false;
+            }
+
+            // 檢查傳票日期
+            const voucherDate = document.getElementById('voucherDate').value;
+            if (!voucherDate) {
+                alert('請選擇傳票日期');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 顯示提示訊息
+        function showToast(message, type = 'info') {
+            // 移除現有的toast
+            const existingToast = document.querySelector('.toast-message');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            // 建立toast元素
+            const toast = document.createElement('div');
+            toast.className = `toast-message fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${type === 'success' ? 'bg-green-500' :
+                type === 'warning' ? 'bg-yellow-500' :
+                    type === 'danger' ? 'bg-red-500' : 'bg-blue-500'
+                }`;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            // 3秒後移除toast
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // 更新最後儲存時間
+        function updateLastSaveTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-TW', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('lastSaveTime').textContent = timeString;
+        }
+
+        // 自動儲存功能
+        function startAutoSave() {
+            // 每2分鐘自動儲存一次
+            setInterval(() => {
+                if (voucherDetails.length > 0 || attachments.length > 0) {
+                    saveAsDraft();
+                }
+            }, 120000); // 2分鐘 = 120000毫秒
+        }
+
+        // 關聯項目搜尋模擬
+        document.getElementById('relatedSearch').addEventListener('input', function (e) {
+            if (e.target.value.length > 2) {
+                // 模擬搜尋結果
+                document.getElementById('relatedInfo').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

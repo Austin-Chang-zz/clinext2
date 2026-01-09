@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>銷售單</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <!-- Status Bar -->
+  <div class="bg-gray-50 px-4 py-2 flex items-center justify-between text-sm">
+    <div class="flex items-center gap-2">
+      <span>21:34</span>
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9V7h2v6z"/>
+      </svg>
+      <span>...</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M2 4h4v12H2V4zm6 0h4v12H8V4zm6 0h4v12h-4V4z"/>
+      </svg>
+      <div class="w-5 h-5 rounded-full border-2 border-black flex items-center justify-center">
+        <span class="text-xs font-bold">R</span>
+      </div>
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M2 4h4v12H2V4zm6 0h4v12H8V4zm6 0h4v12h-4V4z"/>
+      </svg>
+      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M2 6l6-4v12l-6-4V6zm8 0l6-4v12l-6-4V6z"/>
+      </svg>
+      <div class="px-2 py-0.5 border border-gray-400 rounded text-xs">61</div>
+      <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="bg-gray-50 px-4 py-4 flex items-center justify-between">
+    <button class="text-2xl font-light">✕</button>
+    <div class="flex items-center gap-2">
+      <h1 class="text-xl font-medium">銷售單</h1>
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
+      </svg>
+    </div>
+    <div class="w-6"></div>
+  </header>
+
+  <!-- Form Section -->
+  <main class="px-4 py-4 space-y-3">
+    <!-- Customer Field -->
+    <div class="bg-white rounded-lg px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-1">
+        <span class="text-red-500">*</span>
+        <span class="text-gray-800 text-base">客戶</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-600 text-base">零售客戶</span>
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Currency Field -->
+    <div class="bg-white rounded-lg px-4 py-4 flex items-center justify-between">
+      <span class="text-gray-800 text-base">貨幣</span>
+      <span class="text-gray-800 text-base">人民幣</span>
+    </div>
+
+    <!-- Time Field -->
+    <div class="bg-white rounded-lg px-4 py-4 flex items-center justify-between">
+      <span class="text-gray-800 text-base">時間</span>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-800 text-base">2025-12-24</span>
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Sales Person Field -->
+    <div class="bg-white rounded-lg px-4 py-4 flex items-center justify-between">
+      <span class="text-gray-800 text-base">業務員</span>
+      <div class="flex items-center gap-2">
+        <span class="text-gray-800 text-base">老閆</span>
+        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 pt-2">
+      <!-- Select Product Button -->
+      <button class="flex-1 bg-white rounded-lg px-4 py-4 flex items-center justify-center gap-2 text-cyan-500">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        <span class="font-medium">選擇商品</span>
+      </button>
+
+      <!-- Scan to Add Button -->
+      <button class="flex-1 bg-white rounded-lg px-4 py-4 flex items-center justify-center gap-2 text-cyan-500">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+        </svg>
+        <span class="font-medium">掃碼添加</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="fixed bottom-0 left-0 right-0 bg-black h-12 flex items-center justify-around">
+    <div class="w-10 h-1 bg-gray-600 rounded-full"></div>
+    <div class="w-12 h-12 rounded-full border-2 border-gray-400"></div>
+    <div class="w-0 h-0 border-l-8 border-l-transparent border-t-8 border-t-gray-400 border-r-8 border-r-transparent rotate-[-90deg]"></div>
+  </div>
+</body>
+</html>

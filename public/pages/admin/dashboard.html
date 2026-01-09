@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统管理员后台 - Clinext</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Tailwind CSS 核心样式 - 简化版 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f7fafc;
+            color: #4a5568;
+        }
+
+        /* 布局类 */
+        .flex {
+            display: flex;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .block {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+        }
+
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .flex-row {
+            flex-direction: row;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .justify-center {
+            justify-content: center;
+        }
+
+        .justify-around {
+            justify-content: space-around;
+        }
+
+        .flex-1 {
+            flex: 1;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .gap-1 {
+            gap: 0.25rem;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+
+        .gap-3 {
+            gap: 0.75rem;
+        }
+
+        .gap-4 {
+            gap: 1rem;
+        }
+
+        /* 间距类 */
+        .p-1 {
+            padding: 0.25rem;
+        }
+
+        .p-2 {
+            padding: 0.5rem;
+        }
+
+        .p-3 {
+            padding: 0.75rem;
+        }
+
+        .p-4 {
+            padding: 1rem;
+        }
+
+        .p-5 {
+            padding: 1.25rem;
+        }
+
+        .p-6 {
+            padding: 1.5rem;
+        }
+
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .px-3 {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+        }
+
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .px-5 {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+
+        .py-1 {
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .py-2 {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .py-3 {
+            padding-top: 0.75rem;
+            padding-bottom: 0.75rem;
+        }
+
+        .py-4 {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+
+        .py-5 {
+            padding-top: 1.25rem;
+            padding-bottom: 1.25rem;
+        }
+
+        .py-6 {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+
+        .mt-1 {
+            margin-top: 0.25rem;
+        }
+
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-3 {
+            margin-top: 0.75rem;
+        }
+
+        .mt-4 {
+            margin-top: 1rem;
+        }
+
+        .mt-6 {
+            margin-top: 1.5rem;
+        }
+
+        .mt-8 {
+            margin-top: 2rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 0.75rem;
+        }
+
+        .mb-4 {
+            margin-bottom: 1rem;
+        }
+
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-8 {
+            margin-bottom: 2rem;
+        }
+
+        .ml-1 {
+            margin-left: 0.25rem;
+        }
+
+        .ml-2 {
+            margin-left: 0.5rem;
+        }
+
+        .mr-1 {
+            margin-right: 0.25rem;
+        }
+
+        .mr-2 {
+            margin-right: 0.5rem;
+        }
+
+        /* 尺寸类 */
+        .w-full {
+            width: 100%;
+        }
+
+        .w-5 {
+            width: 1.25rem;
+        }
+
+        .w-6 {
+            width: 1.5rem;
+        }
+
+        .w-7 {
+            width: 1.75rem;
+        }
+
+        .w-8 {
+            width: 2rem;
+        }
+
+        .w-12 {
+            width: 3rem;
+        }
+
+        .w-14 {
+            width: 3.5rem;
+        }
+
+        .w-16 {
+            width: 4rem;
+        }
+
+        .w-20 {
+            width: 5rem;
+        }
+
+        .w-64 {
+            width: 16rem;
+        }
+
+        .w-72 {
+            width: 18rem;
+        }
+
+        .w-auto {
+            width: auto;
+        }
+
+        .h-5 {
+            height: 1.25rem;
+        }
+
+        .h-6 {
+            height: 1.5rem;
+        }
+
+        .h-7 {
+            height: 1.75rem;
+        }
+
+        .h-8 {
+            height: 2rem;
+        }
+
+        .h-12 {
+            height: 3rem;
+        }
+
+        .h-14 {
+            height: 3.5rem;
+        }
+
+        .h-16 {
+            height: 4rem;
+        }
+
+        .h-20 {
+            height: 5rem;
+        }
+
+        .h-64 {
+            height: 16rem;
+        }
+
+        .h-screen {
+            height: 100vh;
+        }
+
+        .min-h-screen {
+            min-height: 100vh;
+        }
+
+        /* 文本类 */
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        .text-sm {
+            font-size: 0.875rem;
+        }
+
+        .text-base {
+            font-size: 1rem;
+        }
+
+        .text-lg {
+            font-size: 1.125rem;
+        }
+
+        .text-xl {
+            font-size: 1.25rem;
+        }
+
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+
+        .text-3xl {
+            font-size: 1.875rem;
+        }
+
+        .font-normal {
+            font-weight: 400;
+        }
+
+        .font-medium {
+            font-weight: 500;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        .font-bold {
+            font-weight: 700;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-left {
+            text-align: left;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .tracking-wider {
+            letter-spacing: 0.05em;
+        }
+
+        /* 颜色类 */
+        .text-white {
+            color: white;
+        }
+
+        .text-gray-100 {
+            color: #f7fafc;
+        }
+
+        .text-gray-200 {
+            color: #edf2f7;
+        }
+
+        .text-gray-300 {
+            color: #e2e8f0;
+        }
+
+        .text-gray-400 {
+            color: #cbd5e0;
+        }
+
+        .text-gray-500 {
+            color: #a0aec0;
+        }
+
+        .text-gray-600 {
+            color: #718096;
+        }
+
+        .text-gray-700 {
+            color: #4a5568;
+        }
+
+        .text-gray-800 {
+            color: #2d3748;
+        }
+
+        .text-gray-900 {
+            color: #1a202c;
+        }
+
+        .text-blue-100 {
+            color: #ebf8ff;
+        }
+
+        .text-blue-200 {
+            color: #bee3f8;
+        }
+
+        .text-blue-300 {
+            color: #90cdf4;
+        }
+
+        .text-blue-400 {
+            color: #63b3ed;
+        }
+
+        .text-blue-500 {
+            color: #4299e1;
+        }
+
+        .text-blue-600 {
+            color: #3182ce;
+        }
+
+        .text-blue-700 {
+            color: #2b6cb0;
+        }
+
+        .text-blue-800 {
+            color: #2c5282;
+        }
+
+        .text-blue-900 {
+            color: #2a4365;
+        }
+
+        .text-green-100 {
+            color: #f0fff4;
+        }
+
+        .text-green-500 {
+            color: #48bb78;
+        }
+
+        .text-green-600 {
+            color: #38a169;
+        }
+
+        .text-green-700 {
+            color: #2f855a;
+        }
+
+        .text-green-800 {
+            color: #276749;
+        }
+
+        .text-red-500 {
+            color: #f56565;
+        }
+
+        .text-red-600 {
+            color: #e53e3e;
+        }
+
+        .text-red-800 {
+            color: #9b2c2c;
+        }
+
+        .text-yellow-500 {
+            color: #ecc94b;
+        }
+
+        .text-yellow-600 {
+            color: #d69e2e;
+        }
+
+        .text-yellow-800 {
+            color: #975a16;
+        }
+
+        .text-purple-500 {
+            color: #9f7aea;
+        }
+
+        .text-purple-600 {
+            color: #805ad5;
+        }
+
+        .text-indigo-500 {
+            color: #667eea;
+        }
+
+        .text-indigo-600 {
+            color: #5a67d8;
+        }
+
+        .text-orange-500 {
+            color: #ed8936;
+        }
+
+        .text-orange-600 {
+            color: #dd6b20;
+        }
+
+        /* 背景色类 */
+        .bg-white {
+            background-color: white;
+        }
+
+        .bg-gray-50 {
+            background-color: #f9fafb;
+        }
+
+        .bg-gray-100 {
+            background-color: #f7fafc;
+        }
+
+        .bg-gray-200 {
+            background-color: #edf2f7;
+        }
+
+        .bg-gray-300 {
+            background-color: #e2e8f0;
+        }
+
+        .bg-blue-50 {
+            background-color: #ebf8ff;
+        }
+
+        .bg-blue-100 {
+            background-color: #ebf8ff;
+        }
+
+        .bg-blue-500 {
+            background-color: #4299e1;
+        }
+
+        .bg-blue-600 {
+            background-color: #3182ce;
+        }
+
+        .bg-blue-700 {
+            background-color: #2b6cb0;
+        }
+
+        .bg-blue-800 {
+            background-color: #2c5282;
+        }
+
+        .bg-green-50 {
+            background-color: #f0fff4;
+        }
+
+        .bg-green-100 {
+            background-color: #f0fff4;
+        }
+
+        .bg-green-500 {
+            background-color: #48bb78;
+        }
+
+        .bg-green-600 {
+            background-color: #38a169;
+        }
+
+        .bg-red-50 {
+            background-color: #fff5f5;
+        }
+
+        .bg-red-100 {
+            background-color: #fff5f5;
+        }
+
+        .bg-red-500 {
+            background-color: #f56565;
+        }
+
+        .bg-yellow-50 {
+            background-color: #fffff0;
+        }
+
+        .bg-yellow-100 {
+            background-color: #fffff0;
+        }
+
+        .bg-yellow-500 {
+            background-color: #ecc94b;
+        }
+
+        .bg-purple-50 {
+            background-color: #faf5ff;
+        }
+
+        .bg-purple-100 {
+            background-color: #faf5ff;
+        }
+
+        .bg-purple-500 {
+            background-color: #9f7aea;
+        }
+
+        .bg-indigo-50 {
+            background-color: #e6e6ff;
+        }
+
+        .bg-indigo-100 {
+            background-color: #e6e6ff;
+        }
+
+        .bg-orange-50 {
+            background-color: #fffaf0;
+        }
+
+        .bg-orange-100 {
+            background-color: #fffaf0;
+        }
+
+        /* 渐变背景 */
+        .bg-gradient-to-r {
+            background-image: linear-gradient(to right, var(--tw-gradient-stops));
+        }
+
+        .from-blue-700 {
+            --tw-gradient-from: #2b6cb0;
+        }
+
+        .to-indigo-800 {
+            --tw-gradient-to: #2c5282;
+        }
+
+        .from-green-600 {
+            --tw-gradient-from: #38a169;
+        }
+
+        .to-green-700 {
+            --tw-gradient-to: #2f855a;
+        }
+
+        /* 边框类 */
+        .border {
+            border-width: 1px;
+        }
+
+        .border-0 {
+            border-width: 0;
+        }
+
+        .border-t {
+            border-top-width: 1px;
+        }
+
+        .border-b {
+            border-bottom-width: 1px;
+        }
+
+        .border-l {
+            border-left-width: 1px;
+        }
+
+        .border-r {
+            border-right-width: 1px;
+        }
+
+        .border-gray-100 {
+            border-color: #f7fafc;
+        }
+
+        .border-gray-200 {
+            border-color: #edf2f7;
+        }
+
+        .border-gray-300 {
+            border-color: #e2e8f0;
+        }
+
+        .border-blue-100 {
+            border-color: #ebf8ff;
+        }
+
+        .border-blue-200 {
+            border-color: #bee3f8;
+        }
+
+        .border-blue-500 {
+            border-color: #4299e1;
+        }
+
+        .border-green-100 {
+            border-color: #f0fff4;
+        }
+
+        .border-green-500 {
+            border-color: #48bb78;
+        }
+
+        .border-red-500 {
+            border-color: #f56565;
+        }
+
+        .border-yellow-500 {
+            border-color: #ecc94b;
+        }
+
+        .border-purple-500 {
+            border-color: #9f7aea;
+        }
+
+        /* 圆角类 */
+        .rounded {
+            border-radius: 0.25rem;
+        }
+
+        .rounded-sm {
+            border-radius: 0.125rem;
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem;
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .rounded-2xl {
+            border-radius: 1rem;
+        }
+
+        .rounded-full {
+            border-radius: 9999px;
+        }
+
+        .rounded-l {
+            border-top-left-radius: 0.25rem;
+            border-bottom-left-radius: 0.25rem;
+        }
+
+        .rounded-r {
+            border-top-right-radius: 0.25rem;
+            border-bottom-right-radius: 0.25rem;
+        }
+
+        /* 阴影类 */
+        .shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .shadow-xl {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 定位类 */
+        .relative {
+            position: relative;
+        }
+
+        .absolute {
+            position: absolute;
+        }
+
+        .fixed {
+            position: fixed;
+        }
+
+        .sticky {
+            position: sticky;
+        }
+
+        .top-0 {
+            top: 0;
+        }
+
+        .bottom-0 {
+            bottom: 0;
+        }
+
+        .left-0 {
+            left: 0;
+        }
+
+        .right-0 {
+            right: 0;
+        }
+
+        .z-10 {
+            z-index: 10;
+        }
+
+        .z-20 {
+            z-index: 20;
+        }
+
+        .z-30 {
+            z-index: 30;
+        }
+
+        .z-40 {
+            z-index: 40;
+        }
+
+        .z-50 {
+            z-index: 50;
+        }
+
+        /* 其他 */
+        .overflow-hidden {
+            overflow: hidden;
+        }
+
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
+
+        .overflow-y-auto {
+            overflow-y: auto;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .transition {
+            transition: all 0.3s ease;
+        }
+
+        .hover\:bg-gray-100:hover {
+            background-color: #f7fafc;
+        }
+
+        .hover\:bg-blue-50:hover {
+            background-color: #ebf8ff;
+        }
+
+        .hover\:bg-blue-600:hover {
+            background-color: #3182ce;
+        }
+
+        .hover\:bg-blue-700:hover {
+            background-color: #2b6cb0;
+        }
+
+        .hover\:text-blue-800:hover {
+            color: #2c5282;
+        }
+
+        .hover\:text-red-800:hover {
+            color: #9b2c2c;
+        }
+
+        .hover\:text-gray-800:hover {
+            color: #2d3748;
+        }
+
+        .hover\:shadow-md:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 自定义类 */
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-item {
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background-color: #f7fafc;
+        }
+
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        /* 网格系统 */
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                z-index: 50;
+                height: 100vh;
+                overflow-y: auto;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 40;
+            }
+
+            .overlay.active {
+                display: block;
+            }
+
+            .hidden-mobile {
+                display: none;
+            }
+
+            .grid-cols-1-mobile {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+
+            .grid-cols-2-mobile {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (min-width: 768px) {
+            .hidden-desktop {
+                display: none;
+            }
+
+            .grid-cols-2-desktop {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .grid-cols-3-desktop {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .grid-cols-4-desktop {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+            }
+        }
+
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* 链接样式 */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* 按钮样式 */
+        button {
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: inherit;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 顶部导航栏 -->
+    <div
+        class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-3">
+            <button id="menuToggle" class="hidden-desktop">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+            <div class="h-8 w-8 bg-white rounded flex items-center justify-center">
+                <span class="text-blue-700 font-bold">C</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg">Clinext 系统管理后台</h1>
+                <p class="text-xs text-blue-200">多租户诊所管理系统</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="hidden-desktop flex items-center gap-3">
+                <div class="relative group">
+                    <button class="flex items-center gap-2 text-white/90">
+                        <i class="fas fa-bell"></i>
+                        <span class="bg-red-500 text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+                    </button>
+                </div>
+
+                <div class="relative group">
+                    <button class="flex items-center gap-2 text-white/90">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div class="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span class="font-bold">A</span>
+                </div>
+                <div class="hidden-desktop">
+                    <p class="text-sm font-medium" id="currentUserName">系统管理员</p>
+                    <p class="text-xs text-blue-200">超级管理员</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <div class="flex">
+        <!-- 侧边栏 -->
+        <div class="sidebar bg-white w-64 min-h-screen border-r border-gray-200 p-4">
+            <div class="mb-6">
+                <h2 class="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3">主要功能</h2>
+                <div class="space-y-1">
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-50 text-blue-700">
+                        <i class="fas fa-tachometer-alt w-5"></i>
+                        <span>仪表板总览</span>
+                    </a>
+                    <a href="#tenantSection"
+                        class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-building w-5"></i>
+                        <span>租户管理</span>
+                    </a>
+                    <a href="#userSection" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-users-cog w-5"></i>
+                        <span>用户与权限</span>
+                    </a>
+                    <a href="#systemSection"
+                        class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-sliders-h w-5"></i>
+                        <span>系统配置</span>
+                    </a>
+                    <a href="#analyticsSection"
+                        class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-chart-line w-5"></i>
+                        <span>系统分析</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3">子系统管理</h2>
+                <div class="space-y-1">
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-calendar-check w-5"></i>
+                        <span>预约调度</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-procedures w-5"></i>
+                        <span>治疗管理</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-boxes w-5"></i>
+                        <span>库存管理</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-file-invoice-dollar w-5"></i>
+                        <span>财务结算</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-comments w-5"></i>
+                        <span>通讯通知</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h2 class="text-gray-500 text-xs font-semibold uppercase tracking-wider mb-3">系统工具</h2>
+                <div class="space-y-1">
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-database w-5"></i>
+                        <span>数据备份</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-history w-5"></i>
+                        <span>操作日志</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-life-ring w-5"></i>
+                        <span>系统监控</span>
+                    </a>
+                    <a href="#" class="menu-item flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700">
+                        <i class="fas fa-code w-5"></i>
+                        <span>API管理</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-8 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-100">
+                <h3 class="text-sm font-bold text-blue-800 mb-1">系统状态</h3>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-gray-600">运行时间</span>
+                    <span class="text-xs font-medium text-green-600">99.7%</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-600">响应时间</span>
+                    <span class="text-xs font-medium text-green-600">142ms</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 移动端遮罩层 -->
+        <div class="overlay"></div>
+
+        <!-- 主内容 -->
+        <div class="flex-1 p-4 p-6">
+            <!-- 欢迎与统计 -->
+            <div class="mb-6">
+                <h1 class="text-2xl text-3xl font-bold text-gray-800">系统管理控制台</h1>
+                <p class="text-gray-600">全面管理系统租户、用户权限和子系统配置</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="grid grid-cols-1 grid-cols-2-desktop grid-cols-4-desktop gap-4 mb-8">
+                <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">活跃租户</p>
+                            <p class="text-2xl font-bold text-gray-800">24</p>
+                        </div>
+                        <div class="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-building text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center">
+                        <span class="text-xs text-green-600 flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> 12%
+                        </span>
+                        <span class="text-xs text-gray-500 ml-2">较上月</span>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">总用户数</p>
+                            <p class="text-2xl font-bold text-gray-800">1,847</p>
+                        </div>
+                        <div class="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center">
+                        <span class="text-xs text-green-600 flex items-center">
+                            <i class="fas fa-arrow-up mr-1"></i> 8%
+                        </span>
+                        <span class="text-xs text-gray-500 ml-2">较上周</span>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">今日活跃</p>
+                            <p class="text-2xl font-bold text-gray-800">436</p>
+                        </div>
+                        <div class="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-clock text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3 flex items-center">
+                        <span class="text-xs text-red-600 flex items-center">
+                            <i class="fas fa-arrow-down mr-1"></i> 3%
+                        </span>
+                        <span class="text-xs text-gray-500 ml-2">较昨天</span>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-gray-500">系统负载</p>
+                            <p class="text-2xl font-bold text-gray-800">62%</p>
+                        </div>
+                        <div class="h-12 w-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-server text-orange-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 62%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 租户管理 -->
+            <div id="tenantSection" class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+                <div class="p-5 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-gray-800">租户管理</h2>
+                    <button
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <i class="fas fa-plus"></i>
+                        <span>新增租户</span>
+                    </button>
+                </div>
+                <div class="p-5">
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>诊所名称</th>
+                                    <th>许可证等级</th>
+                                    <th>用户数</th>
+                                    <th>状态</th>
+                                    <th>创建日期</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-8 w-8 bg-blue-100 rounded flex items-center justify-center">
+                                                <i class="fas fa-clinic-medical text-blue-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">阳光医疗中心</p>
+                                                <p class="text-xs text-gray-500">sunshine@clinext.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">企业版</span>
+                                    </td>
+                                    <td>43/50</td>
+                                    <td>
+                                        <span class="flex items-center">
+                                            <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
+                                            活跃
+                                        </span>
+                                    </td>
+                                    <td>2023-10-15</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <button class="text-blue-600">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-600">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-red-600">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-8 w-8 bg-purple-100 rounded flex items-center justify-center">
+                                                <i class="fas fa-clinic-medical text-purple-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">康美诊所</p>
+                                                <p class="text-xs text-gray-500">kangmei@clinext.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">专业版</span>
+                                    </td>
+                                    <td>18/20</td>
+                                    <td>
+                                        <span class="flex items-center">
+                                            <span class="h-2 w-2 bg-yellow-500 rounded-full mr-2"></span>
+                                            接近上限
+                                        </span>
+                                    </td>
+                                    <td>2023-11-22</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <button class="text-blue-600">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-600">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-red-600">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-8 w-8 bg-green-100 rounded flex items-center justify-center">
+                                                <i class="fas fa-clinic-medical text-green-600"></i>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium">仁爱医院皮肤科</p>
+                                                <p class="text-xs text-gray-500">renai@clinext.com</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span
+                                            class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">基础版</span>
+                                    </td>
+                                    <td>5/10</td>
+                                    <td>
+                                        <span class="flex items-center">
+                                            <span class="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
+                                            活跃
+                                        </span>
+                                    </td>
+                                    <td>2023-12-05</td>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <button class="text-blue-600">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="text-gray-600">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="text-red-600">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-4 text-center">
+                        <a href="#" class="text-blue-600 text-sm font-medium">查看全部租户 <i
+                                class="fas fa-arrow-right ml-1"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户与权限 -->
+            <div id="userSection" class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+                <div class="p-5 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-800">用户与权限管理</h2>
+                    <p class="text-sm text-gray-600 mt-1">管理系统用户、角色和权限配置</p>
+                </div>
+                <div class="p-5">
+                    <div class="grid grid-cols-1 grid-cols-3-desktop gap-6">
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-gray-800">角色管理</h3>
+                                <span class="text-xs text-gray-500">4个角色</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                    <div>
+                                        <p class="font-medium">超级管理员</p>
+                                        <p class="text-xs text-gray-500">完整系统访问权限</p>
+                                    </div>
+                                    <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">2人</span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded">
+                                    <div>
+                                        <p class="font-medium">诊所管理员</p>
+                                        <p class="text-xs text-gray-500">诊所级别管理权限</p>
+                                    </div>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">24人</span>
+                                </div>
+                                <div class="flex items-center justify-between p-2 rounded">
+                                    <div>
+                                        <p class="font-medium">医生/治疗师</p>
+                                        <p class="text-xs text-gray-500">治疗与预约管理</p>
+                                    </div>
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">156人</span>
+                                </div>
+                            </div>
+                            <button
+                                class="w-full mt-4 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                <i class="fas fa-plus mr-2"></i> 新增角色
+                            </button>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-gray-800">权限配置</h3>
+                                <span class="text-xs text-gray-500">12个模块</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">租户管理</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">超级管理员</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">用户管理</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">超级管理员</span>
+                                        <span class="text-xs bg-blue-100 px-2 py-1 rounded">诊所管理员</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">治疗管理</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs bg-gray-100 px-2 py-1 rounded">超级管理员</span>
+                                        <span class="text-xs bg-blue-100 px-2 py-1 rounded">诊所管理员</span>
+                                        <span class="text-xs bg-green-100 px-2 py-1 rounded">医生/治疗师</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm">预约调度</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs bg-blue-100 px-2 py-1 rounded">诊所管理员</span>
+                                        <span class="text-xs bg-green-100 px-2 py-1 rounded">医生/治疗师</span>
+                                        <span class="text-xs bg-yellow-100 px-2 py-1 rounded">前台人员</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button
+                                class="w-full mt-4 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                <i class="fas fa-cog mr-2"></i> 配置权限
+                            </button>
+                        </div>
+
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold text-gray-800">最近活动</h3>
+                                <span class="text-xs text-gray-500">今日</span>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="p-2 border-l-4 border-blue-500 bg-blue-50 rounded-r">
+                                    <p class="text-sm font-medium">新用户注册</p>
+                                    <p class="text-xs text-gray-600">王医生 注册于 阳光医疗中心</p>
+                                    <p class="text-xs text-gray-500 mt-1">09:24 AM</p>
+                                </div>
+                                <div class="p-2 border-l-4 border-green-500 bg-green-50 rounded-r">
+                                    <p class="text-sm font-medium">权限变更</p>
+                                    <p class="text-xs text-gray-600">李护士 角色变更为 诊所管理员</p>
+                                    <p class="text-xs text-gray-500 mt-1">10:15 AM</p>
+                                </div>
+                                <div class="p-2 border-l-4 border-purple-500 bg-purple-50 rounded-r">
+                                    <p class="text-sm font-medium">登录异常</p>
+                                    <p class="text-xs text-gray-600">张医生 多次登录失败</p>
+                                    <p class="text-xs text-gray-500 mt-1">11:42 AM</p>
+                                </div>
+                            </div>
+                            <button
+                                class="w-full mt-4 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                <i class="fas fa-history mr-2"></i> 查看完整日志
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系统配置 -->
+            <div id="systemSection" class="bg-white rounded-xl shadow-sm border border-gray-100 mb-8">
+                <div class="p-5 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-800">系统配置</h2>
+                    <p class="text-sm text-gray-600 mt-1">配置系统参数、许可证等级和集成设置</p>
+                </div>
+                <div class="p-5">
+                    <div class="grid grid-cols-1 grid-cols-2-desktop gap-6">
+                        <div>
+                            <h3 class="font-bold text-gray-800 mb-4">许可证等级配置</h3>
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-bold text-gray-800">基础版</h4>
+                                        <span class="text-sm font-bold text-gray-800">$99/月</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">适合小型诊所</p>
+                                    <ul class="text-sm text-gray-700 space-y-1">
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 最多10个用户</li>
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 基本预约功能</li>
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 基础库存管理</li>
+                                        <li><i class="fas fa-times text-gray-400 mr-2"></i> 高级分析报告</li>
+                                    </ul>
+                                    <div class="mt-4 flex justify-between items-center">
+                                        <span class="text-xs text-gray-500">8个诊所使用</span>
+                                        <button class="text-sm text-blue-600 font-medium">编辑</button>
+                                    </div>
+                                </div>
+
+                                <div class="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-bold text-gray-800">专业版</h4>
+                                        <span class="text-sm font-bold text-gray-800">$299/月</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">适合中型诊所</p>
+                                    <ul class="text-sm text-gray-700 space-y-1">
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 最多50个用户</li>
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 完整预约功能</li>
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 高级库存管理</li>
+                                        <li><i class="fas fa-check text-green-500 mr-2"></i> 基础分析报告</li>
+                                    </ul>
+                                    <div class="mt-4 flex justify-between items-center">
+                                        <span class="text-xs text-gray-500">14个诊所使用</span>
+                                        <button class="text-sm text-blue-600 font-medium">编辑</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-gray-800 mb-4">系统参数</h3>
+                            <div class="space-y-4">
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-medium text-gray-800">数据保留策略</h4>
+                                        <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">已配置</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">配置数据自动备份和保留时间</p>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm">备份频率</span>
+                                        <span class="text-sm font-medium">每日</span>
+                                    </div>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="text-sm">保留时间</span>
+                                        <span class="text-sm font-medium">90天</span>
+                                    </div>
+                                    <button
+                                        class="w-full mt-4 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                        <i class="fas fa-cog mr-2"></i> 配置备份策略
+                                    </button>
+                                </div>
+
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <h4 class="font-medium text-gray-800">集成服务</h4>
+                                        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">运行中</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-3">外部服务集成状态</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                                <span class="text-sm">支付网关 (Stripe)</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">已连接</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                                <span class="text-sm">邮件服务 (SES)</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">已连接</span>
+                                        </div>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <div class="h-3 w-3 bg-yellow-500 rounded-full mr-2"></div>
+                                                <span class="text-sm">短信服务 (Twilio)</span>
+                                            </div>
+                                            <span class="text-xs text-gray-500">待配置</span>
+                                        </div>
+                                    </div>
+                                    <button
+                                        class="w-full mt-4 border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium">
+                                        <i class="fas fa-plug mr-2"></i> 管理集成服务
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 系统分析 -->
+            <div id="analyticsSection" class="bg-white rounded-xl shadow-sm border border-gray-100">
+                <div class="p-5 border-b border-gray-200">
+                    <h2 class="text-lg font-bold text-gray-800">系统分析</h2>
+                    <p class="text-sm text-gray-600 mt-1">系统使用情况与性能指标</p>
+                </div>
+                <div class="p-5">
+                    <div class="grid grid-cols-1 grid-cols-2-desktop gap-6">
+                        <div>
+                            <h3 class="font-bold text-gray-800 mb-4">租户增长趋势</h3>
+                            <div
+                                class="h-64 flex items-center justify-center border border-gray-200 rounded-lg bg-gray-50">
+                                <div class="text-center">
+                                    <i class="fas fa-chart-bar text-4xl text-gray-300 mb-2"></i>
+                                    <p class="text-gray-500">图表组件待集成</p>
+                                    <p class="text-sm text-gray-400">租户注册时间分布图</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 grid grid-cols-2 gap-4">
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <p class="text-xs text-blue-700 font-medium">本月新增</p>
+                                    <p class="text-xl font-bold text-gray-800">5</p>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg">
+                                    <p class="text-xs text-green-700 font-medium">活跃增长率</p>
+                                    <p class="text-xl font-bold text-gray-800">12%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-gray-800 mb-4">系统性能指标</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-700">API响应时间</span>
+                                        <span class="text-sm font-medium text-gray-700">142ms</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-green-600 h-2.5 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-700">数据库查询性能</span>
+                                        <span class="text-sm font-medium text-gray-700">98ms</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 92%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-700">系统可用性</span>
+                                        <span class="text-sm font-medium text-gray-700">99.7%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-purple-600 h-2.5 rounded-full" style="width: 99.7%"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm font-medium text-gray-700">错误率</span>
+                                        <span class="text-sm font-medium text-gray-700">0.3%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div class="bg-yellow-600 h-2.5 rounded-full" style="width: 0.3%"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 border border-gray-200 rounded-lg p-4">
+                                <h4 class="font-bold text-gray-800 mb-2">子系统状态</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">租户与许可核心</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">患者身份识别</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">预约调度</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">治疗管理</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-green-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">库存管理</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-yellow-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">财务结算</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-yellow-500 rounded-full mr-2"></div>
+                                        <span class="text-sm">通讯通知</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="h-3 w-3 bg-gray-300 rounded-full mr-2"></div>
+                                        <span class="text-sm">移动应用</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动端底部导航 -->
+    <div
+        class="hidden-mobile fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex items-center justify-around shadow-lg">
+        <button id="mobileMenuToggle" class="flex flex-col items-center gap-1 text-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+            <span class="text-xs">菜单</span>
+        </button>
+        <a href="#" class="flex flex-col items-center gap-1 text-blue-600">
+            <i class="fas fa-tachometer-alt text-xl"></i>
+            <span class="text-xs font-medium">仪表板</span>
+        </a>
+        <a href="#tenantSection" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-building text-xl"></i>
+            <span class="text-xs">租户</span>
+        </a>
+        <a href="#userSection" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-users-cog text-xl"></i>
+            <span class="text-xs">用户</span>
+        </a>
+        <a href="#analyticsSection" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-chart-line text-xl"></i>
+            <span class="text-xs">分析</span>
+        </a>
+    </div>
+
+    <script>
+        // 移动端菜单切换
+        const menuToggle = document.getElementById('menuToggle');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.overlay');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleSidebar);
+        }
+
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', toggleSidebar);
+        }
+
+        if (overlay) {
+            overlay.addEventListener('click', toggleSidebar);
+        }
+
+        // 平滑滚动到对应部分
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // 如果是移动端，先关闭菜单
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.remove('active');
+                        overlay.classList.remove('active');
+                    }
+
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // 模拟用户登录状态
+        const adminUser = {
+            name: "系统管理员",
+            role: "admin",
+            email: "admin@clinext.com"
+        };
+
+        // 更新用户信息显示
+        document.getElementById('currentUserName').textContent = adminUser.name;
+
+        // 登出功能
+        document.querySelectorAll('#logoutBtn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                if (confirm('确定要登出吗？')) {
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log(`管理员后台已加载`);
+
+            // 模拟数据更新
+            function updateStats() {
+                // 这里可以添加实际的数据更新逻辑
+                console.log('更新统计数据...');
+            }
+
+            // 每30秒更新一次统计信息
+            setInterval(updateStats, 30000);
+        });
+
+        // 表格行点击效果
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', function () {
+                this.style.backgroundColor = '#f8fafc';
+                setTimeout(() => {
+                    this.style.backgroundColor = '';
+                }, 200);
+            });
+        });
+
+        // 按钮点击效果
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', function () {
+                this.style.transform = 'scale(0.98)';
+            });
+
+            button.addEventListener('mouseup', function () {
+                this.style.transform = '';
+            });
+
+            button.addEventListener('mouseleave', function () {
+                this.style.transform = '';
+            });
+        });
+    </script>
+</body>
+
+</html>

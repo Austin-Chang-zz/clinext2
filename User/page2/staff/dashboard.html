@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>員工後台 - Clinext</title>
+    <!-- 使用本地 Tailwind CSS 連結 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f3f4f6;
+            padding-bottom: 70px;
+            /* 給底部導航留空間 */
+        }
+
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .menu-icon {
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .bottom-nav {
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .new-order-btn {
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .urgent {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 頂部導航欄 -->
+    <div class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-clinic-medical text-white"></i>
+            </div>
+            <span class="font-bold text-lg">Clinext 員工後台</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-2">
+                <i class="fas fa-user-circle text-white/80"></i>
+                <span id="currentUserName" class="text-sm font-medium">員工姓名</span>
+            </div>
+            <button id="logoutBtn" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i class="fas fa-sign-out-alt text-white/80"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主內容區 -->
+    <div class="px-4 py-6">
+        <!-- 歡迎訊息 -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-1">歡迎回來！</h1>
+            <p class="text-gray-600">今天是 <span id="currentDate">2023年10月15日 星期一</span></p>
+        </div>
+
+        <!-- 今日營運概況卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">今日預約</p>
+                        <p class="text-xl font-bold text-gray-800">12</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-dollar-sign text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">今日營收</p>
+                        <p class="text-xl font-bold text-gray-800">$58,800</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-md text-purple-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">療程人次</p>
+                        <p class="text-xl font-bold text-gray-800">8</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-orange-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">低庫存警示</p>
+                        <p class="text-xl font-bold text-orange-600 urgent">3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 今日預約 & 即將回診 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            <div class="bg-white rounded-xl shadow p-4">
+                <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <i class="fas fa-calendar-day text-blue-500"></i> 今日預約
+                </h2>
+                <ul class="space-y-3">
+                    <li class="flex justify-between items-center pb-2 border-b border-gray-100">
+                        <div>
+                            <span class="font-medium text-gray-800">10:00</span>
+                            <span class="ml-3">王小姐｜皮秒雷射</span>
+                        </div>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">進行中</span>
+                    </li>
+                    <li class="flex justify-between items-center pb-2 border-b border-gray-100">
+                        <div>
+                            <span class="font-medium text-gray-800">11:30</span>
+                            <span class="ml-3">李先生｜肉毒瘦臉</span>
+                        </div>
+                        <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">待進行</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <div>
+                            <span class="font-medium text-gray-800">14:00</span>
+                            <span class="ml-3">陳小姐｜音波拉提</span>
+                        </div>
+                        <span class="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded-full">待進行</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-xl shadow p-4">
+                <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <i class="fas fa-bell text-green-500"></i> 即將回診（7日內）
+                </h2>
+                <ul class="space-y-3">
+                    <li class="flex justify-between items-center pb-2 border-b border-gray-100">
+                        <div>
+                            <span class="font-medium text-gray-800">王小姐</span>
+                            <span class="ml-3 text-sm text-gray-600">皮秒雷射｜D+28</span>
+                        </div>
+                        <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">3天後</span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <div>
+                            <span class="font-medium text-gray-800">李先生</span>
+                            <span class="ml-3 text-sm text-gray-600">肉毒｜D+90</span>
+                        </div>
+                        <span class="text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">明天</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 待處理事項 -->
+        <div class="mb-6">
+            <div class="bg-white rounded-xl shadow p-4">
+                <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                    <i class="fas fa-tasks text-red-500"></i> 待處理事項
+                </h2>
+                <ul class="space-y-3">
+                    <li class="flex justify-between items-center py-2 hover:bg-gray-50 rounded px-2 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-file-medical text-red-600 text-sm"></i>
+                            </div>
+                            <span class="text-gray-700">尚未填寫療程紀錄</span>
+                        </div>
+                        <span class="bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full">3</span>
+                    </li>
+                    <li class="flex justify-between items-center py-2 hover:bg-gray-50 rounded px-2 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-money-check-alt text-orange-600 text-sm"></i>
+                            </div>
+                            <span class="text-gray-700">未完成收款訂單</span>
+                        </div>
+                        <span class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full">2</span>
+                    </li>
+                    <li class="flex justify-between items-center py-2 hover:bg-gray-50 rounded px-2 transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                <i class="fas fa-box text-yellow-600 text-sm"></i>
+                            </div>
+                            <span class="text-gray-700">低於安全庫存項目</span>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">1</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 療程管理 -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">療程管理</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-procedures text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">療程目錄</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-pills text-pink-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">藥材對照</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-file-medical-alt text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">療程紀錄</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-calendar-plus text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">回診提醒</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 庫存管理 -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">庫存管理</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-cyan-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-boxes text-cyan-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">庫存總覽</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clipboard-check text-orange-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">盤點</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shipping-fast text-indigo-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">進貨</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-truck text-teal-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">供應商</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 銷售管理 -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">銷售管理</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-plus-circle text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">新療程單</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-file-invoice-dollar text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">療程訂單</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-users text-pink-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">客戶管理</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-yellow-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">營收報表</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 系統管理 (僅管理員可見) -->
+        <div id="adminSection" class="bg-white rounded-xl p-4 shadow-sm mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-800">系統管理</h2>
+                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">管理員專用</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-cog text-red-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">員工管理</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-cogs text-gray-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">系統設定</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-shield text-indigo-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">權限管理</span>
+                </a>
+
+                <a href="#"
+                    class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                    <div class="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-database text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-xs text-gray-700 text-center font-medium">資料備份</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部導航 -->
+    <div
+        class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-around">
+        <a href="#" class="flex flex-col items-center gap-1 text-green-600">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-xs font-medium">首頁</span>
+        </a>
+
+        <a href="#" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-box text-lg"></i>
+            <span class="text-xs">庫存</span>
+        </a>
+
+        <a href="#" class="flex flex-col items-center -mt-8">
+            <div class="new-order-btn bg-green-600 rounded-full p-5">
+                <i class="fas fa-plus text-white text-xl"></i>
+            </div>
+            <span class="text-xs mt-2 text-gray-700 font-medium">新單</span>
+        </a>
+
+        <a href="#" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-users text-lg"></i>
+            <span class="text-xs">客戶</span>
+        </a>
+
+        <a href="#" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-chart-bar text-lg"></i>
+            <span class="text-xs">報表</span>
+        </a>
+    </div>
+
+    <script>
+        // 設定當前日期
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-TW', options);
+
+        // 模擬登入使用者資料 (實際應用中應從 sessionStorage 獲取)
+        const mockUser = {
+            name: "張大明",
+            role: "staff" // 可改為 "admin" 測試管理員功能
+        };
+
+        // 設定使用者名稱
+        document.getElementById('currentUserName').textContent = mockUser.name;
+
+        // 根據使用者角色顯示/隱藏管理員區塊
+        if (mockUser.role === 'admin') {
+            document.getElementById('adminSection').classList.remove('hidden');
+        } else {
+            document.getElementById('adminSection').classList.add('hidden');
+        }
+
+        // 登出功能
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            if (confirm('確定要登出嗎？')) {
+                // 實際應用中應清除 sessionStorage
+                // sessionStorage.removeItem('currentUser');
+                alert('登出成功！');
+                // 實際應用中應跳轉到登入頁面
+                // window.location.href = 'login.html';
+            }
+        });
+
+        // 點擊底部導航時切換樣式
+        document.querySelectorAll('.bottom-nav a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                // 防止連結跳轉（演示用）
+                e.preventDefault();
+
+                // 移除所有導航項目的活動狀態
+                document.querySelectorAll('.bottom-nav a').forEach(item => {
+                    item.classList.remove('text-green-600', 'font-medium');
+                    item.classList.add('text-gray-500');
+                    item.querySelector('span').classList.remove('font-medium');
+                });
+
+                // 為當前點擊的項目添加活動狀態
+                this.classList.remove('text-gray-500');
+                this.classList.add('text-green-600', 'font-medium');
+                this.querySelector('span').classList.add('font-medium');
+
+                // 如果是"新單"按鈕，保持特殊樣式
+                if (this.querySelector('.new-order-btn')) {
+                    this.classList.remove('text-green-600', 'font-medium');
+                    this.classList.add('text-gray-700');
+                }
+            });
+        });
+
+        // 點擊待處理事項時的處理
+        document.querySelectorAll('.hover\\:bg-gray-50').forEach(item => {
+            item.addEventListener('click', function (e) {
+                e.preventDefault();
+                const text = this.querySelector('.text-gray-700').textContent;
+                alert(`處理: ${text}`);
+            });
+        });
+
+        // 點擊今日預約項目時的處理
+        document.querySelectorAll('.border-b, .border-gray-100').forEach(item => {
+            item.addEventListener('click', function (e) {
+                if (e.target.tagName !== 'A' && !e.target.closest('a')) {
+                    const time = this.querySelector('.font-medium').textContent;
+                    const name = this.textContent.replace(time, '').trim();
+                    alert(`查看預約詳情: ${time} ${name}`);
+                }
+            });
+        });
+
+        console.log('Clinext 後台系統載入完成');
+    </script>
+</body>
+
+</html>

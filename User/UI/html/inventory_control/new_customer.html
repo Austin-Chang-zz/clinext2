@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增客戶</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Mobile Container -->
+    <div class="max-w-md mx-auto bg-white min-h-screen">
+
+        <!-- Status Bar -->
+        <div class="flex items-center justify-between px-4 py-2 text-sm text-gray-700">
+            <div class="flex items-center gap-2">
+                <span>20:33</span>
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8" />
+                </svg>
+                <span>...</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs">||||| ⓑ |||||</span>
+                <span class="text-xs">📶 65%</span>
+                <span class="text-green-500">●</span>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="flex items-center justify-between px-4 py-3 border-b bg-white sticky top-0 z-10">
+            <button class="text-2xl text-gray-700">×</button>
+            <h1 class="text-lg font-medium">新增客户</h1>
+            <button class="text-gray-700 font-medium">保存</button>
+        </header>
+
+        <!-- Form Content -->
+        <div class="pb-20">
+
+            <!-- Basic Information Section -->
+            <section class="mt-4">
+                <h2 class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100">基本信息</h2>
+
+                <div class="bg-white">
+                    <!-- Name Field (Required) -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <label class="text-gray-800">
+                            <span class="text-red-500 mr-1">*</span>名稱
+                        </label>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Customer Currency -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">客戶貨幣</span>
+                        <button class="flex items-center gap-2 text-gray-800">
+                            <span>人民幣 (¥)</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">分類</span>
+                        <button class="flex items-center gap-2 text-gray-800">
+                            <span>未分類</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Price Level -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">價格等級</span>
+                        <button class="flex items-center gap-2 text-gray-800">
+                            <span>零售價</span>
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Exclusive Discount -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">專屬折扣</span>
+                        <span class="text-gray-800 font-medium">100 %</span>
+                    </div>
+
+                    <!-- Contact Person -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">聯繫人</span>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Contact Phone -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">聯絡人電話</span>
+                        <input type="tel" placeholder="手機號" class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Detailed Address -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">詳細地址</span>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Initial Points -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">初始積分</span>
+                        <span class="text-gray-800">0</span>
+                    </div>
+
+                    <!-- Initial Debt -->
+                    <div class="flex items-center justify-between px-4 py-4 border-b">
+                        <span class="text-gray-800">初始欠款</span>
+                        <span class="text-gray-800">0.00</span>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="px-4 py-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-gray-800">備註</span>
+                            <span class="text-gray-400 text-sm">0/200</span>
+                        </div>
+                        <textarea placeholder="請輸入" rows="3" maxlength="200"
+                            class="w-full text-gray-400 outline-none resize-none"></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Delivery Information Section -->
+            <section class="mt-4">
+                <div class="px-4 py-3 bg-gray-100 flex items-center gap-2">
+                    <h2 class="text-sm font-medium text-gray-700">收貨資訊</h2>
+                    <button class="w-5 h-5 rounded-full border-2 border-gray-400 flex items-center justify-center">
+                        <span class="text-gray-400 text-xs">?</span>
+                    </button>
+                </div>
+
+                <div class="bg-white">
+                    <!-- Add Delivery Info -->
+                    <button class="flex items-center justify-between px-4 py-4 border-b w-full">
+                        <span class="text-gray-800">新增收貨人、收貨電話、收貨地址</span>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Auxiliary Information Section -->
+            <section class="mt-4">
+                <button class="flex items-center justify-between px-4 py-4 bg-white border-t w-full">
+                    <span class="text-gray-800">輔助資訊</span>
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </section>
+
+        </div>
+
+        <!-- Bottom Navigation Bar (Android Style) -->
+        <div class="fixed bottom-0 left-0 right-0 bg-black h-12 flex items-center justify-around max-w-md mx-auto">
+            <div class="w-10 h-1 bg-gray-400 rounded-full"></div>
+            <div class="w-10 h-10 rounded-full border-2 border-gray-400"></div>
+            <div
+                class="w-0 h-0 border-t-[15px] border-t-transparent border-r-[20px] border-r-gray-400 border-b-[15px] border-b-transparent transform rotate-180">
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>採購進貨管理 - Clinext</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        .purchase-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .purchase-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-received {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .supplier-badge {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            display: inline-block;
+        }
+
+        .urgency-high {
+            border-left: 4px solid #ef4444 !important;
+        }
+
+        .urgency-medium {
+            border-left: 4px solid #f59e0b !important;
+        }
+
+        .urgency-low {
+            border-left: 4px solid #10b981 !important;
+        }
+
+        .sortable-header {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sortable-header:hover {
+            background-color: #f0f9ff;
+        }
+
+        .sort-asc::after {
+            content: " ↑";
+            font-weight: bold;
+        }
+
+        .sort-desc::after {
+            content: " ↓";
+            font-weight: bold;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 pb-20">
+    <div
+        class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div class="flex items-center gap-3">
+            <a href="../staff/dashboard.html" class="text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <h1 class="text-lg font-medium">採購進貨管理</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="searchBtn" class="text-white">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+            <button id="newPurchaseBtn"
+                class="bg-white text-blue-700 hover:bg-gray-100 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-plus"></i>
+                <span>新增採購單</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="px-4 py-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div class="stat-card">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-shopping-cart text-blue-600"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">待處理採購</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800" id="pendingCount">0</p>
+            </div>
+            <div class="stat-card">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">本月到貨</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800" id="receivedThisMonth">0</p>
+            </div>
+            <div class="stat-card">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-money-bill-wave text-purple-600"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">本月採購金額</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800" id="monthlyTotal">$0</p>
+            </div>
+            <div class="stat-card">
+                <div class="flex items-center gap-2 mb-2">
+                    <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-orange-600"></i>
+                    </div>
+                    <span class="text-sm text-gray-500">急單</span>
+                </div>
+                <p class="text-2xl font-bold text-orange-600" id="urgentCount">0</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜尋與篩選區塊 -->
+    <div class="px-4 py-4 bg-white border-b border-gray-200">
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+            <!-- 搜尋框 -->
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="搜尋品項名稱、供應商或採購單號..."
+                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+
+            <!-- 篩選按鈕 -->
+            <div class="flex gap-2">
+                <select id="statusFilter"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="全部">全部狀態</option>
+                    <option value="pending">待處理</option>
+                    <option value="ordered">已訂購</option>
+                    <option value="shipped">已出貨</option>
+                    <option value="received">已到貨</option>
+                    <option value="cancelled">已取消</option>
+                </select>
+
+                <select id="urgencyFilter"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="全部">緊急程度</option>
+                    <option value="high">急單</option>
+                    <option value="medium">中等</option>
+                    <option value="low">一般</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 快速篩選標籤 -->
+        <div class="flex flex-wrap gap-2">
+            <button
+                class="quick-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                data-status="pending">
+                <i class="fas fa-clock mr-1"></i>待處理
+            </button>
+            <button
+                class="quick-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                data-status="received">
+                <i class="fas fa-check mr-1"></i>已到貨
+            </button>
+            <button
+                class="quick-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                data-urgency="high">
+                <i class="fas fa-exclamation-triangle mr-1"></i>急單
+            </button>
+            <button
+                class="quick-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                data-supplier="美商艾爾建">
+                <i class="fas fa-building mr-1"></i>艾爾建
+            </button>
+            <button
+                class="quick-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                data-category="注射類">
+                <i class="fas fa-syringe mr-1"></i>注射類
+            </button>
+        </div>
+    </div>
+
+    <!-- 採購單列表 -->
+    <div class="px-4 py-4">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-lg font-bold text-gray-800">採購單列表</h2>
+            <div class="text-sm text-gray-500" id="purchaseCount">共 0 筆採購單</div>
+        </div>
+
+        <div id="purchaseList" class="space-y-3">
+            <!-- 採購單將由 JavaScript 動態生成 -->
+        </div>
+    </div>
+
+    <!-- 新增/編輯採購單模態框 -->
+    <div id="purchaseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+            <!-- 模態框標頭 -->
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800" id="modalTitle">新增採購單</h3>
+                        <p class="text-sm text-gray-500 mt-1">填寫採購品項與供應商資訊</p>
+                    </div>
+                    <button id="closeModalBtn"
+                        class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 表單內容 -->
+            <div class="overflow-y-auto max-h-[70vh] p-6 custom-scrollbar">
+                <form id="purchaseForm" class="space-y-6">
+                    <!-- 採購基本資訊 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-invoice text-blue-600"></i>
+                            採購基本資訊
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">採購單號 *</label>
+                                <input type="text" id="purchaseNumber" name="purchaseNumber" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="例: PO-2025-001">
+                                <p class="text-xs text-gray-500 mt-1">自動產生: <span
+                                        id="autoPurchaseNumber">PO-2025-</span></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">採購日期 *</label>
+                                <input type="date" id="purchaseDate" name="purchaseDate" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    value="">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">預期到貨日期</label>
+                                <input type="date" id="expectedDate" name="expectedDate"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">緊急程度</label>
+                                <select id="urgencyLevel" name="urgencyLevel"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="low">一般</option>
+                                    <option value="medium">中等</option>
+                                    <option value="high">急單</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 供應商資訊 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-building text-blue-600"></i>
+                            供應商資訊
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">供應商 *</label>
+                                <select id="supplier" name="supplier" required
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="">選擇供應商</option>
+                                    <option value="美商艾爾建">美商艾爾建 (Allergan)</option>
+                                    <option value="台灣大昌華嘉">台灣大昌華嘉</option>
+                                    <option value="韓國大熊製藥">韓國大熊製藥 (Daewoong)</option>
+                                    <option value="海芙原廠">海芙原廠 (HIFU)</option>
+                                    <option value="鳳凰電波台灣總代理">鳳凰電波台灣總代理</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">供應商單號</label>
+                                <input type="text" id="supplierNumber" name="supplierNumber"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="供應商的訂單編號">
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">供應商備註</label>
+                            <textarea id="supplierNotes" name="supplierNotes" rows="2"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="供應商聯繫資訊或特殊要求..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 採購品項 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-boxes text-blue-600"></i>
+                            採購品項
+                            <span class="text-sm font-normal text-gray-500" id="itemCount">(0 項品項)</span>
+                        </h4>
+
+                        <!-- 品項列表 -->
+                        <div id="purchaseItemsContainer" class="space-y-4 mb-4">
+                            <!-- 採購品項將由 JavaScript 動態生成 -->
+                        </div>
+
+                        <button type="button" id="addItemBtn"
+                            class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            <span>添加採購品項</span>
+                        </button>
+
+                        <!-- 總計 -->
+                        <div class="mt-6 pt-4 border-t border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <div class="text-sm text-gray-600">小計</div>
+                                <div class="text-lg font-bold text-gray-800" id="subtotalAmount">$0</div>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="text-sm text-gray-600">稅金 (5%)</div>
+                                <div class="text-lg text-gray-800" id="taxAmount">$0</div>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <div class="text-sm text-gray-600">運費</div>
+                                <div class="text-lg text-gray-800" id="shippingAmount">$0</div>
+                            </div>
+                            <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                                <div class="text-lg font-bold text-gray-800">總計</div>
+                                <div class="text-2xl font-bold text-blue-600" id="totalAmount">$0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 付款與備註 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-credit-card text-blue-600"></i>
+                            付款與備註
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">付款方式</label>
+                                <select id="paymentMethod" name="paymentMethod"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="credit_card">信用卡</option>
+                                    <option value="bank_transfer">銀行轉帳</option>
+                                    <option value="check">支票</option>
+                                    <option value="cash">現金</option>
+                                    <option value="terms_30">月結30天</option>
+                                    <option value="terms_60">月結60天</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">付款狀態</label>
+                                <select id="paymentStatus" name="paymentStatus"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option value="pending">未付款</option>
+                                    <option value="partial">部分付款</option>
+                                    <option value="paid">已付款</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">採購備註</label>
+                            <textarea id="purchaseNotes" name="purchaseNotes" rows="3"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                placeholder="輸入採購備註..."></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 模態框底部 -->
+            <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                    狀態: <span id="formStatusDisplay">待處理</span>
+                </div>
+                <div class="flex gap-3">
+                    <button type="button" id="cancelModalBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        取消
+                    </button>
+                    <button type="button" id="saveDraftBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        儲存草稿
+                    </button>
+                    <button type="button" id="submitPurchaseBtn"
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        提交採購單
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 收貨確認模態框 -->
+    <div id="receiveModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-truck-loading text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">確認收貨</h3>
+                        <p class="text-sm text-gray-500" id="receivePurchaseNumber">採購單: PO-2025-001</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">實際到貨日期 *</label>
+                    <input type="date" id="actualReceiveDate" name="actualReceiveDate" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        value="">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">收貨備註</label>
+                    <textarea id="receiveNotes" name="receiveNotes" rows="3"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        placeholder="輸入收貨備註..."></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelReceiveBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        取消
+                    </button>
+                    <button type="button" id="confirmReceiveBtn"
+                        class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        確認收貨
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部導航 -->
+    <div
+        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex items-center justify-around">
+        <a href="../staff/dashboard.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            <span class="text-xs">首頁</span>
+        </a>
+        <a href="inventory.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="text-xs">庫存</span>
+        </a>
+        <a href="incoming_materials.html" class="flex flex-col items-center gap-1 text-blue-600">
+            <div class="bg-blue-600 rounded-full p-1 mb-1">
+                <i class="fas fa-truck text-white text-xl p-2"></i>
+            </div>
+            <span class="text-xs font-medium">進貨</span>
+        </a>
+        <a href="drug_materials.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-pills text-xl"></i>
+            <span class="text-xs">藥材</span>
+        </a>
+        <a href="../sales/reports.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span class="text-xs">報表</span>
+        </a>
+    </div>
+
+    <script>
+        // 採購單資料 - 從 localStorage 讀取或初始化
+        let purchaseOrders = JSON.parse(localStorage.getItem('purchaseOrders')) || [
+            {
+                id: generateId(),
+                purchaseNumber: "PO-2025-001",
+                purchaseDate: "2025-03-15",
+                expectedDate: "2025-03-25",
+                actualReceiveDate: "2025-03-22",
+                supplier: "美商艾爾建",
+                supplierNumber: "AGN-2025-001",
+                urgencyLevel: "high",
+                status: "received",
+                paymentMethod: "bank_transfer",
+                paymentStatus: "paid",
+                totalAmount: 187500,
+                subtotal: 178571,
+                tax: 8929,
+                shipping: 0,
+                items: [
+                    {
+                        id: generateId(),
+                        inventoryItemId: "inv_1",
+                        name: "美國肉毒桿菌素",
+                        englishName: "Botulinum Toxin Type A",
+                        quantity: 30,
+                        unit: "瓶",
+                        unitPrice: 4500,
+                        totalPrice: 135000,
+                        batchNumber: "BTX-2025-003",
+                        expirationDate: "2026-03-15",
+                        notes: "100U/瓶"
+                    },
+                    {
+                        id: generateId(),
+                        inventoryItemId: "inv_3",
+                        name: "薇貝拉玻尿酸",
+                        englishName: "Versa HA Filler 1cc",
+                        quantity: 12,
+                        unit: "支",
+                        unitPrice: 4375,
+                        totalPrice: 52500,
+                        batchNumber: "VRS-2025-010",
+                        expirationDate: "2026-06-30",
+                        notes: "1cc/支"
+                    }
+                ],
+                supplierNotes: "每月15號前下單，次月5號前到貨",
+                purchaseNotes: "診所常備庫存，低庫存自動補貨",
+                created_at: "2025-03-15",
+                updated_at: "2025-03-22"
+            },
+            {
+                id: generateId(),
+                purchaseNumber: "PO-2025-002",
+                purchaseDate: "2025-03-18",
+                expectedDate: "2025-04-05",
+                actualReceiveDate: "",
+                supplier: "海芙原廠",
+                supplierNumber: "HIFU-2025-005",
+                urgencyLevel: "medium",
+                status: "ordered",
+                paymentMethod: "terms_30",
+                paymentStatus: "pending",
+                totalAmount: 120000,
+                subtotal: 114286,
+                tax: 5714,
+                shipping: 0,
+                items: [
+                    {
+                        id: generateId(),
+                        inventoryItemId: "inv_4",
+                        name: "海芙音波探頭",
+                        englishName: "HIFU Cartridge 1000發",
+                        quantity: 5,
+                        unit: "個",
+                        unitPrice: 24000,
+                        totalPrice: 120000,
+                        batchNumber: "HIFU-2025-008",
+                        expirationDate: "2026-12-31",
+                        notes: "3.0mm/4.5mm"
+                    }
+                ],
+                supplierNotes: "原廠直送，需預約安裝",
+                purchaseNotes: "客戶預約音波療程增加，需補充探頭",
+                created_at: "2025-03-18",
+                updated_at: "2025-03-18"
+            },
+            {
+                id: generateId(),
+                purchaseNumber: "PO-2025-003",
+                purchaseDate: "2025-03-20",
+                expectedDate: "2025-03-28",
+                actualReceiveDate: "",
+                supplier: "韓國大熊製藥",
+                supplierNumber: "DWG-2025-012",
+                urgencyLevel: "high",
+                status: "pending",
+                paymentMethod: "credit_card",
+                paymentStatus: "pending",
+                totalAmount: 44440,
+                subtotal: 42324,
+                tax: 2116,
+                shipping: 0,
+                items: [
+                    {
+                        id: generateId(),
+                        inventoryItemId: "inv_2",
+                        name: "韓國肉毒桿菌素",
+                        englishName: "Nabota 100U",
+                        quantity: 10,
+                        unit: "瓶",
+                        unitPrice: 4444,
+                        totalPrice: 44440,
+                        batchNumber: "NAB-2025-015",
+                        expirationDate: "2026-05-20",
+                        notes: "100U/瓶，急單補貨"
+                    }
+                ],
+                supplierNotes: "韓國直送，約7-10個工作天",
+                purchaseNotes: "韓國肉毒庫存低於安全線，急需補貨",
+                created_at: "2025-03-20",
+                updated_at: "2025-03-20"
+            }
+        ];
+
+        // 庫存項目資料
+        let inventoryItems = JSON.parse(localStorage.getItem('inventoryItems')) || [];
+
+        // 供應商資料
+        const suppliers = [
+            { id: 1, name: "美商艾爾建", category: "注射類", contact: "02-1234-5678", email: "allergan@email.com" },
+            { id: 2, name: "台灣大昌華嘉", category: "注射類", contact: "02-2345-6789", email: "dksh@email.com" },
+            { id: 3, name: "韓國大熊製藥", category: "注射類", contact: "82-2-1234-5678", email: "daewoong@email.com" },
+            { id: 4, name: "海芙原廠", category: "儀器耗材", contact: "02-3456-7890", email: "hifu@email.com" },
+            { id: 5, name: "鳳凰電波台灣總代理", category: "儀器耗材", contact: "02-4567-8901", email: "thermage@email.com" }
+        ];
+
+        // 當前篩選和搜尋
+        let currentStatusFilter = "全部";
+        let currentUrgencyFilter = "全部";
+        let searchTerm = "";
+        let editingPurchaseId = null;
+
+        // 生成唯一 ID
+        function generateId() {
+            return 'purchase_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // 生成採購單號
+        function generatePurchaseNumber() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+
+            // 計算本月已有幾筆採購
+            const thisMonthPurchases = purchaseOrders.filter(order => {
+                const orderDate = new Date(order.purchaseDate);
+                return orderDate.getFullYear() === year && orderDate.getMonth() + 1 === today.getMonth() + 1;
+            });
+
+            const nextNumber = thisMonthPurchases.length + 1;
+            return `PO-${year}-${String(nextNumber).padStart(3, '0')}`;
+        }
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function () {
+            // 設定日期預設值
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('purchaseDate').value = today;
+            document.getElementById('expectedDate').value = today;
+            document.getElementById('actualReceiveDate').value = today;
+
+            // 更新自動產生的採購單號
+            document.getElementById('autoPurchaseNumber').textContent = generatePurchaseNumber();
+
+            renderPurchaseOrders();
+            setupEventListeners();
+            updateStatistics();
+
+            // 如果沒有庫存項目，嘗試從庫存頁面加載
+            if (inventoryItems.length === 0) {
+                const storedItems = localStorage.getItem('inventoryItems');
+                if (storedItems) {
+                    inventoryItems = JSON.parse(storedItems);
+                }
+            }
+        });
+
+        // 渲染採購單
+        function renderPurchaseOrders() {
+            const container = document.getElementById('purchaseList');
+            container.innerHTML = '';
+
+            // 篩選採購單
+            let filteredOrders = [...purchaseOrders];
+
+            // 搜尋篩選
+            if (searchTerm) {
+                filteredOrders = filteredOrders.filter(order =>
+                    order.purchaseNumber.toLowerCase().includes(searchTerm) ||
+                    order.supplier.toLowerCase().includes(searchTerm) ||
+                    order.items.some(item => item.name.toLowerCase().includes(searchTerm)) ||
+                    (order.supplierNotes && order.supplierNotes.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // 狀態篩選
+            if (currentStatusFilter !== "全部") {
+                filteredOrders = filteredOrders.filter(order => order.status === currentStatusFilter);
+            }
+
+            // 緊急程度篩選
+            if (currentUrgencyFilter !== "全部") {
+                filteredOrders = filteredOrders.filter(order => order.urgencyLevel === currentUrgencyFilter);
+            }
+
+            // 按日期排序（最新在前）
+            filteredOrders.sort((a, b) => new Date(b.purchaseDate) - new Date(a.purchaseDate));
+
+            // 渲染採購單卡片
+            filteredOrders.forEach(order => {
+                const card = createPurchaseCard(order);
+                container.appendChild(card);
+            });
+
+            // 如果沒有採購單
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shopping-cart text-gray-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">沒有找到採購單</h3>
+                        <p class="text-gray-500">試試不同的搜尋條件或新增採購單</p>
+                    </div>
+                `;
+            }
+
+            // 更新計數
+            document.getElementById('purchaseCount').textContent = `共 ${filteredOrders.length} 筆採購單`;
+
+            updateStatistics();
+        }
+
+        // 創建採購單卡片
+        function createPurchaseCard(order) {
+            const card = document.createElement('div');
+            card.className = `purchase-card bg-white rounded-xl p-4 shadow-sm animate-fade-in urgency-${order.urgencyLevel}`;
+
+            // 狀態標籤
+            const statusClass = `status-${getStatusClass(order.status)}`;
+            const statusText = getStatusText(order.status);
+
+            // 緊急程度標籤
+            const urgencyText = getUrgencyText(order.urgencyLevel);
+            const urgencyColor = getUrgencyColor(order.urgencyLevel);
+
+            // 計算品項總數
+            const totalItems = order.items.reduce((sum, item) => sum + item.quantity, 0);
+
+            // 格式化日期
+            const purchaseDate = formatDate(order.purchaseDate);
+            const expectedDate = order.expectedDate ? formatDate(order.expectedDate) : "未設定";
+            const receivedDate = order.actualReceiveDate ? formatDate(order.actualReceiveDate) : "尚未到貨";
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-gray-900">${order.purchaseNumber}</h3>
+                            <span class="${statusClass} px-2 py-1 rounded-full text-xs font-medium">${statusText}</span>
+                            <span class="text-xs px-2 py-1 rounded-full" style="background-color: ${urgencyColor}20; color: ${urgencyColor};">${urgencyText}</span>
+                        </div>
+                        <p class="text-sm text-gray-600">供應商: <span class="font-medium">${order.supplier}</span></p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-blue-600 font-bold text-xl">$${order.totalAmount.toLocaleString()}</div>
+                        <div class="text-sm text-gray-500">${totalItems} 項品項</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <div class="text-xs text-gray-500">採購日期</div>
+                        <div class="text-sm font-medium">${purchaseDate}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500">預期到貨</div>
+                        <div class="text-sm font-medium">${expectedDate}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500">實際到貨</div>
+                        <div class="text-sm font-medium">${receivedDate}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs text-gray-500">付款狀態</div>
+                        <div class="text-sm font-medium ${order.paymentStatus === 'paid' ? 'text-green-600' : order.paymentStatus === 'partial' ? 'text-yellow-600' : 'text-red-600'}">
+                            ${getPaymentStatusText(order.paymentStatus)}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <div class="text-xs text-gray-500 mb-1">採購品項：</div>
+                    <div class="flex flex-wrap gap-1">
+                        ${order.items.slice(0, 3).map(item =>
+                `<span class="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">${item.name} ×${item.quantity}</span>`
+            ).join('')}
+                        ${order.items.length > 3 ? `<span class="text-xs text-gray-500">+${order.items.length - 3} 項</span>` : ''}
+                    </div>
+                </div>
+
+                ${order.purchaseNotes ? `<div class="text-xs text-gray-500 mb-3 border-l-2 border-gray-200 pl-2">${order.purchaseNotes}</div>` : ''}
+
+                <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2">
+                        <span class="supplier-badge">${order.supplier}</span>
+                        ${order.supplierNumber ? `<span class="text-xs text-gray-500">單號: ${order.supplierNumber}</span>` : ''}
+                    </div>
+                    <div class="flex gap-2">
+                        ${order.status === 'pending' || order.status === 'ordered' ? `
+                            <button class="receive-btn text-green-600 hover:text-green-800 p-1" data-id="${order.id}" title="確認收貨">
+                                <i class="fas fa-truck-loading text-sm"></i>
+                            </button>
+                        ` : ''}
+                        <button class="edit-btn text-blue-600 hover:text-blue-800 p-1" data-id="${order.id}" title="編輯">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                        ${order.status === 'pending' ? `
+                            <button class="delete-btn text-red-600 hover:text-red-800 p-1" data-id="${order.id}" title="刪除">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // 新增採購單
+        function newPurchaseOrder() {
+            // 重置表單
+            document.getElementById('purchaseForm').reset();
+            document.getElementById('modalTitle').textContent = '新增採購單';
+            document.getElementById('formStatusDisplay').textContent = '待處理';
+
+            // 設定預設值
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('purchaseDate').value = today;
+            document.getElementById('expectedDate').value = today;
+            document.getElementById('purchaseNumber').value = generatePurchaseNumber();
+
+            // 清空品項容器
+            document.getElementById('purchaseItemsContainer').innerHTML = '';
+            addPurchaseItem(); // 添加一個空的品項欄位
+
+            // 重置總計
+            updateTotals();
+
+            editingPurchaseId = null;
+
+            // 顯示模態框
+            document.getElementById('purchaseModal').classList.remove('hidden');
+            document.getElementById('purchaseModal').classList.add('flex');
+        }
+
+        // 編輯採購單
+        function editPurchaseOrder(orderId) {
+            const order = purchaseOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            // 填充表單
+            document.getElementById('purchaseNumber').value = order.purchaseNumber;
+            document.getElementById('purchaseDate').value = order.purchaseDate;
+            document.getElementById('expectedDate').value = order.expectedDate || '';
+            document.getElementById('urgencyLevel').value = order.urgencyLevel;
+            document.getElementById('supplier').value = order.supplier;
+            document.getElementById('supplierNumber').value = order.supplierNumber || '';
+            document.getElementById('supplierNotes').value = order.supplierNotes || '';
+            document.getElementById('paymentMethod').value = order.paymentMethod;
+            document.getElementById('paymentStatus').value = order.paymentStatus;
+            document.getElementById('purchaseNotes').value = order.purchaseNotes || '';
+
+            // 填充品項
+            const itemsContainer = document.getElementById('purchaseItemsContainer');
+            itemsContainer.innerHTML = '';
+
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(item => {
+                    addPurchaseItem(item);
+                });
+            } else {
+                addPurchaseItem();
+            }
+
+            // 更新總計
+            updateTotals();
+
+            // 更新狀態顯示
+            document.getElementById('formStatusDisplay').textContent = getStatusText(order.status);
+
+            // 更新模態框標題
+            document.getElementById('modalTitle').textContent = '編輯採購單';
+
+            editingPurchaseId = orderId;
+
+            // 顯示模態框
+            document.getElementById('purchaseModal').classList.remove('hidden');
+            document.getElementById('purchaseModal').classList.add('flex');
+        }
+
+        // 新增採購品項欄位
+        function addPurchaseItem(itemData = null) {
+            const container = document.getElementById('purchaseItemsContainer');
+            const itemId = generateId();
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'purchase-item bg-gray-50 rounded-lg p-4 border border-gray-200';
+            itemDiv.dataset.id = itemId;
+
+            // 預設值
+            const itemName = itemData ? itemData.name : '';
+            const englishName = itemData ? itemData.englishName : '';
+            const quantity = itemData ? itemData.quantity : 1;
+            const unit = itemData ? itemData.unit : '瓶';
+            const unitPrice = itemData ? itemData.unitPrice : 0;
+            const batchNumber = itemData ? itemData.batchNumber : '';
+            const expirationDate = itemData ? itemData.expirationDate : '';
+            const notes = itemData ? itemData.notes : '';
+            const inventoryItemId = itemData ? itemData.inventoryItemId : '';
+
+            itemDiv.innerHTML = `
+                <div class="flex justify-between items-start mb-3">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-800">採購品項</div>
+                        <div class="text-xs text-gray-500">填寫品項詳細資訊</div>
+                    </div>
+                    <button type="button" class="remove-item-btn text-red-600 hover:text-red-800 p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">品項名稱 *</label>
+                        <select class="item-select w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <option value="">選擇庫存品項</option>
+                            ${inventoryItems.map(item =>
+                `<option value="${item.id}" data-name="${item.name}" data-english="${item.englishName || ''}" data-unit="${item.unit}" ${inventoryItemId === item.id ? 'selected' : ''}>
+                                    ${item.name} (${item.category})
+                                </option>`
+            ).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">數量 *</label>
+                        <input type="number" class="item-quantity w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" min="1" value="${quantity}">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">單位</label>
+                        <select class="item-unit w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                            <option value="瓶" ${unit === '瓶' ? 'selected' : ''}>瓶</option>
+                            <option value="支" ${unit === '支' ? 'selected' : ''}>支</option>
+                            <option value="個" ${unit === '個' ? 'selected' : ''}>個</option>
+                            <option value="盒" ${unit === '盒' ? 'selected' : ''}>盒</option>
+                            <option value="組" ${unit === '組' ? 'selected' : ''}>組</option>
+                            <option value="包" ${unit === '包' ? 'selected' : ''}>包</option>
+                            <option value="毫升" ${unit === '毫升' ? 'selected' : ''}>毫升</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">單價 *</label>
+                        <div class="relative">
+                            <span class="absolute left-2 top-2 text-gray-500 text-sm">$</span>
+                            <input type="number" class="item-unit-price w-full pl-6 pr-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" min="0" step="1" value="${unitPrice}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">批號</label>
+                        <input type="text" class="item-batch-number w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" value="${batchNumber}" placeholder="例: BTX-2025-001">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">有效期限</label>
+                        <input type="date" class="item-expiration-date w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" value="${expirationDate}">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 mb-1">備註</label>
+                    <input type="text" class="item-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm" value="${notes}" placeholder="輸入備註...">
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center">
+                    <div class="text-xs text-gray-500">小計: <span class="font-medium item-total">$${(quantity * unitPrice).toLocaleString()}</span></div>
+                    <button type="button" class="calculate-btn text-xs text-blue-600 hover:text-blue-800">
+                        重新計算
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(itemDiv);
+
+            // 綁定事件
+            const itemSelect = itemDiv.querySelector('.item-select');
+            const quantityInput = itemDiv.querySelector('.item-quantity');
+            const unitPriceInput = itemDiv.querySelector('.item-unit-price');
+            const removeBtn = itemDiv.querySelector('.remove-item-btn');
+            const calculateBtn = itemDiv.querySelector('.calculate-btn');
+
+            // 品項選擇事件
+            itemSelect.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                if (selectedOption.value) {
+                    // 自動填寫名稱和單位
+                    const name = selectedOption.dataset.name;
+                    const englishName = selectedOption.dataset.english;
+                    const unit = selectedOption.dataset.unit;
+
+                    // 這裡可以添加邏輯來自動填寫預設單價
+                    // 基於庫存項目的歷史採購價格
+                }
+                updateItemTotal(itemDiv);
+                updateTotals();
+            });
+
+            // 數量/單價變更事件
+            quantityInput.addEventListener('input', () => {
+                updateItemTotal(itemDiv);
+                updateTotals();
+            });
+
+            unitPriceInput.addEventListener('input', () => {
+                updateItemTotal(itemDiv);
+                updateTotals();
+            });
+
+            // 移除按鈕
+            removeBtn.addEventListener('click', function () {
+                if (container.children.length > 1) {
+                    container.removeChild(itemDiv);
+                    updateTotals();
+                }
+            });
+
+            // 計算按鈕
+            calculateBtn.addEventListener('click', function () {
+                updateItemTotal(itemDiv);
+                updateTotals();
+            });
+
+            // 如果提供了數據，手動觸發計算
+            if (itemData) {
+                updateItemTotal(itemDiv);
+            }
+
+            return itemDiv;
+        }
+
+        // 更新品項小計
+        function updateItemTotal(itemDiv) {
+            const quantity = parseFloat(itemDiv.querySelector('.item-quantity').value) || 0;
+            const unitPrice = parseFloat(itemDiv.querySelector('.item-unit-price').value) || 0;
+            const total = quantity * unitPrice;
+
+            itemDiv.querySelector('.item-total').textContent = `$${total.toLocaleString()}`;
+        }
+
+        // 更新總計
+        function updateTotals() {
+            const items = document.querySelectorAll('.purchase-item');
+            let subtotal = 0;
+
+            items.forEach(itemDiv => {
+                const quantity = parseFloat(itemDiv.querySelector('.item-quantity').value) || 0;
+                const unitPrice = parseFloat(itemDiv.querySelector('.item-unit-price').value) || 0;
+                subtotal += quantity * unitPrice;
+            });
+
+            const tax = subtotal * 0.05; // 5% 稅金
+            const shipping = 0; // 暫時不計算運費
+            const total = subtotal + tax + shipping;
+
+            // 更新顯示
+            document.getElementById('subtotalAmount').textContent = `$${subtotal.toLocaleString()}`;
+            document.getElementById('taxAmount').textContent = `$${tax.toLocaleString()}`;
+            document.getElementById('shippingAmount').textContent = `$${shipping.toLocaleString()}`;
+            document.getElementById('totalAmount').textContent = `$${total.toLocaleString()}`;
+
+            // 更新品項計數
+            document.getElementById('itemCount').textContent = `(${items.length} 項品項)`;
+        }
+
+        // 儲存採購單
+        function savePurchaseOrder(status = 'pending') {
+            // 驗證表單
+            if (!validatePurchaseForm()) return;
+
+            // 收集品項數據
+            const purchaseItems = [];
+            document.querySelectorAll('.purchase-item').forEach(itemDiv => {
+                const itemSelect = itemDiv.querySelector('.item-select');
+                const selectedOption = itemSelect.options[itemSelect.selectedIndex];
+
+                const item = {
+                    id: itemDiv.dataset.id,
+                    inventoryItemId: itemSelect.value,
+                    name: selectedOption.dataset.name || '',
+                    englishName: selectedOption.dataset.english || '',
+                    quantity: parseInt(itemDiv.querySelector('.item-quantity').value),
+                    unit: itemDiv.querySelector('.item-unit').value,
+                    unitPrice: parseFloat(itemDiv.querySelector('.item-unit-price').value),
+                    batchNumber: itemDiv.querySelector('.item-batch-number').value,
+                    expirationDate: itemDiv.querySelector('.item-expiration-date').value,
+                    notes: itemDiv.querySelector('.item-notes').value
+                };
+
+                item.totalPrice = item.quantity * item.unitPrice;
+                purchaseItems.push(item);
+            });
+
+            // 計算金額
+            const subtotal = purchaseItems.reduce((sum, item) => sum + item.totalPrice, 0);
+            const tax = subtotal * 0.05;
+            const shipping = 0;
+            const total = subtotal + tax + shipping;
+
+            const purchaseData = {
+                purchaseNumber: document.getElementById('purchaseNumber').value,
+                purchaseDate: document.getElementById('purchaseDate').value,
+                expectedDate: document.getElementById('expectedDate').value,
+                actualReceiveDate: '',
+                supplier: document.getElementById('supplier').value,
+                supplierNumber: document.getElementById('supplierNumber').value,
+                urgencyLevel: document.getElementById('urgencyLevel').value,
+                status: status,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                paymentStatus: document.getElementById('paymentStatus').value,
+                totalAmount: total,
+                subtotal: subtotal,
+                tax: tax,
+                shipping: shipping,
+                items: purchaseItems,
+                supplierNotes: document.getElementById('supplierNotes').value,
+                purchaseNotes: document.getElementById('purchaseNotes').value,
+                updated_at: new Date().toISOString().split('T')[0]
+            };
+
+            if (editingPurchaseId) {
+                // 更新現有採購單
+                const index = purchaseOrders.findIndex(o => o.id === editingPurchaseId);
+                if (index !== -1) {
+                    purchaseData.id = editingPurchaseId;
+                    purchaseData.created_at = purchaseOrders[index].created_at;
+                    purchaseOrders[index] = purchaseData;
+                }
+            } else {
+                // 新增採購單
+                purchaseData.id = generateId();
+                purchaseData.created_at = new Date().toISOString().split('T')[0];
+                purchaseOrders.push(purchaseData);
+            }
+
+            // 儲存到 localStorage
+            localStorage.setItem('purchaseOrders', JSON.stringify(purchaseOrders));
+
+            // 關閉模態框
+            document.getElementById('purchaseModal').classList.add('hidden');
+            document.getElementById('purchaseModal').classList.remove('flex');
+
+            // 重新渲染
+            renderPurchaseOrders();
+
+            // 顯示成功訊息
+            showToast(`採購單已${editingPurchaseId ? '更新' : '新增'}！`, 'success');
+
+            editingPurchaseId = null;
+        }
+
+        // 確認收貨
+        function confirmReceiveOrder(orderId) {
+            const order = purchaseOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            // 顯示收貨確認模態框
+            document.getElementById('receivePurchaseNumber').textContent = `採購單: ${order.purchaseNumber}`;
+            document.getElementById('actualReceiveDate').value = new Date().toISOString().split('T')[0];
+
+            // 儲存當前訂單 ID
+            document.getElementById('receiveModal').dataset.orderId = orderId;
+
+            // 顯示模態框
+            document.getElementById('receiveModal').classList.remove('hidden');
+            document.getElementById('receiveModal').classList.add('flex');
+        }
+
+        // 執行收貨
+        function executeReceiveOrder() {
+            const orderId = document.getElementById('receiveModal').dataset.orderId;
+            const actualDate = document.getElementById('actualReceiveDate').value;
+            const receiveNotes = document.getElementById('receiveNotes').value;
+
+            if (!actualDate) {
+                showToast('請填寫實際到貨日期', 'error');
+                return;
+            }
+
+            const order = purchaseOrders.find(o => o.id === orderId);
+            if (!order) return;
+
+            // 更新訂單狀態
+            order.status = 'received';
+            order.actualReceiveDate = actualDate;
+            order.updated_at = new Date().toISOString().split('T')[0];
+
+            // 更新庫存
+            order.items.forEach(purchaseItem => {
+                const inventoryItem = inventoryItems.find(item => item.id === purchaseItem.inventoryItemId);
+                if (inventoryItem) {
+                    // 增加庫存
+                    inventoryItem.currentStock += purchaseItem.quantity;
+
+                    // 更新批號（如果提供了新批號）
+                    if (purchaseItem.batchNumber) {
+                        inventoryItem.batchNumber = purchaseItem.batchNumber;
+                    }
+
+                    // 重新計算狀態
+                    inventoryItem.status = calculateInventoryStatus(inventoryItem);
+
+                    // 更新更新時間
+                    inventoryItem.updated_at = new Date().toISOString().split('T')[0];
+                }
+            });
+
+            // 儲存更新
+            localStorage.setItem('purchaseOrders', JSON.stringify(purchaseOrders));
+            localStorage.setItem('inventoryItems', JSON.stringify(inventoryItems));
+
+            // 關閉模態框
+            document.getElementById('receiveModal').classList.add('hidden');
+            document.getElementById('receiveModal').classList.remove('flex');
+
+            // 重置表單
+            document.getElementById('receiveNotes').value = '';
+
+            // 重新渲染
+            renderPurchaseOrders();
+
+            // 顯示成功訊息
+            showToast('收貨完成！庫存已更新', 'success');
+        }
+
+        // 驗證表單
+        function validatePurchaseForm() {
+            // 檢查品項
+            const items = document.querySelectorAll('.purchase-item');
+            if (items.length === 0) {
+                showToast('請至少添加一項採購品項', 'error');
+                return false;
+            }
+
+            // 檢查每個品項
+            let isValid = true;
+            items.forEach((itemDiv, index) => {
+                const itemSelect = itemDiv.querySelector('.item-select');
+                const quantity = itemDiv.querySelector('.item-quantity').value;
+                const unitPrice = itemDiv.querySelector('.item-unit-price').value;
+
+                if (!itemSelect.value) {
+                    showToast(`第 ${index + 1} 項: 請選擇品項`, 'error');
+                    itemSelect.classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    itemSelect.classList.remove('border-red-500');
+                }
+
+                if (!quantity || quantity <= 0) {
+                    showToast(`第 ${index + 1} 項: 請輸入有效的數量`, 'error');
+                    itemDiv.querySelector('.item-quantity').classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    itemDiv.querySelector('.item-quantity').classList.remove('border-red-500');
+                }
+
+                if (!unitPrice || unitPrice <= 0) {
+                    showToast(`第 ${index + 1} 項: 請輸入有效的單價`, 'error');
+                    itemDiv.querySelector('.item-unit-price').classList.add('border-red-500');
+                    isValid = false;
+                } else {
+                    itemDiv.querySelector('.item-unit-price').classList.remove('border-red-500');
+                }
+            });
+
+            return isValid;
+        }
+
+        // 計算庫存狀態（從庫存頁面複製）
+        function calculateInventoryStatus(item) {
+            if (item.currentStock <= 0) {
+                return "缺貨";
+            } else if (item.lowStockThreshold && item.currentStock <= item.lowStockThreshold) {
+                return "低庫存";
+            } else {
+                return "充足";
+            }
+        }
+
+        // 更新統計數據
+        function updateStatistics() {
+            const today = new Date();
+            const currentMonth = today.getMonth();
+            const currentYear = today.getFullYear();
+
+            // 待處理採購單
+            const pendingCount = purchaseOrders.filter(order =>
+                order.status === 'pending' || order.status === 'ordered'
+            ).length;
+
+            // 本月到貨
+            const receivedThisMonth = purchaseOrders.filter(order => {
+                if (order.status !== 'received' || !order.actualReceiveDate) return false;
+                const receiveDate = new Date(order.actualReceiveDate);
+                return receiveDate.getFullYear() === currentYear && receiveDate.getMonth() === currentMonth;
+            }).length;
+
+            // 本月採購金額
+            const monthlyTotal = purchaseOrders.filter(order => {
+                const purchaseDate = new Date(order.purchaseDate);
+                return purchaseDate.getFullYear() === currentYear && purchaseDate.getMonth() === currentMonth;
+            }).reduce((sum, order) => sum + order.totalAmount, 0);
+
+            // 急單數量
+            const urgentCount = purchaseOrders.filter(order =>
+                order.urgencyLevel === 'high' && (order.status === 'pending' || order.status === 'ordered')
+            ).length;
+
+            // 更新顯示
+            document.getElementById('pendingCount').textContent = pendingCount;
+            document.getElementById('receivedThisMonth').textContent = receivedThisMonth;
+            document.getElementById('monthlyTotal').textContent = `$${monthlyTotal.toLocaleString()}`;
+            document.getElementById('urgentCount').textContent = urgentCount;
+        }
+
+        // 輔助函數
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '待處理',
+                'ordered': '已訂購',
+                'shipped': '已出貨',
+                'received': '已到貨',
+                'cancelled': '已取消'
+            };
+            return statusMap[status] || status;
+        }
+
+        function getStatusClass(status) {
+            const classMap = {
+                'pending': 'pending',
+                'ordered': 'pending',
+                'shipped': 'pending',
+                'received': 'received',
+                'cancelled': 'cancelled'
+            };
+            return classMap[status] || 'pending';
+        }
+
+        function getUrgencyText(urgency) {
+            const urgencyMap = {
+                'high': '急單',
+                'medium': '中等',
+                'low': '一般'
+            };
+            return urgencyMap[urgency] || '一般';
+        }
+
+        function getUrgencyColor(urgency) {
+            const colorMap = {
+                'high': '#ef4444',
+                'medium': '#f59e0b',
+                'low': '#10b981'
+            };
+            return colorMap[urgency] || '#10b981';
+        }
+
+        function getPaymentStatusText(status) {
+            const statusMap = {
+                'pending': '未付款',
+                'partial': '部分付款',
+                'paid': '已付款'
+            };
+            return statusMap[status] || status;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+        }
+
+        // 顯示提示訊息
+        function showToast(message, type = 'info') {
+            // 創建 toast 元素
+            const toast = document.createElement('div');
+            toast.className = `fixed top-20 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-fade-in ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            // 3秒後移除
+            setTimeout(() => {
+                toast.classList.remove('animate-fade-in');
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 設定事件監聽器
+        function setupEventListeners() {
+            // 新增採購單按鈕
+            document.getElementById('newPurchaseBtn').addEventListener('click', newPurchaseOrder);
+
+            // 搜尋輸入
+            document.getElementById('searchInput').addEventListener('input', function () {
+                searchTerm = this.value.toLowerCase();
+                renderPurchaseOrders();
+            });
+
+            // 狀態篩選
+            document.getElementById('statusFilter').addEventListener('change', function () {
+                currentStatusFilter = this.value;
+                renderPurchaseOrders();
+            });
+
+            // 緊急程度篩選
+            document.getElementById('urgencyFilter').addEventListener('change', function () {
+                currentUrgencyFilter = this.value;
+                renderPurchaseOrders();
+            });
+
+            // 快速篩選
+            document.querySelectorAll('.quick-filter').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const status = this.dataset.status;
+                    const urgency = this.dataset.urgency;
+                    const supplier = this.dataset.supplier;
+                    const category = this.dataset.category;
+
+                    if (status) {
+                        document.getElementById('statusFilter').value = status;
+                        currentStatusFilter = status;
+                    }
+                    if (urgency) {
+                        document.getElementById('urgencyFilter').value = urgency;
+                        currentUrgencyFilter = urgency;
+                    }
+
+                    renderPurchaseOrders();
+                });
+            });
+
+            // 模態框關閉按鈕
+            document.getElementById('closeModalBtn').addEventListener('click', function () {
+                document.getElementById('purchaseModal').classList.add('hidden');
+                document.getElementById('purchaseModal').classList.remove('flex');
+            });
+
+            document.getElementById('cancelModalBtn').addEventListener('click', function () {
+                document.getElementById('purchaseModal').classList.add('hidden');
+                document.getElementById('purchaseModal').classList.remove('flex');
+            });
+
+            // 添加品項按鈕
+            document.getElementById('addItemBtn').addEventListener('click', function () {
+                addPurchaseItem();
+            });
+
+            // 儲存草稿按鈕
+            document.getElementById('saveDraftBtn').addEventListener('click', function () {
+                savePurchaseOrder('pending');
+            });
+
+            // 提交採購單按鈕
+            document.getElementById('submitPurchaseBtn').addEventListener('click', function () {
+                savePurchaseOrder('ordered');
+            });
+
+            // 收貨確認模態框
+            document.getElementById('cancelReceiveBtn').addEventListener('click', function () {
+                document.getElementById('receiveModal').classList.add('hidden');
+                document.getElementById('receiveModal').classList.remove('flex');
+            });
+
+            document.getElementById('confirmReceiveBtn').addEventListener('click', executeReceiveOrder);
+
+            // 委派事件（用於動態生成的元素）
+            document.addEventListener('click', function (e) {
+                // 編輯按鈕
+                if (e.target.closest('.edit-btn')) {
+                    const orderId = e.target.closest('.edit-btn').dataset.id;
+                    editPurchaseOrder(orderId);
+                }
+
+                // 刪除按鈕
+                if (e.target.closest('.delete-btn')) {
+                    const orderId = e.target.closest('.delete-btn').dataset.id;
+                    if (confirm('確定要刪除此採購單嗎？')) {
+                        purchaseOrders = purchaseOrders.filter(o => o.id !== orderId);
+                        localStorage.setItem('purchaseOrders', JSON.stringify(purchaseOrders));
+                        renderPurchaseOrders();
+                        showToast('採購單已刪除', 'success');
+                    }
+                }
+
+                // 確認收貨按鈕
+                if (e.target.closest('.receive-btn')) {
+                    const orderId = e.target.closest('.receive-btn').dataset.id;
+                    confirmReceiveOrder(orderId);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

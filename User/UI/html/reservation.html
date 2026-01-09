@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>皮膚部 - 門診預約</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Mobile Container -->
+    <div class="max-w-md mx-auto bg-white min-h-screen">
+
+        <!-- Status Bar -->
+        <div class="bg-indigo-900 text-white px-4 py-2 flex items-center justify-between text-sm">
+            <div class="flex items-center gap-2">
+                <span>16:22</span>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8" />
+                </svg>
+                <span>•••</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span>📶</span>
+                <span>75%</span>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-pink-300 to-pink-200 px-4 py-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button class="text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h1 class="text-white text-3xl font-medium">皮膚部</h1>
+            </div>
+            <!-- Added Chat button with icon to the left of login button -->
+            <div class="flex items-center gap-3">
+                <button class="text-white flex items-center gap-1.5">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <span class="text-lg">討論</span>
+                </button>
+                <button class="text-white text-lg">總院 登入</button>
+            </div>
+        </div>
+
+        <!-- Date Selector -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="flex items-center">
+                <button class="p-4 text-gray-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+
+                <div class="flex flex-1 overflow-x-auto">
+                    <div class="flex-1 bg-pink-300 text-white text-center py-6">
+                        <div class="text-2xl font-medium">12/19</div>
+                        <div class="text-lg">(五)</div>
+                    </div>
+                    <div class="flex-1 text-pink-200 text-center py-6 border-l border-white">
+                        <div class="text-2xl font-medium">12/20</div>
+                        <div class="text-lg">(六)</div>
+                    </div>
+                    <div class="flex-1 text-pink-200 text-center py-6 border-l border-white">
+                        <div class="text-2xl font-medium">12/22</div>
+                        <div class="text-lg">(一)</div>
+                    </div>
+                    <div class="flex-1 text-pink-200 text-center py-6 border-l border-white">
+                        <div class="text-2xl font-medium">12/23</div>
+                        <div class="text-lg">(二)</div>
+                    </div>
+                </div>
+
+                <button class="p-4 text-gray-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Time Period Tabs -->
+        <div class="flex border-b border-gray-200 bg-white">
+            <button class="flex-1 py-4 text-gray-600 text-lg">上午門診(7)</button>
+            <button class="flex-1 py-4 text-pink-400 text-lg font-medium border-b-2 border-pink-400">下午門診(6)</button>
+            <button class="flex-1 py-4 text-gray-600 text-lg">夜間門診(0)</button>
+        </div>
+
+        <!-- Doctor List -->
+        <div class="divide-y divide-gray-100">
+
+            <!-- Doctor Card 1 -->
+            <div class="flex items-center gap-4 p-4 bg-white">
+                <img src="/placeholder.svg?height=120&width=120" alt="Doctor" class="w-24 h-32 object-cover rounded">
+                <div class="flex-1">
+                    <h3 class="text-pink-400 text-xl font-medium mb-1">黃柏瑋 第01診</h3>
+                    <p class="text-gray-500 text-sm mb-2">普通門診</p>
+                    <div class="bg-gray-500 text-white text-center py-2 px-4 text-sm">
+                        已逾當日掛號時間
+                    </div>
+                </div>
+                <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Doctor Card 2 -->
+            <div class="flex items-center gap-4 p-4 bg-white">
+                <img src="/placeholder.svg?height=120&width=120" alt="Doctor" class="w-24 h-32 object-cover rounded">
+                <div class="flex-1">
+                    <h3 class="text-pink-400 text-xl font-medium mb-1">陳柏樺 第02診 <span
+                            class="text-gray-400 text-base">(詳)</span></h3>
+                    <p class="text-gray-500 text-sm mb-2">普通門診</p>
+                    <div class="bg-gray-500 text-white text-center py-2 px-4 text-sm">
+                        已逾當日掛號時間
+                    </div>
+                </div>
+                <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Doctor Card 3 (No Photo) -->
+            <div class="flex items-center gap-4 p-4 bg-white">
+                <div class="w-24 h-32 bg-gray-200 rounded flex-shrink-0"></div>
+                <div class="flex-1">
+                    <h3 class="text-pink-400 text-xl font-medium mb-1">胡淑玲 第05診</h3>
+                    <p class="text-gray-500 text-sm mb-2">普通門診</p>
+                    <div class="bg-gray-500 text-white text-center py-2 px-4 text-sm">
+                        已逾當日掛號時間
+                    </div>
+                </div>
+                <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Doctor Card 4 -->
+            <div class="flex items-center gap-4 p-4 bg-white">
+                <img src="/placeholder.svg?height=120&width=120" alt="Doctor" class="w-24 h-32 object-cover rounded">
+                <div class="flex-1">
+                    <h3 class="text-pink-400 text-xl font-medium mb-1">謝博丞 第06診</h3>
+                    <p class="text-gray-500 text-sm mb-2">普通門診</p>
+                    <div class="bg-gray-500 text-white text-center py-2 px-4 text-sm">
+                        已逾當日掛號時間
+                    </div>
+                </div>
+                <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Doctor Card 5 -->
+            <div class="flex items-center gap-4 p-4 bg-white">
+                <img src="/placeholder.svg?height=120&width=120" alt="Doctor" class="w-24 h-32 object-cover rounded">
+                <div class="flex-1">
+                    <h3 class="text-pink-400 text-xl font-medium mb-1">邱政偉 第07診</h3>
+                    <p class="text-gray-500 text-sm mb-2">普通門診</p>
+                    <div class="bg-gray-500 text-white text-center py-2 px-4 text-sm">
+                        已逾當日掛號時間
+                    </div>
+                </div>
+                <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Doctor Card 6 -->
+            <div class="flex items-center gap-4 p-4 bg-white">
+                <img src="/placeholder.svg?height=120&width=120" alt="Doctor" class="w-24 h-32 object-cover rounded">
+                <div class="flex-1">
+                    <h3 class="text-pink-400 text-xl font-medium mb-1">卓雅哲 第13診</h3>
+                    <p class="text-gray-500 text-sm mb-2">普通門診</p>
+                    <div class="bg-gray-500 text-white text-center py-2 px-4 text-sm">
+                        已逾當日掛號時間
+                    </div>
+                </div>
+                <svg class="w-6 h-6 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <div
+            class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-200 flex justify-around items-center py-3">
+            <button class="p-2">
+                <div class="w-8 h-8 bg-gray-400 rounded"></div>
+            </button>
+            <button class="p-2">
+                <div class="w-12 h-12 border-4 border-gray-400 rounded-full"></div>
+            </button>
+            <button class="p-2">
+                <div
+                    class="w-0 h-0 border-l-[16px] border-l-transparent border-t-[24px] border-t-gray-400 border-r-[16px] border-r-transparent">
+                </div>
+            </button>
+        </div>
+
+    </div>
+</body>
+
+</html>

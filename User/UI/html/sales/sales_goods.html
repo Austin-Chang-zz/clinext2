@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選擇商品</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Status Bar -->
+    <div class="bg-white px-4 py-2 flex items-center justify-between text-sm">
+        <div class="flex items-center gap-2">
+            <span class="font-medium">8:54</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4z" />
+                <path fill-rule="evenodd"
+                    d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"
+                    clip-rule="evenodd" />
+            </svg>
+            <span>...</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a8 8 0 100 16 8 8 0 000-16z" />
+            </svg>
+            <div class="flex flex-col h-3 gap-0.5">
+                <div class="flex gap-0.5">
+                    <div class="w-1 h-1 bg-gray-800 rounded-sm"></div>
+                    <div class="w-1 h-1 bg-gray-800 rounded-sm"></div>
+                    <div class="w-1 h-1 bg-gray-800 rounded-sm"></div>
+                    <div class="w-1 h-1 bg-gray-400 rounded-sm"></div>
+                </div>
+            </div>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2" />
+                <path d="M12 4v8l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <div class="flex flex-col h-3 gap-0.5">
+                <div class="flex gap-0.5">
+                    <div class="w-1 h-1 bg-gray-800 rounded-sm"></div>
+                    <div class="w-1 h-1 bg-gray-800 rounded-sm"></div>
+                    <div class="w-1 h-1 bg-gray-800 rounded-sm"></div>
+                    <div class="w-1 h-1 bg-gray-400 rounded-sm"></div>
+                </div>
+            </div>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A9.007 9.007 0 001 12a9.007 9.007 0 001.222 3.778 1 1 0 001.414 0l1.464-1.464a1 1 0 000-1.414A5.003 5.003 0 015 12a5.003 5.003 0 01.1-1.9 1 1 0 000-1.414L3.636 7.222a1 1 0 010-1.414zm11.314 0a1 1 0 000 1.414l-1.464 1.464a1 1 0 000 1.414A5.003 5.003 0 0115 12a5.003 5.003 0 01-.1 1.9 1 1 0 000 1.414l1.464 1.464a1 1 0 001.414 0A9.007 9.007 0 0019 12a9.007 9.007 0 00-1.222-3.778zm-7.071 7.071a1 1 0 011.414 0 3 3 0 004.242 0 1 1 0 111.414 1.414 5 5 0 01-7.07 0 1 1 0 010-1.414z"
+                    clip-rule="evenodd" />
+            </svg>
+            <div class="px-1.5 py-0.5 border border-gray-400 rounded text-xs">100</div>
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <button class="p-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <div class="flex items-center gap-6">
+            <button class="text-lg font-medium text-gray-900">銷售</button>
+            <button class="text-lg font-medium text-gray-500">退貨</button>
+        </div>
+        <button class="p-1">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+        </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="bg-white px-4 py-3">
+        <div class="flex items-center gap-3 bg-gray-100 rounded-lg px-3 py-2">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" placeholder="名稱/條碼/編號貨號/簡拼"
+                class="flex-1 bg-transparent text-sm outline-none placeholder-gray-400" />
+            <button class="p-1">
+                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex h-[calc(100vh-280px)]">
+        <!-- Left Sidebar -->
+        <div class="w-36 bg-gray-100 flex flex-col">
+            <button class="px-4 py-4 text-left text-sm font-medium text-gray-900 bg-white border-r-2 border-cyan-500">
+                常購商品
+            </button>
+            <button class="px-4 py-4 text-left text-sm font-medium text-gray-600 bg-gray-100">
+                熱賣商品
+            </button>
+            <div class="mt-6 px-4">
+                <div class="text-sm font-medium text-cyan-500 mb-4">全部類別</div>
+                <button class="px-4 py-3 text-left text-sm text-gray-700 bg-white rounded-lg w-full">
+                    未分類
+                </button>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="flex-1 bg-gray-50 p-4 overflow-y-auto">
+            <div class="bg-white rounded-lg p-3 flex items-start gap-3 relative">
+                <!-- Product Image -->
+                <div
+                    class="w-20 h-20 bg-gradient-to-br from-cyan-400 to-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-10 h-10 text-white opacity-80" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <div class="absolute top-4 left-4 w-2 h-2 bg-white rounded-full"></div>
+                </div>
+
+                <!-- Product Info -->
+                <div class="flex-1 min-w-0">
+                    <h3 class="text-base font-medium text-gray-900 mb-1">Example</h3>
+                    <p class="text-sm text-gray-600 mb-1">庫存：10000Piece</p>
+                    <p class="text-base font-medium text-gray-900">¥0.01</p>
+                </div>
+
+                <!-- Add Button -->
+                <button
+                    class="absolute top-3 right-3 w-10 h-10 bg-cyan-500 text-white rounded-full flex items-center justify-center hover:bg-cyan-600 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="relative">
+                <svg class="w-10 h-10 text-cyan-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                        d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
+                </svg>
+                <span
+                    class="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                    0
+                </span>
+            </div>
+            <div>
+                <div class="text-lg font-medium text-orange-500">¥ 0<span class="text-sm">.00</span></div>
+                <div class="text-xs text-gray-500">種類 0，數量 0</div>
+            </div>
+        </div>
+        <button
+            class="bg-cyan-500 text-white px-10 py-3 rounded-lg text-base font-medium hover:bg-cyan-600 transition-colors">
+            選好了
+        </button>
+    </div>
+
+    <!-- Android Navigation Bar -->
+    <div class="bg-black h-12 flex items-center justify-around">
+        <button class="w-12 h-8 bg-gray-600 rounded"></button>
+        <button class="w-12 h-12 border-2 border-gray-400 rounded-full"></button>
+        <button
+            class="w-0 h-0 border-t-[16px] border-t-transparent border-r-[24px] border-r-gray-400 border-b-[16px] border-b-transparent"></button>
+    </div>
+</body>
+
+</html>

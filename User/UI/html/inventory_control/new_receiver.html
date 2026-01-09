@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增收貨資訊</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="max-w-2xl mx-auto bg-white min-h-screen">
+        <!-- Header -->
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+            <button class="text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <h1 class="text-lg font-medium">新增收貨地址</h1>
+            <button class="text-blue-600 font-medium">保存</button>
+        </div>
+
+        <!-- Receiver Information Section -->
+        <div class="px-4 py-5">
+            <div class="flex items-center gap-2 mb-4">
+                <h2 class="text-base font-medium text-gray-900">收貨資訊</h2>
+                <button class="w-5 h-5 rounded-full border-2 border-gray-400 flex items-center justify-center">
+                    <span class="text-gray-400 text-xs">?</span>
+                </button>
+            </div>
+
+            <!-- Receiver Name -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                    <label class="text-gray-900 text-base">收貨人</label>
+                    <input type="text" placeholder="請輸入" class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                </div>
+            </div>
+
+            <!-- Receiver Phone -->
+            <div class="mb-4">
+                <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                    <label class="text-gray-900 text-base">收貨人電話</label>
+                    <input type="tel" placeholder="請輸入" class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                </div>
+            </div>
+
+            <!-- Detailed Address -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                    <label class="text-gray-900 text-base">詳細地址</label>
+                    <input type="text" placeholder="請輸入" class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                </div>
+            </div>
+
+            <!-- Auxiliary Information Section -->
+            <div class="mt-8">
+                <button class="w-full flex items-center justify-between py-3 bg-gray-100 px-4 rounded-lg"
+                    onclick="toggleAuxInfo()">
+                    <h3 class="text-base font-medium text-gray-700">輔助資訊</h3>
+                    <svg id="auxArrow" class="w-5 h-5 text-gray-400 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                    </svg>
+                </button>
+
+                <div id="auxInfo" class="mt-4 space-y-4">
+                    <!-- Email -->
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <label class="text-gray-900 text-base">郵箱</label>
+                        <input type="email" placeholder="請輸入信箱"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Bank Name -->
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <label class="text-gray-900 text-base">開戶銀行</label>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Bank Account -->
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <label class="text-gray-900 text-base">銀行賬號</label>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- Birthday -->
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <label class="text-gray-900 text-base">生日</label>
+                        <div class="flex items-center gap-2 text-gray-400">
+                            <input type="date" placeholder="請選擇日期" class="text-right text-gray-400 outline-none" />
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- WeChat -->
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <label class="text-gray-900 text-base">微信</label>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+
+                    <!-- QQ -->
+                    <div class="flex items-center justify-between py-3 border-b border-gray-200">
+                        <label class="text-gray-900 text-base">QQ</label>
+                        <input type="text" placeholder="請輸入"
+                            class="text-right text-gray-400 outline-none flex-1 ml-4" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAuxInfo() {
+            const auxInfo = document.getElementById('auxInfo');
+            const arrow = document.getElementById('auxArrow');
+            auxInfo.classList.toggle('hidden');
+            arrow.classList.toggle('rotate-180');
+        }
+    </script>
+</body>
+
+</html>

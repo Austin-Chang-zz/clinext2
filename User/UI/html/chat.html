@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Discussion - 同欣電 6271</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-800">
+
+    <!-- Status Bar -->
+    <div class="bg-slate-700 px-4 py-2 flex items-center justify-between text-white text-sm">
+        <div class="flex items-center gap-2">
+            <span>10:14</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z">
+                </path>
+            </svg>
+            <span>⋯</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                </path>
+            </svg>
+            <span>⋯⋯</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z">
+                </path>
+            </svg>
+            <span class="px-2 py-0.5 border border-white rounded text-xs">99</span>
+            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+        </div>
+    </div>
+
+    <!-- Header with stock info -->
+    <div class="bg-slate-700 px-4 py-4">
+        <div class="flex items-center justify-between mb-4">
+            <button class="text-white text-2xl">‹</button>
+            <div class="flex items-center gap-3">
+                <button class="text-white text-xl">◁</button>
+                <div class="text-center">
+                    <div class="text-white text-2xl font-bold">同欣電</div>
+                    <div class="text-white text-lg">6271</div>
+                </div>
+                <button class="text-white text-xl">▷</button>
+            </div>
+            <div class="flex gap-2">
+                <button class="text-white text-xl">✈</button>
+                <button class="text-blue-400 text-2xl">★</button>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-start">
+            <div>
+                <div class="text-slate-300 text-sm mb-1">上市-可當沖/有股期/</div>
+                <div class="text-slate-300 text-sm mb-2">有權證</div>
+                <div class="flex items-baseline gap-2">
+                    <span class="text-red-500 text-5xl font-bold">123.0</span>
+                    <div class="text-red-500">
+                        <div class="flex items-center gap-1 text-lg">
+                            <span>▲</span>
+                            <span>0.5</span>
+                        </div>
+                        <div class="text-sm">(0.41%)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-slate-400 text-sm mb-1">12/19(五) 13:30</div>
+                <div class="text-slate-400 text-sm">單量 <span class="text-green-400">152</span></div>
+                <div class="text-slate-400 text-sm">總量 <span class="text-white">871</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-slate-800 flex justify-around border-b border-slate-700">
+        <button class="text-slate-400 py-3 px-4">營收</button>
+        <button class="text-slate-400 py-3 px-4">盈餘</button>
+        <button class="text-blue-400 py-3 px-4 border-b-2 border-blue-400">討論</button>
+        <button class="text-slate-400 py-3 px-4">主力</button>
+        <button class="text-slate-400 py-3 px-4">資券</button>
+    </div>
+
+    <!-- Filter buttons -->
+    <div class="bg-slate-800 px-4 py-3 flex justify-end gap-2">
+        <button class="text-white text-sm px-4 py-2 border border-slate-500 rounded">最新</button>
+        <button class="text-white text-sm px-4 py-2 border border-slate-500 rounded">熱門</button>
+    </div>
+
+    <!-- Chat/Discussion Feed -->
+    <div class="bg-slate-800 pb-20">
+
+        <!-- Post 1 -->
+        <div class="px-4 py-4 border-b border-slate-700">
+            <div class="flex items-start gap-3 mb-3">
+                <img src="/placeholder.svg?height=48&width=48" alt="User" class="w-12 h-12 rounded-full">
+                <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-white font-medium">蛇年好運來</h3>
+                        <button class="text-slate-400">⋯</button>
+                    </div>
+                    <div class="text-slate-400 text-sm">2小時前</div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <span class="inline-block bg-slate-700 text-white px-3 py-1 rounded text-sm mb-2">同欣電</span>
+                <p class="text-white text-lg">大戶又大增熱完車了吧</p>
+            </div>
+
+            <div class="flex items-center gap-2 mb-4">
+                <div class="bg-red-600 rounded-full w-6 h-6 flex items-center justify-center">
+                    <span class="text-white text-xs">👍</span>
+                </div>
+                <span class="text-white text-lg">3</span>
+            </div>
+
+            <div class="flex justify-around pt-3 border-t border-slate-700">
+                <button class="flex items-center gap-2 text-slate-400">
+                    <span class="text-xl">👍</span>
+                    <span>讚</span>
+                </button>
+                <button class="flex items-center gap-2 text-slate-400">
+                    <span class="text-xl">💬</span>
+                    <span>留言</span>
+                </button>
+                <button class="flex items-center gap-2 text-slate-400">
+                    <span class="text-xl">↗</span>
+                    <span>分享</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Post 2 -->
+        <div class="px-4 py-4">
+            <div class="flex items-start gap-3 mb-3">
+                <img src="/placeholder.svg?height=48&width=48" alt="User" class="w-12 h-12 rounded-full">
+                <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-white font-medium">咪菲巴</h3>
+                        <button class="text-slate-400">⋯</button>
+                    </div>
+                    <div class="text-slate-400 text-sm">9小時前</div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-4">
+                <span class="inline-block bg-slate-700 text-white px-3 py-1.5 rounded text-sm">啟碁</span>
+                <span class="inline-block bg-slate-700 text-white px-3 py-1.5 rounded text-sm">同欣電</span>
+                <span class="inline-block bg-slate-700 text-white px-3 py-1.5 rounded text-sm">華通</span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Input Bar -->
+    <div class="fixed bottom-14 left-0 right-0 bg-slate-800 px-4 py-3 border-t border-slate-700">
+        <div class="flex items-center gap-3">
+            <button class="text-slate-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                    </path>
+                </svg>
+            </button>
+            <input type="text" placeholder="傳訊息到..."
+                class="flex-1 bg-slate-700 text-slate-500 px-4 py-3 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-900 flex justify-around py-3">
+        <button class="text-slate-400 w-12 h-12 flex items-center justify-center">
+            <div class="w-8 h-8 bg-slate-600 rounded"></div>
+        </button>
+        <button class="text-slate-400 w-12 h-12 flex items-center justify-center">
+            <div class="w-10 h-10 border-2 border-slate-400 rounded-full"></div>
+        </button>
+        <button class="text-slate-400 w-12 h-12 flex items-center justify-center">
+            <div
+                class="w-0 h-0 border-l-[12px] border-l-transparent border-t-[20px] border-t-slate-400 border-r-[12px] border-r-transparent">
+            </div>
+        </button>
+    </div>
+
+</body>
+
+</html>

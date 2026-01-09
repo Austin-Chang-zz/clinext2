@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增商品</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <button class="text-2xl text-gray-700">✕</button>
+        <h1 class="text-lg font-medium text-gray-900">新增商品</h1>
+        <button class="text-base text-gray-700">保存</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pb-6">
+        <!-- Barcode Scanner -->
+        <div class="bg-white mx-4 mt-4 p-4 rounded-lg border border-blue-200">
+            <button class="w-full flex items-center justify-center gap-2 text-blue-500">
+                <span class="text-xl">⊡</span>
+                <span class="text-base">掃條碼快速輸入商品</span>
+            </button>
+        </div>
+
+        <!-- Product Name -->
+        <div class="bg-white mt-4 px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <label class="text-base text-gray-900">
+                    <span class="text-red-500">*</span>商品名稱
+                </label>
+                <input type="text" placeholder="請輸入"
+                    class="text-right text-gray-400 bg-transparent outline-none flex-1 ml-4">
+            </div>
+        </div>
+
+        <!-- SKU Number -->
+        <div class="bg-white px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <label class="text-base text-gray-900">編號/貨號</label>
+                <input type="text" placeholder="便於內部管理"
+                    class="text-right text-gray-400 bg-transparent outline-none flex-1 ml-4">
+            </div>
+        </div>
+
+        <!-- Category -->
+        <div class="bg-white px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <label class="text-base text-gray-900">商品分類</label>
+                <button class="flex items-center gap-2 text-gray-500">
+                    <span>未分類</span>
+                    <span class="text-gray-400">›</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="bg-white px-4 py-4 border-b border-gray-100">
+            <label class="text-base text-gray-900 block mb-3">圖片</label>
+            <button
+                class="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                <span class="text-4xl text-gray-400 font-light">+</span>
+            </button>
+        </div>
+
+        <!-- Unit -->
+        <div class="bg-white px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <label class="text-base text-gray-900">單位</label>
+                <button class="flex items-center gap-2 text-gray-400">
+                    <span>請選擇單位</span>
+                    <span>›</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Barcode -->
+        <div class="bg-white px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <label class="text-base text-gray-900">條碼</label>
+                <div class="flex items-center gap-3 flex-1 justify-end">
+                    <input type="text" placeholder="請輸入" class="text-right text-gray-400 bg-transparent outline-none">
+                    <button class="flex items-center gap-1 text-blue-500 text-sm">
+                        <span>自動生成</span>
+                        <span class="text-lg">⟲</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multiple Specifications Toggle -->
+        <div class="bg-white px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <label class="text-base text-gray-900">多重規格</label>
+                    <button
+                        class="w-5 h-5 rounded-full border border-gray-300 flex items-center justify-center text-xs text-gray-500">?</button>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer">
+                    <div
+                        class="w-12 h-7 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-5 after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500">
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Specification -->
+        <div class="bg-white px-4 py-3 border-b border-gray-100">
+            <div class="flex items-center justify-between">
+                <label class="text-base text-gray-900">規格</label>
+                <input type="text" placeholder="規格或型號，如：300ml"
+                    class="text-right text-gray-400 bg-transparent outline-none flex-1 ml-4">
+            </div>
+        </div>
+
+        <!-- Price Section -->
+        <div class="bg-white mt-4">
+            <div class="px-4 py-3 border-b border-gray-100">
+                <h2 class="text-base text-gray-900">價格 (¥)</h2>
+            </div>
+
+            <!-- Purchase Price -->
+            <div class="px-4 py-3 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-base text-gray-900">進貨價</label>
+                    <input type="number" value="0.00" class="text-right text-gray-900 bg-transparent outline-none w-24">
+                </div>
+            </div>
+
+            <!-- Retail Price -->
+            <div class="px-4 py-3 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-base text-gray-900">零售價</label>
+                    <input type="number" value="0.00" class="text-right text-gray-900 bg-transparent outline-none w-24">
+                </div>
+            </div>
+
+            <!-- Wholesale Price -->
+            <div class="px-4 py-3 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-base text-gray-900">批發價</label>
+                    <input type="number" value="0.00" class="text-right text-gray-900 bg-transparent outline-none w-24">
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Section -->
+        <div class="bg-white mt-4">
+            <div class="px-4 py-3 border-b border-gray-100">
+                <h2 class="text-base text-gray-900">庫存</h2>
+            </div>
+
+            <!-- Initial Cost -->
+            <div class="px-4 py-3 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-base text-gray-900">初始成本</label>
+                    <input type="number" value="0.00" class="text-right text-gray-900 bg-transparent outline-none w-24">
+                </div>
+            </div>
+
+            <!-- Initial Inventory -->
+            <div class="px-4 py-3 border-b border-gray-100">
+                <div class="flex items-center justify-between">
+                    <label class="text-base text-gray-900">初始庫存</label>
+                    <input type="number" value="0" class="text-right text-gray-900 bg-transparent outline-none w-24">
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div class="px-4 py-3">
+                <div class="flex items-start justify-between mb-2">
+                    <label class="text-base text-gray-900">備註</label>
+                    <span class="text-sm text-gray-400">0/200</span>
+                </div>
+                <textarea placeholder="在這裡輸入關於商品的詳細信息...." rows="3"
+                    class="w-full text-gray-400 bg-transparent outline-none resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- More Information -->
+        <div class="bg-white mt-4 px-4 py-4">
+            <button class="w-full flex flex-col items-center gap-1 text-gray-500">
+                <span class="text-base">更多信息</span>
+                <span class="text-sm text-gray-400">輸入供應商、品牌等訊息</span>
+                <span class="text-gray-400 mt-1">∨</span>
+            </button>
+        </div>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,1554 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>療程訂單管理 - Clinext</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-new {
+            background-color: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status-in-progress {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-completed {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-preorder {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        /* Priority indicators */
+        .priority-high {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        .priority-medium {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #f59e0b;
+        }
+
+        .priority-low {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10b981;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Table styling */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .table-container table {
+            min-width: 1200px;
+        }
+
+        .table-container th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 12px 16px;
+            border-bottom: 2px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table-container th:hover {
+            background-color: #f1f5f9;
+        }
+
+        .table-container td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .table-container tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Card view styling */
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .order-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Stats cards */
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid transparent;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 pb-20">
+    <!-- 頂部導航 -->
+    <div
+        class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+            <a href="../staff/dashboard.html" class="text-white hover:bg-white/10 p-1 rounded-full transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-lg font-medium">療程訂單管理</h1>
+                <p class="text-xs text-white/80">歷史訂單、進行中訂單、預約訂單管理</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <button id="viewToggle"
+                class="text-sm bg-white/20 hover:bg-white/30 px-3 py-1 rounded-full transition-colors flex items-center gap-1">
+                <i class="fas fa-th-list text-xs"></i>
+                <span>卡片檢視</span>
+            </button>
+            <a href="new_order.html"
+                class="bg-white text-green-700 hover:bg-gray-100 px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-colors">
+                <i class="fas fa-plus"></i>
+                <span>新增訂單</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 統計卡片 -->
+    <div class="px-4 py-4">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div class="stat-card" style="border-top-color: #3b82f6;">
+                <div class="text-2xl font-bold text-gray-800" id="totalOrders">0</div>
+                <div class="text-sm text-gray-500">總訂單數</div>
+            </div>
+            <div class="stat-card" style="border-top-color: #f59e0b;">
+                <div class="text-2xl font-bold text-gray-800" id="newOrders">0</div>
+                <div class="text-sm text-gray-500">新訂單</div>
+            </div>
+            <div class="stat-card" style="border-top-color: #10b981;">
+                <div class="text-2xl font-bold text-gray-800" id="inProgressOrders">0</div>
+                <div class="text-sm text-gray-500">進行中</div>
+            </div>
+            <div class="stat-card" style="border-top-color: #8b5cf6;">
+                <div class="text-2xl font-bold text-gray-800" id="preOrders">0</div>
+                <div class="text-sm text-gray-500">預約訂單</div>
+            </div>
+            <div class="stat-card" style="border-top-color: #ef4444;">
+                <div class="text-2xl font-bold text-gray-800" id="cancelledOrders">0</div>
+                <div class="text-sm text-gray-500">已取消</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜尋與篩選區塊 -->
+    <div class="px-4 py-4 bg-white border-b border-gray-200">
+        <div class="flex flex-col md:flex-row gap-4">
+            <!-- 搜尋框 -->
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="搜尋訂單編號、患者姓名、電話或療程名稱..."
+                    class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            </div>
+
+            <!-- 日期範圍選擇 -->
+            <div class="flex gap-2">
+                <input type="text" id="dateRangePicker" placeholder="選擇日期範圍..."
+                    class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-4 mt-4">
+            <!-- 狀態篩選 -->
+            <div class="flex-1">
+                <label class="block text-sm font-medium text-gray-700 mb-2">訂單狀態</label>
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        class="status-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                        data-status="all">
+                        全部訂單
+                    </button>
+                    <button
+                        class="status-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                        data-status="new">
+                        <i class="fas fa-clock mr-1"></i>新訂單
+                    </button>
+                    <button
+                        class="status-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                        data-status="in_progress">
+                        <i class="fas fa-spinner mr-1"></i>進行中
+                    </button>
+                    <button
+                        class="status-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                        data-status="completed">
+                        <i class="fas fa-check mr-1"></i>已完成
+                    </button>
+                    <button
+                        class="status-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                        data-status="preorder">
+                        <i class="fas fa-calendar-alt mr-1"></i>預約訂單
+                    </button>
+                    <button
+                        class="status-filter text-xs px-3 py-1.5 rounded-full border border-gray-300 hover:bg-gray-50 transition-colors"
+                        data-status="cancelled">
+                        <i class="fas fa-times mr-1"></i>已取消
+                    </button>
+                </div>
+            </div>
+
+            <!-- 其他篩選 -->
+            <div class="flex gap-2">
+                <select id="priorityFilter"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <option value="">所有優先級</option>
+                    <option value="high">高優先</option>
+                    <option value="medium">中優先</option>
+                    <option value="low">低優先</option>
+                </select>
+
+                <select id="paymentFilter"
+                    class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                    <option value="">付款方式</option>
+                    <option value="cash">現金</option>
+                    <option value="credit_card">信用卡</option>
+                    <option value="transfer">轉帳</option>
+                    <option value="instalment">分期付款</option>
+                </select>
+
+                <button id="clearFiltersBtn"
+                    class="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    清除篩選
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 表格檢視容器 -->
+    <div id="tableView" class="px-4 py-6">
+        <div class="flex justify-between items-center mb-4">
+            <div class="text-sm text-gray-600" id="tableInfo">
+                顯示 0 筆訂單
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-600">排序：</span>
+                <select id="sortBy"
+                    class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
+                    <option value="date_desc">最新訂單</option>
+                    <option value="date_asc">最舊訂單</option>
+                    <option value="amount_desc">金額最高</option>
+                    <option value="amount_asc">金額最低</option>
+                    <option value="priority_desc">優先級最高</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container bg-white rounded-xl">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th data-sort="order_id">訂單編號 <i class="fas fa-sort ml-1"></i></th>
+                        <th data-sort="patient_name">患者資訊 <i class="fas fa-sort ml-1"></i></th>
+                        <th data-sort="date">日期 <i class="fas fa-sort ml-1"></i></th>
+                        <th data-sort="status">狀態 <i class="fas fa-sort ml-1"></i></th>
+                        <th data-sort="treatments">療程項目 <i class="fas fa-sort ml-1"></i></th>
+                        <th data-sort="total">總金額 <i class="fas fa-sort ml-1"></i></th>
+                        <th data-sort="priority">優先級 <i class="fas fa-sort ml-1"></i></th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTableBody">
+                    <!-- 訂單數據將由 JavaScript 動態生成 -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分頁控制 -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <span id="currentRange">0-0</span> 筆，共 <span id="totalItems">0</span> 筆
+            </div>
+            <div class="flex gap-2">
+                <button id="prevPageBtn"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    上一頁
+                </button>
+                <div class="flex items-center gap-1">
+                    <button class="page-btn px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        data-page="1">1</button>
+                    <span class="px-2">...</span>
+                </div>
+                <button id="nextPageBtn"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    下一頁
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 卡片檢視容器 -->
+    <div id="cardView" class="hidden px-4 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="orderCardContainer">
+            <!-- 訂單卡片將由 JavaScript 動態生成 -->
+        </div>
+
+        <!-- 分頁控制 -->
+        <div class="flex justify-between items-center mt-6">
+            <div class="text-sm text-gray-600">
+                <span id="cardCurrentRange">0-0</span> 筆，共 <span id="cardTotalItems">0</span> 筆
+            </div>
+            <div class="flex gap-2">
+                <button id="cardPrevPageBtn"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    上一頁
+                </button>
+                <div class="flex items-center gap-1">
+                    <button class="card-page-btn px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        data-page="1">1</button>
+                    <span class="px-2">...</span>
+                </div>
+                <button id="cardNextPageBtn"
+                    class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    下一頁
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 訂單詳情模態框 -->
+    <div id="orderDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-xl">
+            <!-- 模態框標頭 -->
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800" id="detailOrderId">訂單詳情</h3>
+                        <p class="text-sm text-gray-500 mt-1">治療記錄與患者資訊</p>
+                    </div>
+                    <button id="closeDetailModalBtn"
+                        class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 詳情內容 -->
+            <div class="overflow-y-auto max-h-[70vh] p-6 custom-scrollbar">
+                <div class="space-y-6">
+                    <!-- 患者與基本資訊 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-user text-green-600"></i>
+                                患者資訊
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm text-gray-500">姓名</span>
+                                    <p class="font-medium" id="detailPatientName">-</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-500">聯絡電話</span>
+                                    <p class="font-medium" id="detailPatientPhone">-</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-500">年齡/性別</span>
+                                    <p class="font-medium" id="detailPatientInfo">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                                <i class="fas fa-clipboard text-green-600"></i>
+                                訂單資訊
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <span class="text-sm text-gray-500">訂單狀態</span>
+                                    <p><span id="detailOrderStatus" class="status-badge">-</span></p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-500">建立日期</span>
+                                    <p class="font-medium" id="detailOrderDate">-</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-500">主治醫師</span>
+                                    <p class="font-medium" id="detailDoctor">-</p>
+                                </div>
+                                <div>
+                                    <span class="text-sm text-gray-500">護理師</span>
+                                    <p class="font-medium" id="detailNurse">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 療程項目 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-syringe text-green-600"></i>
+                            療程項目
+                        </h4>
+                        <div class="space-y-3" id="detailTreatments">
+                            <!-- 療程項目將動態生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 付款資訊 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-credit-card text-green-600"></i>
+                            付款資訊
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <span class="text-sm text-gray-500">小計</span>
+                                <p class="font-bold text-lg" id="detailSubtotal">$0</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">折扣</span>
+                                <p class="font-bold text-green-600" id="detailDiscount">$0</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">總計</span>
+                                <p class="font-bold text-xl text-green-600" id="detailTotal">$0</p>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <span class="text-sm text-gray-500">付款方式</span>
+                            <p class="font-medium" id="detailPaymentMethod">-</p>
+                        </div>
+                    </div>
+
+                    <!-- 臨床備註 -->
+                    <div>
+                        <h4 class="font-medium text-gray-800 mb-4 flex items-center gap-2">
+                            <i class="fas fa-sticky-note text-green-600"></i>
+                            臨床備註
+                        </h4>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <p id="detailClinicalNotes" class="text-gray-700">無備註</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模態框底部 -->
+            <div class="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+                <button type="button" id="editOrderBtn"
+                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    <i class="fas fa-edit mr-2"></i>編輯訂單
+                </button>
+                <button type="button" id="deleteDetailBtn"
+                    class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                    <i class="fas fa-trash mr-2"></i>刪除訂單
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯狀態模態框 -->
+    <div id="editStatusModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl">
+            <div class="p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">更新訂單狀態</h3>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">選擇狀態</label>
+                        <select id="newStatusSelect"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <option value="new">新訂單</option>
+                            <option value="in_progress">進行中</option>
+                            <option value="completed">已完成</option>
+                            <option value="cancelled">已取消</option>
+                            <option value="preorder">預約訂單</option>
+                        </select>
+                    </div>
+
+                    <div id="completionFields" class="hidden">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">實際完成日期</label>
+                                <input type="date" id="actualCompletionDate"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">治療結果備註</label>
+                                <textarea id="treatmentResultNotes" rows="3"
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="記錄治療結果與追蹤建議..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" id="cancelEditStatusBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        取消
+                    </button>
+                    <button type="button" id="saveStatusBtn"
+                        class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        更新狀態
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 刪除確認模態框 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-xl">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">確認刪除</h3>
+                        <p class="text-sm text-gray-500">此操作無法復原</p>
+                    </div>
+                </div>
+
+                <p class="text-gray-700 mb-6" id="deleteConfirmText">
+                    您確定要刪除這個訂單嗎？
+                </p>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" id="cancelDeleteBtn"
+                        class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+                        取消
+                    </button>
+                    <button type="button" id="confirmDeleteBtn"
+                        class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
+                        確認刪除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部導航 -->
+    <div
+        class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex items-center justify-around">
+        <a href="../staff/dashboard.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+            </svg>
+            <span class="text-xs">首頁</span>
+        </a>
+        <a href="inventory.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span class="text-xs">庫存</span>
+        </a>
+        <a href="treatment_catalog.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-syringe text-xl"></i>
+            <span class="text-xs">治療目錄</span>
+        </a>
+        <a href="treatment_order.html" class="flex flex-col items-center gap-1 text-green-600 -mt-6">
+            <div class="bg-green-600 rounded-full p-4 shadow-lg">
+                <i class="fas fa-clipboard-list text-white text-xl"></i>
+            </div>
+            <span class="text-xs font-medium">訂單管理</span>
+        </a>
+        <a href="../sales/reports.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span class="text-xs">報表</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // 訂單資料 - 從 localStorage 讀取或初始化
+        let orders = JSON.parse(localStorage.getItem('treatment_orders')) || [
+            {
+                id: 'ORD-' + Date.now(),
+                order_id: 'ORD-20231225-001',
+                patient: {
+                    id: 'PAT001',
+                    full_name: '陳美玲',
+                    phone: '0912-345-678',
+                    gender: '女性',
+                    date_of_birth: '1990-05-15',
+                    skin_type: 'III型',
+                    medical_history: '無重大病史，對盤尼西林過敏'
+                },
+                date: '2025-12-25',
+                time: '14:30',
+                status: 'completed',
+                priority: 'high',
+                doctor: '張醫師',
+                nurse: '張護理師',
+                treatments: [
+                    {
+                        id: 'BOT_MASSETER',
+                        name: '美國肉毒瘦小臉',
+                        category: 'injection',
+                        dosage_value: '35',
+                        dosage_unit: 'U',
+                        treatment_area: ['左臉', '右臉'],
+                        device_used: 'BOTOX_US',
+                        clinical_notes: '咬肌肥厚明顯，注射後需冰敷',
+                        price: 4999
+                    }
+                ],
+                subtotal: 4999,
+                discount: 0,
+                total: 4999,
+                payment_method: 'cash',
+                clinical_notes: '患者首次治療，反應良好',
+                created_at: '2025-12-25 10:30:00',
+                updated_at: '2025-12-25 16:00:00',
+                completed_at: '2025-12-25 15:30:00'
+            },
+            {
+                id: 'ORD-' + (Date.now() + 1),
+                order_id: 'ORD-20231226-001',
+                patient: {
+                    id: 'PAT002',
+                    full_name: '林志明',
+                    phone: '0933-456-789',
+                    gender: '男性',
+                    date_of_birth: '1985-11-22',
+                    skin_type: 'IV型',
+                    medical_history: '無過敏史'
+                },
+                date: '2025-12-26',
+                time: '10:00',
+                status: 'in_progress',
+                priority: 'medium',
+                doctor: '王醫師',
+                nurse: '李護理師',
+                treatments: [
+                    {
+                        id: 'HIFU_1000',
+                        name: '海芙音波 1000條',
+                        category: 'device',
+                        dosage_value: '1000',
+                        dosage_unit: '條',
+                        treatment_area: ['全臉'],
+                        device_used: 'HIFU_LIFTING',
+                        clinical_notes: '臉部緊緻治療，能量中等',
+                        price: 38000
+                    },
+                    {
+                        id: 'PICO_LASER',
+                        name: '皮秒蜂巢雷射',
+                        category: 'device',
+                        dosage_value: '1',
+                        dosage_unit: '次',
+                        treatment_area: ['臉部'],
+                        device_used: 'PICO_LASER',
+                        clinical_notes: '針對色素斑治療',
+                        price: 5800
+                    }
+                ],
+                subtotal: 43800,
+                discount: 2000,
+                total: 41800,
+                payment_method: 'credit_card',
+                clinical_notes: '合併療程，需注意術後保濕',
+                created_at: '2025-12-26 09:00:00',
+                updated_at: '2025-12-26 09:00:00'
+            },
+            {
+                id: 'ORD-' + (Date.now() + 2),
+                order_id: 'ORD-20231227-001',
+                patient: {
+                    id: 'PAT003',
+                    full_name: '王曉婷',
+                    phone: '0988-777-666',
+                    gender: '女性',
+                    date_of_birth: '1995-03-18',
+                    skin_type: 'II型',
+                    medical_history: '有蟹足腫體質'
+                },
+                date: '2025-12-27',
+                time: '15:00',
+                status: 'preorder',
+                priority: 'low',
+                doctor: '李醫師',
+                nurse: '陳護理師',
+                treatments: [
+                    {
+                        id: 'VERSA_HA_1CC',
+                        name: '薇貝拉玻尿酸 1cc',
+                        category: 'injection',
+                        dosage_value: '1',
+                        dosage_unit: 'cc',
+                        treatment_area: ['法令紋'],
+                        device_used: 'HA_FILLER',
+                        clinical_notes: '填充法令紋，注意對稱性',
+                        price: 12000
+                    }
+                ],
+                subtotal: 12000,
+                discount: 1000,
+                total: 11000,
+                payment_method: 'transfer',
+                clinical_notes: '預約治療，已付訂金3000元',
+                created_at: '2025-12-25 16:30:00',
+                updated_at: '2025-12-25 16:30:00'
+            },
+            {
+                id: 'ORD-' + (Date.now() + 3),
+                order_id: 'ORD-20231224-001',
+                patient: {
+                    id: 'PAT004',
+                    full_name: '劉建國',
+                    phone: '0922-333-444',
+                    gender: '男性',
+                    date_of_birth: '1978-08-12',
+                    skin_type: 'V型',
+                    medical_history: '高血壓病史'
+                },
+                date: '2025-12-24',
+                time: '11:00',
+                status: 'new',
+                priority: 'high',
+                doctor: '張醫師',
+                nurse: '張護理師',
+                treatments: [
+                    {
+                        id: 'NABOTA_100U',
+                        name: '韓國肉毒 100U + 容酷針',
+                        category: 'injection',
+                        dosage_value: '100',
+                        dosage_unit: 'U',
+                        treatment_area: ['下巴', '頸部'],
+                        device_used: 'NABOTA',
+                        clinical_notes: '下巴線條雕塑',
+                        price: 8888
+                    }
+                ],
+                subtotal: 8888,
+                discount: 0,
+                total: 8888,
+                payment_method: 'cash',
+                clinical_notes: '新患者，需確認無藥物過敏',
+                created_at: '2025-12-24 10:15:00',
+                updated_at: '2025-12-24 10:15:00'
+            }
+        ];
+
+        // 分頁設定
+        let currentPage = 1;
+        let currentCardPage = 1;
+        const itemsPerPage = 10;
+        const itemsPerCardPage = 12;
+        let filteredOrders = [...orders];
+        let currentSort = 'date_desc';
+        let selectedOrder = null;
+
+        // 計算年齡
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // 初始化頁面
+        document.addEventListener('DOMContentLoaded', function () {
+            // 初始化日期選擇器
+            flatpickr("#dateRangePicker", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                locale: "zh_tw"
+            });
+
+            renderOrders();
+            updateStats();
+            setupEventListeners();
+        });
+
+        // 渲染訂單
+        function renderOrders() {
+            filterOrders();
+            sortOrders();
+            renderTableView();
+            renderCardView();
+            updatePagination();
+            updateStats();
+        }
+
+        // 篩選訂單
+        function filterOrders() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.querySelector('.status-filter.active')?.dataset.status || 'all';
+            const priorityFilter = document.getElementById('priorityFilter').value;
+            const paymentFilter = document.getElementById('paymentFilter').value;
+            const dateRange = document.getElementById('dateRangePicker').value;
+
+            filteredOrders = orders.filter(order => {
+                // 搜尋條件
+                const matchesSearch = searchTerm === '' ||
+                    order.order_id.toLowerCase().includes(searchTerm) ||
+                    order.patient.full_name.toLowerCase().includes(searchTerm) ||
+                    order.patient.phone.includes(searchTerm) ||
+                    order.treatments.some(t => t.name.toLowerCase().includes(searchTerm));
+
+                // 狀態條件
+                const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+
+                // 優先級條件
+                const matchesPriority = priorityFilter === '' || order.priority === priorityFilter;
+
+                // 付款方式條件
+                const matchesPayment = paymentFilter === '' || order.payment_method === paymentFilter;
+
+                // 日期範圍條件
+                let matchesDate = true;
+                if (dateRange && dateRange.includes(' to ')) {
+                    const [startDate, endDate] = dateRange.split(' to ');
+                    const orderDate = new Date(order.date);
+                    const start = new Date(startDate);
+                    const end = new Date(endDate);
+                    matchesDate = orderDate >= start && orderDate <= end;
+                }
+
+                return matchesSearch && matchesStatus && matchesPriority && matchesPayment && matchesDate;
+            });
+        }
+
+        // 排序訂單
+        function sortOrders() {
+            switch (currentSort) {
+                case 'date_desc':
+                    filteredOrders.sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time));
+                    break;
+                case 'date_asc':
+                    filteredOrders.sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time));
+                    break;
+                case 'amount_desc':
+                    filteredOrders.sort((a, b) => b.total - a.total);
+                    break;
+                case 'amount_asc':
+                    filteredOrders.sort((a, b) => a.total - b.total);
+                    break;
+                case 'priority_desc':
+                    const priorityOrder = { high: 3, medium: 2, low: 1 };
+                    filteredOrders.sort((a, b) => priorityOrder[b.priority] - priorityOrder[a.priority]);
+                    break;
+            }
+        }
+
+        // 渲染表格檢視
+        function renderTableView() {
+            const tableBody = document.getElementById('orderTableBody');
+            tableBody.innerHTML = '';
+
+            // 計算分頁
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageOrders = filteredOrders.slice(startIndex, endIndex);
+
+            pageOrders.forEach(order => {
+                const row = document.createElement('tr');
+                row.className = 'animate-fade-in';
+
+                // 狀態標籤
+                const statusLabel = getStatusLabel(order.status);
+                const statusClass = getStatusClass(order.status);
+
+                // 優先級指示器
+                const priorityIndicator = getPriorityIndicator(order.priority);
+
+                // 治療項目簡述
+                const treatmentSummary = order.treatments.length > 1
+                    ? `${order.treatments[0].name} 等 ${order.treatments.length} 項`
+                    : order.treatments[0].name;
+
+                row.innerHTML = `
+                    <td class="font-mono font-medium">${order.order_id}</td>
+                    <td>
+                        <div class="font-medium">${order.patient.full_name}</div>
+                        <div class="text-xs text-gray-500">${order.patient.phone}</div>
+                        <div class="text-xs text-gray-500">${calculateAge(order.patient.date_of_birth)}歲 ${order.patient.gender}</div>
+                    </td>
+                    <td>
+                        <div class="font-medium">${order.date}</div>
+                        <div class="text-xs text-gray-500">${order.time}</div>
+                    </td>
+                    <td>
+                        <span class="${statusClass}">${statusLabel}</span>
+                    </td>
+                    <td>
+                        <div class="font-medium">${treatmentSummary}</div>
+                        <div class="text-xs text-gray-500">${order.treatments.length} 項療程</div>
+                    </td>
+                    <td class="font-bold text-purple-600">$${order.total.toLocaleString()}</td>
+                    <td>
+                        <div class="flex items-center gap-2">
+                            ${priorityIndicator}
+                            <span class="text-sm">${getPriorityLabel(order.priority)}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <button class="view-btn px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm" data-id="${order.id}">
+                                <i class="fas fa-eye mr-1"></i>查看
+                            </button>
+                            <button class="edit-status-btn px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm" data-id="${order.id}">
+                                <i class="fas fa-edit mr-1"></i>狀態
+                            </button>
+                            <button class="delete-btn px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm" data-id="${order.id}">
+                                <i class="fas fa-trash mr-1"></i>刪除
+                            </button>
+                        </div>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+            // 更新表格資訊
+            document.getElementById('tableInfo').textContent = `顯示 ${filteredOrders.length} 筆訂單`;
+            document.getElementById('currentRange').textContent = `${startIndex + 1}-${Math.min(endIndex, filteredOrders.length)}`;
+            document.getElementById('totalItems').textContent = filteredOrders.length;
+
+            // 綁定按鈕事件
+            bindButtonEvents();
+        }
+
+        // 渲染卡片檢視
+        function renderCardView() {
+            const container = document.getElementById('orderCardContainer');
+            container.innerHTML = '';
+
+            // 計算分頁
+            const startIndex = (currentCardPage - 1) * itemsPerCardPage;
+            const endIndex = startIndex + itemsPerCardPage;
+            const pageOrders = filteredOrders.slice(startIndex, endIndex);
+
+            pageOrders.forEach(order => {
+                const card = document.createElement('div');
+                card.className = 'order-card p-4 animate-fade-in';
+                card.style.borderLeftColor = getStatusColor(order.status);
+
+                // 狀態標籤
+                const statusLabel = getStatusLabel(order.status);
+                const statusClass = getStatusClass(order.status);
+
+                // 優先級指示器
+                const priorityIndicator = getPriorityIndicator(order.priority);
+
+                // 治療項目列表
+                const treatmentsList = order.treatments.map(t =>
+                    `<div class="text-sm text-gray-600">• ${t.name}</div>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h3 class="font-bold text-gray-900">${order.patient.full_name}</h3>
+                                ${priorityIndicator}
+                            </div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs text-gray-500 font-mono">${order.order_id}</span>
+                                <span class="${statusClass}">${statusLabel}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-purple-600 font-bold text-lg">$${order.total.toLocaleString()}</div>
+                            <div class="text-sm text-gray-500">${order.date} ${order.time}</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                            <i class="fas fa-phone"></i>
+                            <span>${order.patient.phone}</span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600">
+                            <i class="fas fa-user-md"></i>
+                            <span>${order.doctor} / ${order.nurse}</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h4 class="text-sm font-medium text-gray-700 mb-2">療程項目 (${order.treatments.length}項)</h4>
+                        ${treatmentsList}
+                    </div>
+
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                        <div class="text-xs text-gray-500">
+                            付款: ${getPaymentMethodLabel(order.payment_method)}
+                        </div>
+                        <div class="flex gap-2">
+                            <button class="view-btn text-blue-600 hover:text-blue-800 p-2" data-id="${order.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="edit-status-btn text-green-600 hover:text-green-800 p-2" data-id="${order.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn text-red-600 hover:text-red-800 p-2" data-id="${order.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // 更新卡片分頁資訊
+            document.getElementById('cardCurrentRange').textContent = `${startIndex + 1}-${Math.min(endIndex, filteredOrders.length)}`;
+            document.getElementById('cardTotalItems').textContent = filteredOrders.length;
+        }
+
+        // 更新統計數據
+        function updateStats() {
+            const totalOrders = orders.length;
+            const newOrders = orders.filter(o => o.status === 'new').length;
+            const inProgressOrders = orders.filter(o => o.status === 'in_progress').length;
+            const preOrders = orders.filter(o => o.status === 'preorder').length;
+            const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
+
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('newOrders').textContent = newOrders;
+            document.getElementById('inProgressOrders').textContent = inProgressOrders;
+            document.getElementById('preOrders').textContent = preOrders;
+            document.getElementById('cancelledOrders').textContent = cancelledOrders;
+        }
+
+        // 更新分頁控制
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+            const totalCardPages = Math.ceil(filteredOrders.length / itemsPerCardPage);
+
+            // 表格分頁
+            document.getElementById('prevPageBtn').disabled = currentPage === 1;
+            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+            // 卡片分頁
+            document.getElementById('cardPrevPageBtn').disabled = currentCardPage === 1;
+            document.getElementById('cardNextPageBtn').disabled = currentCardPage >= totalCardPages;
+        }
+
+        // 綁定按鈕事件
+        function bindButtonEvents() {
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const orderId = this.dataset.id;
+                    showOrderDetail(orderId);
+                });
+            });
+
+            document.querySelectorAll('.edit-status-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const orderId = this.dataset.id;
+                    showEditStatusModal(orderId);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const orderId = this.dataset.id;
+                    confirmDelete(orderId);
+                });
+            });
+        }
+
+        // 顯示訂單詳情
+        function showOrderDetail(orderId) {
+            selectedOrder = orders.find(o => o.id === orderId);
+            if (!selectedOrder) return;
+
+            // 更新模態框內容
+            document.getElementById('detailOrderId').textContent = selectedOrder.order_id;
+            document.getElementById('detailPatientName').textContent = selectedOrder.patient.full_name;
+            document.getElementById('detailPatientPhone').textContent = selectedOrder.patient.phone;
+            document.getElementById('detailPatientInfo').textContent =
+                `${calculateAge(selectedOrder.patient.date_of_birth)}歲 ${selectedOrder.patient.gender}`;
+
+            const statusLabel = getStatusLabel(selectedOrder.status);
+            const statusClass = getStatusClass(selectedOrder.status);
+            document.getElementById('detailOrderStatus').textContent = statusLabel;
+            document.getElementById('detailOrderStatus').className = `status-badge ${statusClass}`;
+
+            document.getElementById('detailOrderDate').textContent =
+                `${selectedOrder.date} ${selectedOrder.time}`;
+            document.getElementById('detailDoctor').textContent = selectedOrder.doctor;
+            document.getElementById('detailNurse').textContent = selectedOrder.nurse;
+
+            // 治療項目
+            const treatmentsContainer = document.getElementById('detailTreatments');
+            treatmentsContainer.innerHTML = selectedOrder.treatments.map(t => `
+                <div class="bg-gray-50 rounded-lg p-3">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h5 class="font-medium text-gray-900">${t.name}</h5>
+                            <div class="text-sm text-gray-600 mt-1">
+                                <div>劑量: ${t.dosage_value} ${t.dosage_unit}</div>
+                                ${t.treatment_area.length > 0 ? `<div>部位: ${t.treatment_area.join(', ')}</div>` : ''}
+                                ${t.clinical_notes ? `<div class="mt-1">備註: ${t.clinical_notes}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-purple-600">$${t.price.toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 付款資訊
+            document.getElementById('detailSubtotal').textContent = '$' + selectedOrder.subtotal.toLocaleString();
+            document.getElementById('detailDiscount').textContent = '-$' + selectedOrder.discount.toLocaleString();
+            document.getElementById('detailTotal').textContent = '$' + selectedOrder.total.toLocaleString();
+            document.getElementById('detailPaymentMethod').textContent =
+                getPaymentMethodLabel(selectedOrder.payment_method);
+
+            // 臨床備註
+            document.getElementById('detailClinicalNotes').textContent =
+                selectedOrder.clinical_notes || '無備註';
+
+            // 顯示模態框
+            document.getElementById('orderDetailModal').classList.remove('hidden');
+            document.getElementById('orderDetailModal').classList.add('flex');
+        }
+
+        // 顯示編輯狀態模態框
+        function showEditStatusModal(orderId) {
+            selectedOrder = orders.find(o => o.id === orderId);
+            if (!selectedOrder) return;
+
+            document.getElementById('newStatusSelect').value = selectedOrder.status;
+            document.getElementById('actualCompletionDate').value = '';
+            document.getElementById('treatmentResultNotes').value = '';
+
+            // 顯示/隱藏完成相關欄位
+            const completionFields = document.getElementById('completionFields');
+            if (selectedOrder.status === 'completed') {
+                completionFields.classList.remove('hidden');
+            } else {
+                completionFields.classList.add('hidden');
+            }
+
+            // 更新完成欄位顯示狀態
+            document.getElementById('newStatusSelect').addEventListener('change', function () {
+                if (this.value === 'completed') {
+                    completionFields.classList.remove('hidden');
+                } else {
+                    completionFields.classList.add('hidden');
+                }
+            });
+
+            document.getElementById('editStatusModal').classList.remove('hidden');
+            document.getElementById('editStatusModal').classList.add('flex');
+        }
+
+        // 確認刪除
+        function confirmDelete(orderId) {
+            selectedOrder = orders.find(o => o.id === orderId);
+            if (!selectedOrder) return;
+
+            document.getElementById('deleteConfirmText').textContent =
+                `您確定要刪除訂單「${selectedOrder.order_id}」嗎？此操作無法復原。`;
+
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.getElementById('deleteModal').classList.add('flex');
+        }
+
+        // 刪除訂單
+        function deleteOrder(orderId) {
+            orders = orders.filter(o => o.id !== orderId);
+            localStorage.setItem('treatment_orders', JSON.stringify(orders));
+            renderOrders();
+            showToast('訂單已成功刪除！', 'success');
+        }
+
+        // 更新訂單狀態
+        function updateOrderStatus(newStatus) {
+            if (!selectedOrder) return;
+
+            const index = orders.findIndex(o => o.id === selectedOrder.id);
+            if (index !== -1) {
+                orders[index].status = newStatus;
+                orders[index].updated_at = new Date().toISOString().split('T')[0] + ' ' +
+                    new Date().toTimeString().split(' ')[0].substring(0, 8);
+
+                if (newStatus === 'completed') {
+                    orders[index].completed_at = document.getElementById('actualCompletionDate').value ||
+                        new Date().toISOString().split('T')[0];
+
+                    const resultNotes = document.getElementById('treatmentResultNotes').value;
+                    if (resultNotes) {
+                        orders[index].clinical_notes = (orders[index].clinical_notes || '') +
+                            '\n\n治療結果: ' + resultNotes;
+                    }
+                }
+
+                localStorage.setItem('treatment_orders', JSON.stringify(orders));
+                renderOrders();
+                showToast('訂單狀態已更新！', 'success');
+            }
+        }
+
+        // 輔助函數
+        function getStatusLabel(status) {
+            switch (status) {
+                case 'new': return '新訂單';
+                case 'in_progress': return '進行中';
+                case 'completed': return '已完成';
+                case 'cancelled': return '已取消';
+                case 'preorder': return '預約訂單';
+                default: return '未知';
+            }
+        }
+
+        function getStatusClass(status) {
+            switch (status) {
+                case 'new': return 'status-new';
+                case 'in_progress': return 'status-in-progress';
+                case 'completed': return 'status-completed';
+                case 'cancelled': return 'status-cancelled';
+                case 'preorder': return 'status-preorder';
+                default: return '';
+            }
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'new': return '#3b82f6';
+                case 'in_progress': return '#f59e0b';
+                case 'completed': return '#10b981';
+                case 'cancelled': return '#ef4444';
+                case 'preorder': return '#8b5cf6';
+                default: return '#6b7280';
+            }
+        }
+
+        function getPriorityLabel(priority) {
+            switch (priority) {
+                case 'high': return '高優先';
+                case 'medium': return '中優先';
+                case 'low': return '低優先';
+                default: return '未知';
+            }
+        }
+
+        function getPriorityIndicator(priority) {
+            switch (priority) {
+                case 'high': return '<div class="priority-high"></div>';
+                case 'medium': return '<div class="priority-medium"></div>';
+                case 'low': return '<div class="priority-low"></div>';
+                default: return '';
+            }
+        }
+
+        function getPaymentMethodLabel(method) {
+            switch (method) {
+                case 'cash': return '現金';
+                case 'credit_card': return '信用卡';
+                case 'transfer': return '轉帳';
+                case 'instalment': return '分期付款';
+                default: return '未知';
+            }
+        }
+
+        // 顯示提示訊息
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `fixed top-20 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white font-medium animate-fade-in ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
+            toast.textContent = message;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('animate-fade-in');
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // 設定事件監聽器
+        function setupEventListeners() {
+            // 檢視切換
+            document.getElementById('viewToggle').addEventListener('click', function () {
+                const cardView = document.getElementById('cardView');
+                const tableView = document.getElementById('tableView');
+                const toggleBtn = document.getElementById('viewToggle');
+
+                if (cardView.classList.contains('hidden')) {
+                    // 切換到卡片檢視
+                    cardView.classList.remove('hidden');
+                    tableView.classList.add('hidden');
+                    toggleBtn.innerHTML = '<i class="fas fa-th-list text-xs"></i><span>表格檢視</span>';
+                } else {
+                    // 切換到表格檢視
+                    cardView.classList.add('hidden');
+                    tableView.classList.remove('hidden');
+                    toggleBtn.innerHTML = '<i class="fas fa-th-large text-xs"></i><span>卡片檢視</span>';
+                }
+            });
+
+            // 搜尋與篩選
+            document.getElementById('searchInput').addEventListener('input', renderOrders);
+            document.getElementById('priorityFilter').addEventListener('change', renderOrders);
+            document.getElementById('paymentFilter').addEventListener('change', renderOrders);
+            document.getElementById('dateRangePicker').addEventListener('change', renderOrders);
+
+            // 狀態篩選按鈕
+            document.querySelectorAll('.status-filter').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    document.querySelectorAll('.status-filter').forEach(b => {
+                        b.classList.remove('active', 'bg-green-600', 'text-white');
+                        b.classList.add('border-gray-300', 'hover:bg-gray-50');
+                    });
+
+                    this.classList.remove('border-gray-300', 'hover:bg-gray-50');
+                    this.classList.add('active', 'bg-green-600', 'text-white');
+                    renderOrders();
+                });
+            });
+
+            // 清除篩選
+            document.getElementById('clearFiltersBtn').addEventListener('click', function () {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('dateRangePicker').value = '';
+                document.getElementById('priorityFilter').value = '';
+                document.getElementById('paymentFilter').value = '';
+
+                document.querySelectorAll('.status-filter').forEach(b => {
+                    b.classList.remove('active', 'bg-green-600', 'text-white');
+                    b.classList.add('border-gray-300', 'hover:bg-gray-50');
+                });
+
+                document.querySelector('.status-filter[data-status="all"]').classList.add('active', 'bg-green-600', 'text-white');
+                renderOrders();
+            });
+
+            // 排序
+            document.getElementById('sortBy').addEventListener('change', function () {
+                currentSort = this.value;
+                renderOrders();
+            });
+
+            // 表格標頭排序
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', function () {
+                    const sortField = this.dataset.sort;
+                    // 這裡可以實現點擊標頭排序的功能
+                });
+            });
+
+            // 分頁控制
+            document.getElementById('prevPageBtn').addEventListener('click', function () {
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTableView();
+                    updatePagination();
+                }
+            });
+
+            document.getElementById('nextPageBtn').addEventListener('click', function () {
+                const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTableView();
+                    updatePagination();
+                }
+            });
+
+            document.getElementById('cardPrevPageBtn').addEventListener('click', function () {
+                if (currentCardPage > 1) {
+                    currentCardPage--;
+                    renderCardView();
+                    updatePagination();
+                }
+            });
+
+            document.getElementById('cardNextPageBtn').addEventListener('click', function () {
+                const totalPages = Math.ceil(filteredOrders.length / itemsPerCardPage);
+                if (currentCardPage < totalPages) {
+                    currentCardPage++;
+                    renderCardView();
+                    updatePagination();
+                }
+            });
+
+            // 模態框控制
+            document.getElementById('closeDetailModalBtn').addEventListener('click', function () {
+                document.getElementById('orderDetailModal').classList.add('hidden');
+                document.getElementById('orderDetailModal').classList.remove('flex');
+            });
+
+            document.getElementById('cancelEditStatusBtn').addEventListener('click', function () {
+                document.getElementById('editStatusModal').classList.add('hidden');
+                document.getElementById('editStatusModal').classList.remove('flex');
+            });
+
+            document.getElementById('saveStatusBtn').addEventListener('click', function () {
+                const newStatus = document.getElementById('newStatusSelect').value;
+                updateOrderStatus(newStatus);
+                document.getElementById('editStatusModal').classList.add('hidden');
+                document.getElementById('editStatusModal').classList.remove('flex');
+            });
+
+            // 編輯訂單按鈕
+            document.getElementById('editOrderBtn').addEventListener('click', function () {
+                if (selectedOrder) {
+                    // 這裡可以跳轉到編輯頁面
+                    window.location.href = `new_order.html?order_id=${selectedOrder.id}`;
+                }
+            });
+
+            // 刪除按鈕
+            document.getElementById('deleteDetailBtn').addEventListener('click', function () {
+                if (selectedOrder) {
+                    confirmDelete(selectedOrder.id);
+                    document.getElementById('orderDetailModal').classList.add('hidden');
+                    document.getElementById('orderDetailModal').classList.remove('flex');
+                }
+            });
+
+            document.getElementById('cancelDeleteBtn').addEventListener('click', function () {
+                document.getElementById('deleteModal').classList.add('hidden');
+                document.getElementById('deleteModal').classList.remove('flex');
+            });
+
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+                if (selectedOrder) {
+                    deleteOrder(selectedOrder.id);
+                    document.getElementById('deleteModal').classList.add('hidden');
+                    document.getElementById('deleteModal').classList.remove('flex');
+                }
+            });
+
+            // 點擊外部關閉模態框
+            window.addEventListener('click', function (event) {
+                const modals = ['orderDetailModal', 'editStatusModal', 'deleteModal'];
+                modals.forEach(modalId => {
+                    const modal = document.getElementById(modalId);
+                    if (event.target === modal) {
+                        modal.classList.add('hidden');
+                        modal.classList.remove('flex');
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

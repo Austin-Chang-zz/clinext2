@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>銷售預訂單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .required::before {
+            content: "*";
+            color: #ef4444;
+            margin-right: 4px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-input {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: #f1f5f9;
+            color: #475569;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        .scan-btn {
+            background-color: #10b981;
+            color: white;
+            border-radius: 8px;
+            padding: 14px 20px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .scan-btn:hover {
+            background-color: #059669;
+        }
+
+        .add-product-btn {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+
+        .add-product-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background-color: #f8fafc;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+            border-bottom: 3px solid #3b82f6;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800">
+    <div class="max-w-md mx-auto min-h-screen bg-gray-50">
+        <!-- 頂部導航 -->
+        <div class="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center">
+                <button id="backBtn" class="p-2 mr-2 text-gray-600">
+                    <i class="fas fa-arrow-left text-lg"></i>
+                </button>
+                <h1 class="text-xl font-bold">銷售預訂單</h1>
+            </div>
+            <button id="saveDraftBtn" class="text-blue-600 font-medium text-sm px-3 py-1">
+                暫存
+            </button>
+        </div>
+
+        <!-- 表單內容 -->
+        <div class="p-4">
+            <!-- 客戶選擇 -->
+            <div class="form-card p-5 mb-4">
+                <div class="flex items-center mb-3">
+                    <label class="required font-medium text-gray-700">客戶</label>
+                </div>
+                <div class="relative">
+                    <div id="customerSelect" class="form-input flex items-center justify-between cursor-pointer">
+                        <span id="customerName" class="text-gray-500">請選擇客戶</span>
+                        <i class="fas fa-chevron-down text-gray-400"></i>
+                    </div>
+                    <!-- 客戶選擇下拉選單 (預設隱藏) -->
+                    <div id="customerDropdown"
+                        class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-60 overflow-y-auto">
+                        <div class="p-2 border-b border-gray-100">
+                            <div class="relative">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" placeholder="搜尋客戶..."
+                                    class="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+                        <div class="py-2">
+                            <div class="customer-option px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center"
+                                data-value="0">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-user-plus text-blue-600"></i>
+                                </div>
+                                <span class="font-medium">新增客戶</span>
+                            </div>
+                            <div class="customer-option px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-t border-gray-100"
+                                data-value="1">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="font-medium text-blue-600">王</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">王大發科技有限公司</p>
+                                    <p class="text-sm text-gray-500">王大明</p>
+                                </div>
+                            </div>
+                            <div class="customer-option px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-t border-gray-100"
+                                data-value="2">
+                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="font-medium text-green-600">李</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">李氏實業股份有限公司</p>
+                                    <p class="text-sm text-gray-500">李美麗</p>
+                                </div>
+                            </div>
+                            <div class="customer-option px-4 py-3 hover:bg-gray-50 cursor-pointer flex items-center border-t border-gray-100"
+                                data-value="3">
+                                <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="font-medium text-purple-600">張</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">張氏國際貿易</p>
+                                    <p class="text-sm text-gray-500">張小華</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i> 選擇或新增客戶以繼續
+                </div>
+            </div>
+
+            <!-- 時間選擇 -->
+            <div class="form-card p-5 mb-4">
+                <div class="flex items-center mb-3">
+                    <label class="required font-medium text-gray-700">時間</label>
+                </div>
+                <div class="relative">
+                    <input type="date" id="orderDate" class="form-input w-full" value="2025-12-25">
+                    <i
+                        class="fas fa-calendar-alt absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+                <div class="mt-2 text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i> 預訂單的預計交貨日期
+                </div>
+            </div>
+
+            <!-- 業務員選擇 -->
+            <div class="form-card p-5 mb-4">
+                <label class="block font-medium text-gray-700 mb-3">業務員</label>
+                <div class="relative">
+                    <select id="salesperson" class="form-input w-full appearance-none bg-white">
+                        <option value="boss" selected>老闆</option>
+                        <option value="sales1">業務員A</option>
+                        <option value="sales2">業務員B</option>
+                        <option value="sales3">業務員C</option>
+                        <option value="other">其他人員</option>
+                    </select>
+                    <i
+                        class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                </div>
+                <div class="mt-2 text-sm text-gray-500">
+                    <i class="fas fa-info-circle mr-1"></i> 負責此訂單的業務人員
+                </div>
+            </div>
+
+            <!-- 商品添加區域 -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-bold text-lg">商品清單</h2>
+                    <span id="productCount" class="text-sm text-gray-500">0個商品</span>
+                </div>
+
+                <!-- 添加商品按鈕 -->
+                <div id="addProductBtn" class="add-product-btn mb-4 cursor-pointer">
+                    <i class="fas fa-plus-circle text-3xl mb-2"></i>
+                    <p class="font-medium">選擇商品</p>
+                </div>
+
+                <!-- 掃碼添加按鈕 -->
+                <button id="scanBtn" class="scan-btn w-full flex items-center justify-center mb-6">
+                    <i class="fas fa-qrcode text-xl mr-3"></i>
+                    <span class="font-medium">掃碼添加</span>
+                </button>
+
+                <!-- 商品列表 (初始為空) -->
+                <div id="productList" class="space-y-3">
+                    <!-- 商品將動態添加到這裡 -->
+                    <div class="empty-product text-center py-10 text-gray-400">
+                        <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                        <p>尚未添加任何商品</p>
+                        <p class="text-sm mt-1">點擊上方按鈕添加商品</p>
+                    </div>
+                </div>
+
+                <!-- 商品選擇模態框 (預設隱藏) -->
+                <div id="productModal"
+                    class="fixed inset-0 bg-black bg-opacity-50 z-30 flex items-center justify-center p-4 hidden">
+                    <div class="bg-white rounded-xl w-full max-w-md max-h-[80vh] overflow-hidden">
+                        <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                            <h3 class="font-bold text-lg">選擇商品</h3>
+                            <button id="closeProductModal" class="p-2 text-gray-500">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-4 border-b border-gray-200">
+                            <div class="relative">
+                                <i
+                                    class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" placeholder="搜尋商品..."
+                                    class="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500">
+                            </div>
+                        </div>
+                        <div class="overflow-y-auto max-h-[50vh] p-2">
+                            <div class="product-option p-3 border-b border-gray-100 flex items-center cursor-pointer hover:bg-gray-50"
+                                data-id="1">
+                                <div class="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-box text-blue-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">高效能筆記型電腦</p>
+                                    <p class="text-sm text-gray-500">庫存: 25 | 價格: ¥12,800</p>
+                                </div>
+                                <i class="fas fa-plus-circle text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="product-option p-3 border-b border-gray-100 flex items-center cursor-pointer hover:bg-gray-50"
+                                data-id="2">
+                                <div class="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-mobile-alt text-green-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">旗艦智慧型手機</p>
+                                    <p class="text-sm text-gray-500">庫存: 42 | 價格: ¥8,500</p>
+                                </div>
+                                <i class="fas fa-plus-circle text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="product-option p-3 border-b border-gray-100 flex items-center cursor-pointer hover:bg-gray-50"
+                                data-id="3">
+                                <div class="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-headphones text-purple-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">無線藍牙耳機</p>
+                                    <p class="text-sm text-gray-500">庫存: 67 | 價格: ¥1,200</p>
+                                </div>
+                                <i class="fas fa-plus-circle text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="product-option p-3 border-b border-gray-100 flex items-center cursor-pointer hover:bg-gray-50"
+                                data-id="4">
+                                <div class="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-tablet-alt text-yellow-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">平板電腦</p>
+                                    <p class="text-sm text-gray-500">庫存: 18 | 價格: ¥6,300</p>
+                                </div>
+                                <i class="fas fa-plus-circle text-blue-500 text-xl"></i>
+                            </div>
+                            <div class="product-option p-3 border-b border-gray-100 flex items-center cursor-pointer hover:bg-gray-50"
+                                data-id="5">
+                                <div class="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-print text-red-500"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-medium">多功能事務機</p>
+                                    <p class="text-sm text-gray-500">庫存: 12 | 價格: ¥4,500</p>
+                                </div>
+                                <i class="fas fa-plus-circle text-blue-500 text-xl"></i>
+                            </div>
+                        </div>
+                        <div class="p-4 border-t border-gray-200">
+                            <button id="confirmProduct" class="btn-primary w-full">加入選取商品</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 訂單摘要 -->
+            <div class="form-card p-5 mb-6">
+                <h3 class="font-bold text-lg mb-4">訂單摘要</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">商品數量</span>
+                        <span id="summaryQuantity" class="font-medium">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">商品總額</span>
+                        <span id="summaryTotal" class="font-medium">¥0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">折扣</span>
+                        <span id="summaryDiscount" class="font-medium">¥0.00</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-200 flex justify-between">
+                        <span class="font-bold text-lg">應收金額</span>
+                        <span id="summaryFinal" class="font-bold text-xl text-blue-600">¥0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 備註 -->
+            <div class="form-card p-5 mb-6">
+                <label class="block font-medium text-gray-700 mb-3">備註</label>
+                <textarea id="notes" class="form-input w-full h-32" placeholder="輸入訂單備註..."></textarea>
+            </div>
+        </div>
+
+        <!-- 底部操作按鈕 -->
+        <div class="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+            <div class="flex space-x-3">
+                <button id="cancelBtn" class="btn-secondary flex-1">取消</button>
+                <button id="submitBtn" class="btn-primary flex-1">提交預訂單</button>
+            </div>
+        </div>
+
+        <!-- 底部導航 (僅在移動端顯示) -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 hidden">
+            <div class="max-w-md mx-auto flex justify-around">
+                <a href="#" class="nav-item flex flex-col items-center py-1 px-3 text-gray-500">
+                    <i class="fas fa-home text-xl mb-1"></i>
+                    <span class="text-xs">首頁</span>
+                </a>
+                <a href="#" class="nav-item active flex flex-col items-center py-1 px-3">
+                    <i class="fas fa-plus-circle text-xl mb-1"></i>
+                    <span class="text-xs">銷售</span>
+                </a>
+                <a href="#" class="nav-item flex flex-col items-center py-1 px-3 text-gray-500">
+                    <i class="fas fa-chart-bar text-xl mb-1"></i>
+                    <span class="text-xs">報表</span>
+                </a>
+                <a href="#" class="nav-item flex flex-col items-center py-1 px-3 text-gray-500">
+                    <i class="fas fa-user text-xl mb-1"></i>
+                    <span class="text-xs">我的</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素
+        const customerSelect = document.getElementById('customerSelect');
+        const customerDropdown = document.getElementById('customerDropdown');
+        const customerName = document.getElementById('customerName');
+        const customerOptions = document.querySelectorAll('.customer-option');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const productModal = document.getElementById('productModal');
+        const closeProductModal = document.getElementById('closeProductModal');
+        const scanBtn = document.getElementById('scanBtn');
+        const productList = document.getElementById('productList');
+        const productOptions = document.querySelectorAll('.product-option');
+        const confirmProductBtn = document.getElementById('confirmProduct');
+        const backBtn = document.getElementById('backBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const productCount = document.getElementById('productCount');
+        const summaryQuantity = document.getElementById('summaryQuantity');
+        const summaryTotal = document.getElementById('summaryTotal');
+        const summaryDiscount = document.getElementById('summaryDiscount');
+        const summaryFinal = document.getElementById('summaryFinal');
+
+        // 商品資料
+        const productData = {
+            1: { name: "高效能筆記型電腦", price: 12800, stock: 25 },
+            2: { name: "旗艦智慧型手機", price: 8500, stock: 42 },
+            3: { name: "無線藍牙耳機", price: 1200, stock: 67 },
+            4: { name: "平板電腦", price: 6300, stock: 18 },
+            5: { name: "多功能事務機", price: 4500, stock: 12 }
+        };
+
+        // 已選商品陣列
+        let selectedProducts = [];
+        let selectedProductIds = new Set();
+
+        // 客戶選擇功能
+        customerSelect.addEventListener('click', function () {
+            customerDropdown.classList.toggle('hidden');
+        });
+
+        // 客戶選項點擊事件
+        customerOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                const value = this.getAttribute('data-value');
+
+                if (value === "0") {
+                    // 新增客戶
+                    customerName.textContent = "新增客戶";
+                    customerName.classList.remove('text-gray-500');
+                    customerName.classList.add('text-blue-600');
+                } else {
+                    // 選擇現有客戶
+                    const customerText = this.querySelector('p').textContent;
+                    customerName.textContent = customerText;
+                    customerName.classList.remove('text-gray-500');
+                    customerName.classList.add('text-gray-800');
+                }
+
+                customerDropdown.classList.add('hidden');
+            });
+        });
+
+        // 點擊頁面其他區域關閉下拉選單
+        document.addEventListener('click', function (event) {
+            if (!customerSelect.contains(event.target) && !customerDropdown.contains(event.target)) {
+                customerDropdown.classList.add('hidden');
+            }
+        });
+
+        // 打開商品選擇模態框
+        addProductBtn.addEventListener('click', function () {
+            productModal.classList.remove('hidden');
+        });
+
+        // 關閉商品選擇模態框
+        closeProductModal.addEventListener('click', function () {
+            productModal.classList.add('hidden');
+        });
+
+        // 掃碼添加功能
+        scanBtn.addEventListener('click', function () {
+            alert("掃碼功能需配合相機使用，此為演示版本。");
+            // 模擬掃碼添加一個商品
+            addProductToOrder(3); // 添加ID為3的商品（耳機）
+        });
+
+        // 商品選項點擊事件
+        productOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                const productId = this.getAttribute('data-id');
+
+                // 切選中狀態
+                if (selectedProductIds.has(productId)) {
+                    selectedProductIds.delete(productId);
+                    this.querySelector('.fa-plus-circle').classList.remove('text-green-500');
+                    this.querySelector('.fa-plus-circle').classList.add('text-blue-500');
+                } else {
+                    selectedProductIds.add(productId);
+                    this.querySelector('.fa-plus-circle').classList.remove('text-blue-500');
+                    this.querySelector('.fa-plus-circle').classList.add('text-green-500');
+                }
+            });
+        });
+
+        // 確認添加商品
+        confirmProductBtn.addEventListener('click', function () {
+            if (selectedProductIds.size === 0) {
+                alert("請選擇至少一個商品");
+                return;
+            }
+
+            selectedProductIds.forEach(id => {
+                if (!selectedProducts.some(product => product.id === id)) {
+                    addProductToOrder(parseInt(id));
+                }
+            });
+
+            // 重置選擇
+            selectedProductIds.clear();
+            productOptions.forEach(option => {
+                option.querySelector('.fa-plus-circle').classList.remove('text-green-500');
+                option.querySelector('.fa-plus-circle').classList.add('text-blue-500');
+            });
+
+            productModal.classList.add('hidden');
+        });
+
+        // 添加商品到訂單
+        function addProductToOrder(productId) {
+            if (selectedProducts.some(product => product.id === productId)) {
+                // 如果商品已存在，增加數量
+                const index = selectedProducts.findIndex(product => product.id === productId);
+                selectedProducts[index].quantity += 1;
+                updateProductQuantity(productId, selectedProducts[index].quantity);
+            } else {
+                // 新增商品
+                const product = {
+                    id: productId,
+                    name: productData[productId].name,
+                    price: productData[productId].price,
+                    quantity: 1
+                };
+                selectedProducts.push(product);
+
+                // 添加到商品列表
+                addProductToUI(product);
+            }
+
+            updateOrderSummary();
+        }
+
+        // 添加商品到UI
+        function addProductToUI(product) {
+            // 如果沒有商品，移除空狀態訊息
+            const emptyProduct = document.querySelector('.empty-product');
+            if (emptyProduct) {
+                emptyProduct.remove();
+            }
+
+            // 檢查商品是否已存在於UI中
+            const existingProduct = document.querySelector(`.product-item[data-id="${product.id}"]`);
+            if (existingProduct) {
+                // 如果已存在，只更新數量
+                const quantitySpan = existingProduct.querySelector('.product-quantity');
+                quantitySpan.textContent = product.quantity;
+                return;
+            }
+
+            // 創建新商品項目
+            const productItem = document.createElement('div');
+            productItem.className = 'product-item bg-white rounded-lg border border-gray-200 p-4';
+            productItem.setAttribute('data-id', product.id);
+
+            productItem.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-medium">${product.name}</h4>
+                    <button class="delete-product text-red-500 p-1" data-id="${product.id}">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <span class="text-gray-600 mr-4">單價: ¥${product.price.toLocaleString()}</span>
+                        <div class="flex items-center">
+                            <button class="quantity-decrease p-1 text-gray-600" data-id="${product.id}">
+                                <i class="fas fa-minus-circle"></i>
+                            </button>
+                            <span class="product-quantity mx-2 font-medium w-8 text-center">${product.quantity}</span>
+                            <button class="quantity-increase p-1 text-gray-600" data-id="${product.id}">
+                                <i class="fas fa-plus-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <span class="font-bold">¥${(product.price * product.quantity).toLocaleString()}</span>
+                </div>
+            `;
+
+            productList.prepend(productItem);
+
+            // 添加事件監聽器
+            const deleteBtn = productItem.querySelector('.delete-product');
+            const decreaseBtn = productItem.querySelector('.quantity-decrease');
+            const increaseBtn = productItem.querySelector('.quantity-increase');
+
+            deleteBtn.addEventListener('click', function () {
+                const id = parseInt(this.getAttribute('data-id'));
+                removeProductFromOrder(id);
+            });
+
+            decreaseBtn.addEventListener('click', function () {
+                const id = parseInt(this.getAttribute('data-id'));
+                updateProductQuantity(id, -1);
+            });
+
+            increaseBtn.addEventListener('click', function () {
+                const id = parseInt(this.getAttribute('data-id'));
+                updateProductQuantity(id, 1);
+            });
+        }
+
+        // 更新商品數量
+        function updateProductQuantity(productId, change) {
+            const index = selectedProducts.findIndex(product => product.id === productId);
+
+            if (index !== -1) {
+                if (change === -1) {
+                    // 減少數量
+                    if (selectedProducts[index].quantity > 1) {
+                        selectedProducts[index].quantity += change;
+                    } else {
+                        // 如果數量為1，減少則移除商品
+                        removeProductFromOrder(productId);
+                        return;
+                    }
+                } else if (change === 1) {
+                    // 增加數量
+                    selectedProducts[index].quantity += change;
+                } else {
+                    // 直接設置數量
+                    selectedProducts[index].quantity = change;
+                }
+
+                // 更新UI
+                const productItem = document.querySelector(`.product-item[data-id="${productId}"]`);
+                if (productItem) {
+                    const quantitySpan = productItem.querySelector('.product-quantity');
+                    quantitySpan.textContent = selectedProducts[index].quantity;
+
+                    const totalSpan = productItem.querySelector('.font-bold');
+                    totalSpan.textContent = `¥${(selectedProducts[index].price * selectedProducts[index].quantity).toLocaleString()}`;
+                }
+
+                updateOrderSummary();
+            }
+        }
+
+        // 從訂單中移除商品
+        function removeProductFromOrder(productId) {
+            const index = selectedProducts.findIndex(product => product.id === productId);
+            if (index !== -1) {
+                selectedProducts.splice(index, 1);
+
+                // 從UI中移除
+                const productItem = document.querySelector(`.product-item[data-id="${productId}"]`);
+                if (productItem) {
+                    productItem.remove();
+                }
+
+                // 如果沒有商品，顯示空狀態
+                if (selectedProducts.length === 0) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.className = 'empty-product text-center py-10 text-gray-400';
+                    emptyDiv.innerHTML = `
+                        <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                        <p>尚未添加任何商品</p>
+                        <p class="text-sm mt-1">點擊上方按鈕添加商品</p>
+                    `;
+                    productList.appendChild(emptyDiv);
+                }
+
+                updateOrderSummary();
+            }
+        }
+
+        // 更新訂單摘要
+        function updateOrderSummary() {
+            const totalQuantity = selectedProducts.reduce((sum, product) => sum + product.quantity, 0);
+            const totalAmount = selectedProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+            const discount = totalAmount * 0.05; // 5%折扣
+            const finalAmount = totalAmount - discount;
+
+            productCount.textContent = `${totalQuantity}個商品`;
+            summaryQuantity.textContent = totalQuantity;
+            summaryTotal.textContent = `¥${totalAmount.toLocaleString()}`;
+            summaryDiscount.textContent = `¥${discount.toLocaleString()}`;
+            summaryFinal.textContent = `¥${finalAmount.toLocaleString()}`;
+        }
+
+        // 返回按鈕
+        backBtn.addEventListener('click', function () {
+            if (selectedProducts.length > 0) {
+                if (confirm("您有未儲存的變更，確定要離開嗎？")) {
+                    window.history.back();
+                }
+            } else {
+                window.history.back();
+            }
+        });
+
+        // 取消按鈕
+        cancelBtn.addEventListener('click', function () {
+            if (selectedProducts.length > 0 || customerName.textContent !== "請選擇客戶") {
+                if (confirm("確定要取消此預訂單嗎？所有輸入的資料將遺失。")) {
+                    window.history.back();
+                }
+            } else {
+                window.history.back();
+            }
+        });
+
+        // 提交按鈕
+        submitBtn.addEventListener('click', function () {
+            if (customerName.textContent === "請選擇客戶") {
+                alert("請選擇客戶");
+                customerSelect.scrollIntoView({ behavior: 'smooth' });
+                return;
+            }
+
+            if (selectedProducts.length === 0) {
+                alert("請添加至少一個商品");
+                return;
+            }
+
+            // 這裡可以添加提交表單的邏輯
+            const orderData = {
+                customer: customerName.textContent,
+                date: document.getElementById('orderDate').value,
+                salesperson: document.getElementById('salesperson').value,
+                products: selectedProducts,
+                notes: document.getElementById('notes').value,
+                total: parseFloat(summaryFinal.textContent.replace('¥', '').replace(',', ''))
+            };
+
+            console.log("訂單資料:", orderData);
+            alert("預訂單提交成功！");
+
+            // 重設表單
+            resetForm();
+        });
+
+        // 重設表單
+        function resetForm() {
+            customerName.textContent = "請選擇客戶";
+            customerName.classList.remove('text-gray-800', 'text-blue-600');
+            customerName.classList.add('text-gray-500');
+            document.getElementById('orderDate').value = "2025-12-25";
+            document.getElementById('salesperson').value = "boss";
+            document.getElementById('notes').value = "";
+
+            // 清空商品
+            selectedProducts = [];
+            selectedProductIds.clear();
+            productList.innerHTML = `
+                <div class="empty-product text-center py-10 text-gray-400">
+                    <i class="fas fa-shopping-cart text-4xl mb-3"></i>
+                    <p>尚未添加任何商品</p>
+                    <p class="text-sm mt-1">點擊上方按鈕添加商品</p>
+                </div>
+            `;
+
+            updateOrderSummary();
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 設置日期選擇器的最小日期為今天
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('orderDate').min = today;
+        });
+    </script>
+</body>
+
+</html>

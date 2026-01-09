@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新療程單 - Clinext 醫療美容系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh-tw.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        /* 自定義滾動條 */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* 動畫效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 pb-24">
+    <!-- 頂部導航 -->
+    <div
+        class="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-md">
+        <div class="flex items-center gap-3">
+            <a href="../staff/dashboard.html" class="text-white hover:bg-white/10 p-1 rounded-full transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-lg font-semibold">新療程單</h1>
+                <p class="text-xs text-white/80">醫療美容治療記錄</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="text-xs bg-white/20 px-2 py-1 rounded-full">v2.0</span>
+            <a href="../calendar.html" class="text-xs bg-white text-green-700 px-2 py-1 rounded-full hover:bg-gray-100">行事曆</a>
+        </div>
+    </div>
+
+    <!-- 主要內容區域 -->
+    <div class="px-4 py-4 space-y-4">
+        <!-- 患者資料區塊 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+            <div class="p-4 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-800 flex items-center gap-1">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    患者資料
+                </h2>
+            </div>
+            <div class="p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1">
+                        <span class="text-red-500">*</span>
+                        <span class="text-gray-800 font-medium">患者選擇</span>
+                    </div>
+                    <button id="selectPatientBtn"
+                        class="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors">
+                        <span class="text-gray-600" id="selectedPatient">選擇患者</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="patientInfo" class="hidden bg-gray-50 rounded-lg p-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium text-gray-900" id="patientName">-</h4>
+                            <div class="flex items-center gap-3 mt-1 text-sm">
+                                <span class="text-gray-600" id="patientGender">-</span>
+                                <span class="text-gray-600" id="patientAge">-</span>
+                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs"
+                                    id="patientSkinType">-</span>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-1" id="patientMedicalHistory">-</p>
+                        </div>
+                        <button id="changePatientBtn" class="text-blue-600 text-sm">變更</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 療程資訊區塊 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100">
+            <div class="p-4 border-b border-gray-100">
+                <h2 class="font-semibold text-gray-800 flex items-center gap-1">
+                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                    </svg>
+                    療程資訊
+                </h2>
+            </div>
+            <div class="p-4 space-y-3">
+                <!-- 日期 -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-gray-800">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <span class="font-medium">治療日期</span>
+                    </div>
+                    <button id="selectDateBtn" class="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors">
+                        <span class="text-gray-800 font-medium" id="currentDate">2025-12-25</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 醫師 -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-gray-800">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="font-medium">主治醫師</span>
+                    </div>
+                    <button id="selectDoctorBtn" class="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors">
+                        <span class="text-gray-600" id="selectedDoctorName">選擇醫師</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 護理師 -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-gray-800">
+                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span class="font-medium">護理師</span>
+                    </div>
+                    <button id="selectNurseBtn" class="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors">
+                        <span class="text-gray-800 font-medium" id="staffName">選擇護理師</span>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 添加療程按鈕 -->
+        <div class="flex gap-3 pt-2">
+            <button id="selectTreatmentBtn"
+                class="flex-1 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white rounded-xl px-4 py-4 flex items-center justify-center gap-3 shadow-md transition-all active:scale-95">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                <span class="font-semibold">選擇療程</span>
+            </button>
+
+            <button id="scanTreatmentBtn"
+                class="flex-1 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-600 hover:to-cyan-700 text-white rounded-xl px-4 py-4 flex items-center justify-center gap-3 shadow-md transition-all active:scale-95">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                </svg>
+                <span class="font-semibold">掃碼添加</span>
+            </button>
+        </div>
+
+        <!-- 已選療程清單 -->
+        <div id="treatmentList" class="space-y-3 hidden">
+            <div class="flex items-center justify-between pt-4">
+                <h3 class="text-lg font-bold text-gray-800">已選療程</h3>
+                <span class="text-sm text-gray-500" id="treatmentCount">0 項療程</span>
+            </div>
+        </div>
+
+        <!-- 治療詳細資料表單 -->
+        <div id="treatmentDetails" class="space-y-4 hidden">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">治療詳細資料</h3>
+
+                <!-- 劑量/能量設定 -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">治療劑量/能量</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <input type="number" id="dosageValue" placeholder="數值"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            </div>
+                            <div>
+                                <select id="dosageUnit"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="U">單位 (U)</option>
+                                    <option value="條">條數</option>
+                                    <option value="cc">毫升 (cc)</option>
+                                    <option value="發">發數</option>
+                                    <option value="次">次數</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 治療部位 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">治療部位</label>
+                        <div class="flex flex-wrap gap-2">
+                            <button
+                                class="treatment-area-btn px-3 py-1.5 border border-gray-300 rounded-full text-sm hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                                data-area="左臉">左臉</button>
+                            <button
+                                class="treatment-area-btn px-3 py-1.5 border border-gray-300 rounded-full text-sm hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                                data-area="右臉">右臉</button>
+                            <button
+                                class="treatment-area-btn px-3 py-1.5 border border-gray-300 rounded-full text-sm hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                                data-area="額頭">額頭</button>
+                            <button
+                                class="treatment-area-btn px-3 py-1.5 border border-gray-300 rounded-full text-sm hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                                data-area="下巴">下巴</button>
+                            <button
+                                class="treatment-area-btn px-3 py-1.5 border border-gray-300 rounded-full text-sm hover:bg-purple-50 hover:border-purple-300 transition-colors"
+                                data-area="法令紋">法令紋</button>
+                        </div>
+                        <input type="text" id="treatmentAreaInput" placeholder="其他部位..."
+                            class="w-full mt-3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent hidden">
+                    </div>
+
+                    <!-- 使用設備/藥品 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">使用設備/藥品</label>
+                        <select id="deviceUsed"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">選擇設備或藥品</option>
+                            <option value="HIFU_LIFTING">海芙音波儀</option>
+                            <option value="PICO_LASER">皮秒雷射儀</option>
+                            <option value="THERMAGE">鳳凰電波儀</option>
+                            <option value="BOTOX_US">美國肉毒桿菌</option>
+                            <option value="HA_FILLER">玻尿酸填充劑</option>
+                        </select>
+                    </div>
+
+                    <!-- 臨床備註 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">臨床備註</label>
+                        <textarea id="clinicalNotes" rows="3" placeholder="記錄治療過程、特殊反應或注意事項..."
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 訂單摘要 -->
+        <div id="orderSummary" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hidden animate-fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800">訂單摘要</h3>
+                <span class="text-sm text-gray-500" id="itemCount">共 0 項</span>
+            </div>
+
+            <div class="space-y-3">
+                <!-- 小計 -->
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-gray-600">療程小計</span>
+                    <span class="text-gray-800 font-semibold" id="subtotal">$0</span>
+                </div>
+
+                <!-- 折扣 -->
+                <div class="flex justify-between items-center py-2 border-b border-gray-200">
+                    <div class="flex items-center gap-2">
+                        <span class="text-gray-600">折扣</span>
+                        <button id="applyDiscountBtn" class="text-xs text-blue-600 hover:text-blue-700">添加折扣</button>
+                    </div>
+                    <span class="text-green-600 font-semibold" id="discount">-$0</span>
+                </div>
+
+                <!-- 總計 -->
+                <div class="flex justify-between items-center pt-2">
+                    <span class="text-gray-800 font-bold text-lg">總計</span>
+                    <span class="text-green-600 font-bold text-xl" id="total">$0</span>
+                </div>
+
+                <!-- 付款方式 -->
+                <div class="pt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">付款方式</label>
+                    <select id="paymentMethod"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="cash">現金</option>
+                        <option value="credit_card">信用卡</option>
+                        <option value="transfer">轉帳</option>
+                        <option value="instalment">分期付款</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 療程選擇模態框 -->
+    <div id="treatmentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-xl">
+            <!-- 模態框標頭 -->
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">選擇療程項目</h3>
+                        <p class="text-sm text-gray-500 mt-1">根據患者需求選擇治療項目</p>
+                    </div>
+                    <button id="closeModalBtn"
+                        class="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 搜尋與篩選 -->
+                <div class="mt-3">
+                    <div class="relative">
+                        <input type="text" id="treatmentSearch" placeholder="搜尋療程名稱..."
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <div class="flex gap-2 mt-3">
+                        <button
+                            class="category-filter text-xs px-3 py-1 rounded-full border border-gray-300 hover:bg-gray-50"
+                            data-category="all">全部</button>
+                        <button
+                            class="category-filter text-xs px-3 py-1 rounded-full border border-gray-300 hover:bg-gray-50"
+                            data-category="injection">注射類</button>
+                        <button
+                            class="category-filter text-xs px-3 py-1 rounded-full border border-gray-300 hover:bg-gray-50"
+                            data-category="device">儀器類</button>
+                        <button
+                            class="category-filter text-xs px-3 py-1 rounded-full border border-gray-300 hover:bg-gray-50"
+                            data-category="promotion">促銷方案</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 療程列表 -->
+            <div class="overflow-y-auto max-h-[60vh] p-4 custom-scrollbar">
+                <div class="space-y-3" id="treatmentItemsContainer">
+                    <!-- 療程項目將由 JavaScript 動態生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 患者選擇模態框 -->
+    <div id="patientModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-800">選擇患者</h3>
+                    <button id="closePatientModalBtn" class="text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-3">
+                    <input type="text" id="patientSearchInput" placeholder="搜尋患者姓名..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+            <div class="overflow-y-auto max-h-[60vh] p-4">
+                <div class="space-y-3" id="patientListContainer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 醫師選擇模態框 -->
+    <div id="doctorModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">選擇主治醫師</h3>
+                        <p class="text-sm text-gray-500 mt-1">選擇負責本次療程的醫師</p>
+                    </div>
+                    <button id="closeDoctorModalBtn" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-y-auto max-h-[60vh] p-4">
+                <div class="space-y-3" id="doctorListContainer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 護理師選擇模態框 -->
+    <div id="nurseModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-pink-50 to-rose-50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">選擇護理師</h3>
+                        <p class="text-sm text-gray-500 mt-1">選擇協助本次療程的護理師</p>
+                    </div>
+                    <button id="closeNurseModalBtn" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-y-auto max-h-[60vh] p-4">
+                <div class="space-y-3" id="nurseListContainer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 日期選擇模態框 -->
+    <div id="dateModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 px-4">
+        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-green-50 to-teal-50">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-800">選擇治療日期</h3>
+                    <button id="closeDateModalBtn" class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="p-4">
+                <input type="text" id="datePicker" class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-lg font-medium" readonly>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex justify-end gap-3">
+                <button id="cancelDateBtn" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">取消</button>
+                <button id="confirmDateBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部確認按鈕 -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-10">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <span class="text-sm text-gray-600">總金額</span>
+                <div class="text-xl font-bold text-green-600" id="bottomTotal">$0</div>
+            </div>
+            <button id="submitOrderBtn"
+                class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-8 rounded-full transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                建立療程單
+            </button>
+        </div>
+        <p class="text-xs text-gray-500 text-center">點擊確認建立療程單並記錄治療資訊</p>
+    </div>
+
+    <script>
+        if (typeof flatpickr !== 'undefined' && flatpickr.l10ns && flatpickr.l10ns.zh_tw) {
+            flatpickr.localize(flatpickr.l10ns.zh_tw);
+        }
+
+        const user = JSON.parse(sessionStorage.getItem('currentUser')) || { name: '未登入' };
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('currentDate').textContent = today;
+
+        const doctors = [
+            { doctor_id: 'DOC001', full_name: '張醫師', license_no: 'DOC-2015-001', specialty: '微整形注射', status: 'active', avatar: '👨‍⚕️' },
+            { doctor_id: 'DOC002', full_name: '李醫師', license_no: 'DOC-2018-002', specialty: '雷射光療', status: 'active', avatar: '👨‍⚕️' },
+            { doctor_id: 'DOC003', full_name: '王醫師', license_no: 'DOC-2020-003', specialty: '音波電波', status: 'active', avatar: '👩‍⚕️' },
+            { doctor_id: 'DOC004', full_name: '陳醫師', license_no: 'DOC-2019-004', specialty: '皮膚科', status: 'active', avatar: '👩‍⚕️' }
+        ];
+
+        const nurses = [
+            { staff_id: 'STF001', full_name: '張護理師', role: 'nurse', license_no: 'NUR-2016-001', status: 'active', avatar: '👩‍⚕️' },
+            { staff_id: 'STF002', full_name: '林美容師', role: 'therapist', specialty: '臉部保養', status: 'active', avatar: '💆‍♀️' },
+            { staff_id: 'STF003', full_name: '陳顧問', role: 'consultant', specialty: '療程諮詢', status: 'active', avatar: '👩‍💼' },
+            { staff_id: 'STF004', full_name: '王護理師', role: 'nurse', license_no: 'NUR-2018-002', status: 'active', avatar: '👩‍⚕️' },
+            { staff_id: 'STF005', full_name: '黃美容師', role: 'therapist', specialty: '身體療程', status: 'active', avatar: '💆‍♀️' }
+        ];
+
+        const treatments = [
+            {
+                treatment_id: "BOT_MASSETER",
+                treatment_code: "BOT_MASSETER",
+                treatment_name: "美國肉毒瘦小臉",
+                category: "injection",
+                default_unit: "U",
+                base_price: 4999,
+                description: "Botox 30U，咬肌肥厚治療",
+                common_dosage: "30-50U"
+            },
+            {
+                treatment_id: "NABOTA_100U",
+                treatment_code: "NABOTA_100U",
+                treatment_name: "韓國肉毒 100U + 容酷針",
+                category: "injection",
+                default_unit: "U",
+                base_price: 8888,
+                description: "Nabota 100U + Contour",
+                common_dosage: "100U"
+            },
+            {
+                treatment_id: "VERSA_HA_1CC",
+                treatment_code: "VERSA_HA_1CC",
+                treatment_name: "薇貝拉玻尿酸 1cc",
+                category: "injection",
+                default_unit: "cc",
+                base_price: 12000,
+                description: "Versa HA Filler",
+                common_dosage: "1cc"
+            },
+            {
+                treatment_id: "HIFU_1000",
+                treatment_code: "HIFU_1000",
+                treatment_name: "海芙音波 1000條",
+                category: "device",
+                default_unit: "條",
+                base_price: 38000,
+                description: "HIFU Lifting，臉部緊緻",
+                common_dosage: "1000條"
+            },
+            {
+                treatment_id: "PICO_LASER",
+                treatment_code: "PICO_LASER",
+                treatment_name: "皮秒蜂巢雷射",
+                category: "device",
+                default_unit: "次",
+                base_price: 5800,
+                description: "Pico Laser，色素斑治療",
+                common_dosage: "單次"
+            },
+            {
+                treatment_id: "THERMAGE_HIFU",
+                treatment_code: "THERMAGE_HIFU",
+                treatment_name: "鳳凰電波 900 + 音波 300",
+                category: "device",
+                default_unit: "發",
+                base_price: 68000,
+                description: "Thermage + HIFU Combo",
+                common_dosage: "1200發"
+            },
+            {
+                treatment_id: "FLAWLESS_SKIN",
+                treatment_code: "FLAWLESS_SKIN",
+                treatment_name: "無瑕肌方案",
+                category: "promotion",
+                default_unit: "方案",
+                base_price: 10000,
+                description: "四選一促銷方案",
+                common_dosage: "四選一"
+            }
+        ];
+
+        const patients = [
+            { patient_id: "PAT001", full_name: "陳美玲", gender: "女性", date_of_birth: "1990-05-15", phone: "0912-345-678", skin_type: "III型", medical_history: "無重大病史，對盤尼西林過敏" },
+            { patient_id: "PAT002", full_name: "林志明", gender: "男性", date_of_birth: "1985-08-22", phone: "0933-456-789", skin_type: "IV型", medical_history: "高血壓" },
+            { patient_id: "PAT003", full_name: "王小美", gender: "女性", date_of_birth: "1992-03-10", phone: "0988-777-666", skin_type: "II型", medical_history: "無" },
+            { patient_id: "PAT004", full_name: "張雅婷", gender: "女性", date_of_birth: "1988-12-05", phone: "0955-123-456", skin_type: "III型", medical_history: "對某些麻醉藥物敏感" },
+            { patient_id: "PAT005", full_name: "李大偉", gender: "男性", date_of_birth: "1978-07-18", phone: "0922-888-999", skin_type: "V型", medical_history: "糖尿病" },
+            { patient_id: "PAT006", full_name: "黃佳琪", gender: "女性", date_of_birth: "1995-01-28", phone: "0966-555-444", skin_type: "II型", medical_history: "無" }
+        ];
+
+        let selectedTreatments = [];
+        let currentPatient = null;
+        let selectedDoctor = null;
+        let selectedNurse = null;
+        let selectedDate = today;
+        let selectedTreatmentAreas = [];
+        let datePickerInstance = null;
+
+        // 計算年齡
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // 初始化治療項目列表
+        function initializeTreatmentItems() {
+            const container = document.getElementById('treatmentItemsContainer');
+            container.innerHTML = '';
+
+            treatments.forEach(treatment => {
+                const item = document.createElement('div');
+                item.className = `treatment-item bg-gray-50 rounded-xl p-4 cursor-pointer hover:bg-purple-50 transition-colors border border-gray-200 hover:border-purple-300 ${treatment.category}`;
+                item.setAttribute('data-treatment-id', treatment.treatment_id);
+                item.setAttribute('data-treatment-code', treatment.treatment_code);
+                item.setAttribute('data-treatment-name', treatment.treatment_name);
+                item.setAttribute('data-category', treatment.category);
+                item.setAttribute('data-base-price', treatment.base_price);
+                item.setAttribute('data-default-unit', treatment.default_unit);
+                item.setAttribute('data-common-dosage', treatment.common_dosage);
+                item.setAttribute('data-description', treatment.description);
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-semibold text-gray-900">${treatment.treatment_name}</h4>
+                                <span class="text-xs px-2 py-0.5 rounded-full ${treatment.category === 'injection' ? 'bg-blue-100 text-blue-700' : treatment.category === 'device' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}">
+                                    ${treatment.category === 'injection' ? '注射類' : treatment.category === 'device' ? '儀器類' : '促銷方案'}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-500 mb-2">${treatment.description}</p>
+                            <div class="flex items-center gap-3 text-xs text-gray-600">
+                                <span>${treatment.default_unit}</span>
+                                <span>建議: ${treatment.common_dosage}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-purple-600 font-bold text-lg">$${treatment.base_price.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+
+                item.addEventListener('click', function () {
+                    selectTreatment(this);
+                });
+
+                container.appendChild(item);
+            });
+        }
+
+        // 選擇治療項目
+        function selectTreatment(element) {
+            const treatment = {
+                id: element.dataset.treatmentId,
+                code: element.dataset.treatmentCode,
+                name: element.dataset.treatmentName,
+                category: element.dataset.category,
+                base_price: parseInt(element.dataset.basePrice),
+                default_unit: element.dataset.defaultUnit,
+                common_dosage: element.dataset.commonDosage,
+                description: element.dataset.description,
+                dosage_value: '',
+                dosage_unit: element.dataset.defaultUnit,
+                treatment_area: [],
+                device_used: '',
+                clinical_notes: ''
+            };
+
+            selectedTreatments.push(treatment);
+            updateOrderDisplay();
+
+            // 關閉模態框
+            document.getElementById('treatmentModal').classList.add('hidden');
+            document.getElementById('treatmentModal').classList.remove('flex');
+
+            // 顯示治療詳細資料區塊
+            document.getElementById('treatmentDetails').classList.remove('hidden');
+        }
+
+        // 更新訂單顯示
+        function updateOrderDisplay() {
+            const listEl = document.getElementById('treatmentList');
+            const summaryEl = document.getElementById('orderSummary');
+            const detailsEl = document.getElementById('treatmentDetails');
+            const submitBtn = document.getElementById('submitOrderBtn');
+            const treatmentCount = document.getElementById('treatmentCount');
+            const itemCount = document.getElementById('itemCount');
+
+            if (selectedTreatments.length > 0) {
+                listEl.classList.remove('hidden');
+                summaryEl.classList.remove('hidden');
+                submitBtn.disabled = false;
+                treatmentCount.textContent = `${selectedTreatments.length} 項療程`;
+                itemCount.textContent = `共 ${selectedTreatments.length} 項`;
+
+                // 生成治療項目列表
+                let html = '';
+                selectedTreatments.forEach((t, idx) => {
+                    html += `
+                        <div class="bg-white rounded-xl p-4 border border-gray-200 shadow-sm animate-fade-in">
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="font-semibold text-gray-900">${t.name}</h4>
+                                        <span class="text-xs px-2 py-0.5 rounded-full ${t.category === 'injection' ? 'bg-blue-100 text-blue-700' : t.category === 'device' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}">
+                                            ${t.category === 'injection' ? '注射類' : t.category === 'device' ? '儀器類' : '促銷方案'}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm text-gray-600 space-y-1">
+                                        ${t.dosage_value ? `<div>劑量: ${t.dosage_value} ${t.dosage_unit}</div>` : ''}
+                                        ${t.treatment_area.length > 0 ? `<div>部位: ${t.treatment_area.join(', ')}</div>` : ''}
+                                        ${t.device_used ? `<div>設備: ${t.device_used}</div>` : ''}
+                                    </div>
+                                    ${t.clinical_notes ? `<p class="text-sm text-gray-500 mt-2">備註: ${t.clinical_notes}</p>` : ''}
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-purple-600 font-bold whitespace-nowrap">$${t.base_price.toLocaleString()}</span>
+                                    <button onclick="removeTreatment(${idx})" class="text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                listEl.innerHTML = html;
+
+                // 計算總金額
+                const subtotal = selectedTreatments.reduce((sum, t) => sum + t.base_price, 0);
+                const discount = 0; // 可以擴展折扣功能
+                const total = subtotal - discount;
+
+                document.getElementById('subtotal').textContent = '$' + subtotal.toLocaleString();
+                document.getElementById('discount').textContent = '-$' + discount.toLocaleString();
+                document.getElementById('total').textContent = '$' + total.toLocaleString();
+                document.getElementById('bottomTotal').textContent = '$' + total.toLocaleString();
+
+                // 更新治療詳細資料表單
+                if (selectedTreatments.length > 0) {
+                    const lastTreatment = selectedTreatments[selectedTreatments.length - 1];
+                    document.getElementById('dosageValue').value = lastTreatment.dosage_value || '';
+                    document.getElementById('dosageUnit').value = lastTreatment.dosage_unit || lastTreatment.default_unit;
+                    document.getElementById('deviceUsed').value = lastTreatment.device_used || '';
+                    document.getElementById('clinicalNotes').value = lastTreatment.clinical_notes || '';
+                }
+            } else {
+                listEl.classList.add('hidden');
+                summaryEl.classList.add('hidden');
+                detailsEl.classList.add('hidden');
+                submitBtn.disabled = true;
+                treatmentCount.textContent = '0 項療程';
+            }
+
+            // 檢查是否可以提交
+            checkSubmissionReady();
+        }
+
+        // 檢查是否可以提交訂單
+        function checkSubmissionReady() {
+            const submitBtn = document.getElementById('submitOrderBtn');
+            const patientSelected = currentPatient !== null;
+            const treatmentsSelected = selectedTreatments.length > 0;
+
+            submitBtn.disabled = !(patientSelected && treatmentsSelected);
+
+            if (!patientSelected) {
+                submitBtn.setAttribute('title', '請先選擇患者');
+            } else if (!treatmentsSelected) {
+                submitBtn.setAttribute('title', '請至少選擇一項療程');
+            } else {
+                submitBtn.removeAttribute('title');
+            }
+        }
+
+        // 移除治療項目
+        window.removeTreatment = function (idx) {
+            selectedTreatments.splice(idx, 1);
+            updateOrderDisplay();
+
+            if (selectedTreatments.length === 0) {
+                document.getElementById('treatmentDetails').classList.add('hidden');
+            }
+        };
+
+        document.getElementById('selectPatientBtn').addEventListener('click', function () {
+            document.getElementById('patientModal').classList.remove('hidden');
+            document.getElementById('patientModal').classList.add('flex');
+        });
+
+        function initializeDoctorList() {
+            const container = document.getElementById('doctorListContainer');
+            container.innerHTML = doctors.map(doc => `
+                <div class="doctor-item bg-gray-50 rounded-xl p-4 cursor-pointer hover:bg-blue-50 transition-colors border border-gray-200 hover:border-blue-300" data-doctor-id="${doc.doctor_id}">
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl">${doc.avatar}</div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900">${doc.full_name}</h4>
+                            <p class="text-sm text-gray-600">${doc.specialty}</p>
+                            <p class="text-xs text-gray-400">執照: ${doc.license_no}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+
+            container.querySelectorAll('.doctor-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const doctorId = this.dataset.doctorId;
+                    const doctor = doctors.find(d => d.doctor_id === doctorId);
+                    if (doctor) {
+                        selectedDoctor = doctor;
+                        document.getElementById('selectedDoctorName').textContent = doctor.full_name;
+                        document.getElementById('selectedDoctorName').classList.remove('text-gray-600');
+                        document.getElementById('selectedDoctorName').classList.add('text-gray-800', 'font-medium');
+                        document.getElementById('doctorModal').classList.add('hidden');
+                        document.getElementById('doctorModal').classList.remove('flex');
+                    }
+                });
+            });
+        }
+
+        function initializeNurseList() {
+            const container = document.getElementById('nurseListContainer');
+            container.innerHTML = nurses.map(nurse => `
+                <div class="nurse-item bg-gray-50 rounded-xl p-4 cursor-pointer hover:bg-pink-50 transition-colors border border-gray-200 hover:border-pink-300" data-staff-id="${nurse.staff_id}">
+                    <div class="flex items-center gap-3">
+                        <div class="text-3xl">${nurse.avatar}</div>
+                        <div class="flex-1">
+                            <h4 class="font-semibold text-gray-900">${nurse.full_name}</h4>
+                            <p class="text-sm text-gray-600">${nurse.role === 'nurse' ? '護理師' : nurse.role === 'therapist' ? '美容師' : '顧問'}</p>
+                            <p class="text-xs text-gray-400">${nurse.specialty || nurse.license_no || ''}</p>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+            `).join('');
+
+            container.querySelectorAll('.nurse-item').forEach(item => {
+                item.addEventListener('click', function () {
+                    const staffId = this.dataset.staffId;
+                    const nurse = nurses.find(n => n.staff_id === staffId);
+                    if (nurse) {
+                        selectedNurse = nurse;
+                        document.getElementById('staffName').textContent = nurse.full_name;
+                        document.getElementById('nurseModal').classList.add('hidden');
+                        document.getElementById('nurseModal').classList.remove('flex');
+                    }
+                });
+            });
+        }
+
+        function initializeDatePicker() {
+            datePickerInstance = flatpickr('#datePicker', {
+                defaultDate: today,
+                dateFormat: 'Y-m-d',
+                inline: true,
+                onChange: function(selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeTreatmentItems();
+            initializeDoctorList();
+            initializeNurseList();
+            initializeDatePicker();
+
+            // 治療模態框控制
+            document.getElementById('selectTreatmentBtn').addEventListener('click', function () {
+                document.getElementById('treatmentModal').classList.remove('hidden');
+                document.getElementById('treatmentModal').classList.add('flex');
+            });
+
+            document.getElementById('closeModalBtn').addEventListener('click', function () {
+                document.getElementById('treatmentModal').classList.add('hidden');
+                document.getElementById('treatmentModal').classList.remove('flex');
+            });
+
+            // 患者模態框控制
+            document.getElementById('closePatientModalBtn').addEventListener('click', function () {
+                document.getElementById('patientModal').classList.add('hidden');
+                document.getElementById('patientModal').classList.remove('flex');
+            });
+
+            // 醫師選擇模態框
+            document.getElementById('selectDoctorBtn').addEventListener('click', function () {
+                document.getElementById('doctorModal').classList.remove('hidden');
+                document.getElementById('doctorModal').classList.add('flex');
+            });
+
+            document.getElementById('closeDoctorModalBtn').addEventListener('click', function () {
+                document.getElementById('doctorModal').classList.add('hidden');
+                document.getElementById('doctorModal').classList.remove('flex');
+            });
+
+            // 護理師選擇模態框
+            document.getElementById('selectNurseBtn').addEventListener('click', function () {
+                document.getElementById('nurseModal').classList.remove('hidden');
+                document.getElementById('nurseModal').classList.add('flex');
+            });
+
+            document.getElementById('closeNurseModalBtn').addEventListener('click', function () {
+                document.getElementById('nurseModal').classList.add('hidden');
+                document.getElementById('nurseModal').classList.remove('flex');
+            });
+
+            // 日期選擇模態框
+            document.getElementById('selectDateBtn').addEventListener('click', function () {
+                document.getElementById('dateModal').classList.remove('hidden');
+                document.getElementById('dateModal').classList.add('flex');
+            });
+
+            document.getElementById('closeDateModalBtn').addEventListener('click', function () {
+                document.getElementById('dateModal').classList.add('hidden');
+                document.getElementById('dateModal').classList.remove('flex');
+            });
+
+            document.getElementById('cancelDateBtn').addEventListener('click', function () {
+                document.getElementById('dateModal').classList.add('hidden');
+                document.getElementById('dateModal').classList.remove('flex');
+            });
+
+            document.getElementById('confirmDateBtn').addEventListener('click', function () {
+                document.getElementById('currentDate').textContent = selectedDate;
+                document.getElementById('dateModal').classList.add('hidden');
+                document.getElementById('dateModal').classList.remove('flex');
+            });
+
+            // 搜尋功能
+            document.getElementById('treatmentSearch').addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const items = document.querySelectorAll('.treatment-item');
+
+                items.forEach(item => {
+                    const name = item.dataset.treatmentName.toLowerCase();
+                    const description = item.dataset.description.toLowerCase();
+
+                    if (name.includes(searchTerm) || description.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // 分類篩選
+            document.querySelectorAll('.category-filter').forEach(button => {
+                button.addEventListener('click', function () {
+                    const category = this.dataset.category;
+                    const items = document.querySelectorAll('.treatment-item');
+
+                    document.querySelectorAll('.category-filter').forEach(btn => {
+                        btn.classList.remove('bg-purple-600', 'text-white');
+                        btn.classList.add('border-gray-300', 'hover:bg-gray-50');
+                    });
+
+                    this.classList.remove('border-gray-300', 'hover:bg-gray-50');
+                    this.classList.add('bg-purple-600', 'text-white');
+
+                    items.forEach(item => {
+                        if (category === 'all' || item.dataset.category === category) {
+                            item.style.display = 'block';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            // 治療部位選擇
+            document.querySelectorAll('.treatment-area-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const area = this.dataset.area;
+                    const index = selectedTreatmentAreas.indexOf(area);
+
+                    if (index === -1) {
+                        selectedTreatmentAreas.push(area);
+                        this.classList.add('bg-purple-600', 'text-white', 'border-purple-600');
+                        this.classList.remove('border-gray-300', 'hover:bg-purple-50');
+                    } else {
+                        selectedTreatmentAreas.splice(index, 1);
+                        this.classList.remove('bg-purple-600', 'text-white', 'border-purple-600');
+                        this.classList.add('border-gray-300', 'hover:bg-purple-50');
+                    }
+
+                    // 更新最後一個治療項目的部位
+                    if (selectedTreatments.length > 0) {
+                        const lastIndex = selectedTreatments.length - 1;
+                        selectedTreatments[lastIndex].treatment_area = [...selectedTreatmentAreas];
+                        updateOrderDisplay();
+                    }
+                });
+            });
+
+            // 治療詳細資料輸入
+            document.getElementById('dosageValue').addEventListener('input', function () {
+                if (selectedTreatments.length > 0) {
+                    const lastIndex = selectedTreatments.length - 1;
+                    selectedTreatments[lastIndex].dosage_value = this.value;
+                }
+            });
+
+            document.getElementById('dosageUnit').addEventListener('change', function () {
+                if (selectedTreatments.length > 0) {
+                    const lastIndex = selectedTreatments.length - 1;
+                    selectedTreatments[lastIndex].dosage_unit = this.value;
+                    updateOrderDisplay();
+                }
+            });
+
+            document.getElementById('deviceUsed').addEventListener('change', function () {
+                if (selectedTreatments.length > 0) {
+                    const lastIndex = selectedTreatments.length - 1;
+                    selectedTreatments[lastIndex].device_used = this.value;
+                    updateOrderDisplay();
+                }
+            });
+
+            document.getElementById('clinicalNotes').addEventListener('input', function () {
+                if (selectedTreatments.length > 0) {
+                    const lastIndex = selectedTreatments.length - 1;
+                    selectedTreatments[lastIndex].clinical_notes = this.value;
+                    updateOrderDisplay();
+                }
+            });
+
+            function renderPatientList(patientsList) {
+                document.getElementById('patientListContainer').innerHTML = patientsList.map(patient => `
+                    <div class="patient-item bg-gray-50 rounded-xl p-4 cursor-pointer hover:bg-green-50 transition-colors border border-gray-200 hover:border-green-300" 
+                         data-patient-id="${patient.patient_id}">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-semibold text-gray-900">${patient.full_name}</h4>
+                                <div class="flex items-center gap-3 mt-1 text-sm text-gray-600">
+                                    <span>${patient.gender}</span>
+                                    <span>${calculateAge(patient.date_of_birth)}歲</span>
+                                    <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs">${patient.skin_type}</span>
+                                </div>
+                                <p class="text-sm text-gray-500 mt-1">${patient.phone}</p>
+                                <p class="text-sm text-gray-500 mt-1">${patient.medical_history}</p>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    </div>
+                `).join('');
+
+                document.querySelectorAll('.patient-item').forEach(item => {
+                    item.addEventListener('click', function () {
+                        const patientId = this.dataset.patientId;
+                        const patient = patients.find(p => p.patient_id === patientId);
+                        if (patient) {
+                            currentPatient = patient;
+                            document.getElementById('patientInfo').classList.remove('hidden');
+                            document.getElementById('patientName').textContent = patient.full_name;
+                            document.getElementById('patientGender').textContent = patient.gender;
+                            document.getElementById('patientAge').textContent = `${calculateAge(patient.date_of_birth)}歲`;
+                            document.getElementById('patientSkinType').textContent = patient.skin_type;
+                            document.getElementById('patientMedicalHistory').textContent = patient.medical_history;
+                            document.getElementById('patientModal').classList.add('hidden');
+                            document.getElementById('patientModal').classList.remove('flex');
+                            checkSubmissionReady();
+                        }
+                    });
+                });
+            }
+
+            renderPatientList(patients);
+
+            document.getElementById('patientSearchInput').addEventListener('input', function (e) {
+                const searchTerm = e.target.value.toLowerCase();
+                const filteredPatients = patients.filter(p => 
+                    p.full_name.toLowerCase().includes(searchTerm) || 
+                    p.phone.includes(searchTerm)
+                );
+                renderPatientList(filteredPatients);
+            });
+
+            // 變更患者按鈕
+            document.getElementById('changePatientBtn').addEventListener('click', function () {
+                document.getElementById('patientModal').classList.remove('hidden');
+                document.getElementById('patientModal').classList.add('flex');
+            });
+
+            // 提交訂單
+            document.getElementById('submitOrderBtn').addEventListener('click', function () {
+                if (!currentPatient) {
+                    alert('請先選擇患者');
+                    return;
+                }
+
+                if (selectedTreatments.length === 0) {
+                    alert('請至少選擇一項療程');
+                    return;
+                }
+
+                const orderData = {
+                    order_id: 'ORD-' + Date.now(),
+                    patient: currentPatient,
+                    doctor: selectedDoctor ? selectedDoctor.full_name : '未選擇',
+                    nurse: selectedNurse ? selectedNurse.full_name : '未選擇',
+                    created_by: user.name,
+                    treatment_date: selectedDate,
+                    treatments: selectedTreatments,
+                    payment_method: document.getElementById('paymentMethod').value,
+                    subtotal: selectedTreatments.reduce((sum, t) => sum + t.base_price, 0),
+                    discount: 0,
+                    total: selectedTreatments.reduce((sum, t) => sum + t.base_price, 0)
+                };
+
+                // 儲存到 sessionStorage（模擬提交）
+                sessionStorage.setItem('lastOrder', JSON.stringify(orderData));
+
+                // 顯示成功訊息
+                alert('療程單已建立成功！\n訂單編號: ' + orderData.order_id);
+
+                // 跳轉到儀表板
+                window.location.href = '../staff/dashboard.html';
+            });
+
+            // 添加折扣按鈕
+            document.getElementById('applyDiscountBtn').addEventListener('click', function () {
+                const discountAmount = prompt('請輸入折扣金額:', '0');
+                if (discountAmount !== null) {
+                    const discount = parseInt(discountAmount) || 0;
+                    const subtotal = selectedTreatments.reduce((sum, t) => sum + t.base_price, 0);
+                    const total = Math.max(0, subtotal - discount);
+
+                    document.getElementById('discount').textContent = '-$' + discount.toLocaleString();
+                    document.getElementById('total').textContent = '$' + total.toLocaleString();
+                    document.getElementById('bottomTotal').textContent = '$' + total.toLocaleString();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>會計儀表板 - Clinext</title>
+    <!-- 使用本地 Tailwind CSS 連結 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8b5cf6',
+                        'primary-dark': '#7c3aed',
+                        secondary: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .voucher-type-income {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .voucher-type-expense {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .voucher-type-transfer {
+            background-color: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .voucher-type-adjustment {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .scrollbar-thin {
+            scrollbar-width: thin;
+            scrollbar-color: #c7d2fe transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background-color: #c7d2fe;
+            border-radius: 20px;
+        }
+
+        .urgent {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .menu-icon {
+            transition: all 0.3s ease;
+        }
+
+        .menu-icon:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <!-- 頂部導航欄 -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <i class="fas fa-file-invoice-dollar text-white"></i>
+            </div>
+            <span class="font-bold text-lg">Clinext 會計後台</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-2">
+                <i class="fas fa-user-circle text-white/80"></i>
+                <span id="currentUserName" class="text-sm font-medium">張美華 會計</span>
+            </div>
+            <div class="relative hidden md:block">
+                <i class="fas fa-bell text-white/80 text-lg cursor-pointer" id="notificationBtn"></i>
+                <span
+                    class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full text-xs flex items-center justify-center">3</span>
+            </div>
+            <button id="logoutBtn" class="p-2 rounded-full hover:bg-white/10 transition-colors">
+                <i class="fas fa-sign-out-alt text-white/80"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 主內容區 -->
+    <div class="px-4 py-6">
+        <!-- 歡迎訊息 -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-1">會計儀表板</h1>
+            <p class="text-gray-600">今天是 <span id="currentDate">2024年1月20日 星期一</span></p>
+        </div>
+
+        <!-- 今日會計概況卡片 -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-primary">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-file-invoice text-purple-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">今日傳票</p>
+                        <p class="text-xl font-bold text-gray-800">8</p>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    <span class="text-green-600">+2</span> 較昨日
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-green-500">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-money-bill-wave text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">今日營收</p>
+                        <p class="text-xl font-bold text-gray-800">$248,500</p>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    <span class="text-green-600">+15%</span> 較昨日
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-red-500">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-receipt text-red-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">未確認傳票</p>
+                        <p class="text-xl font-bold text-red-600 urgent">5</p>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    需今日處理
+                </div>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-4 shadow-sm border-l-4 border-l-blue-500">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-balance-scale text-blue-600"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">本月結餘</p>
+                        <p class="text-xl font-bold text-gray-800">$1,258,300</p>
+                    </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    <span class="text-green-600">+8.5%</span> 較上月
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 左側：傳票狀態與待辦事項 -->
+            <div class="lg:col-span-2">
+                <!-- 待確認傳票 -->
+                <div class="bg-white rounded-xl shadow p-4 mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-clock text-orange-500"></i> 待確認傳票
+                        </h2>
+                        <a href="voucher.html"
+                            class="text-sm text-primary hover:text-primary-dark flex items-center gap-1">
+                            查看全部 <i class="fas fa-chevron-right text-xs"></i>
+                        </a>
+                    </div>
+                    <div class="overflow-x-auto scrollbar-thin">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">傳票號碼</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">日期</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">類型</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">金額</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-4">
+                                        <div class="font-mono font-bold text-sm">ADJ-20240120-002</div>
+                                        <div class="text-xs text-gray-500">庫存調整</div>
+                                    </td>
+                                    <td class="py-2 px-4 text-sm">2024/01/20</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="voucher-type-adjustment px-2 py-1 rounded-full text-xs font-bold">調整</span>
+                                    </td>
+                                    <td class="py-2 px-4 font-bold text-yellow-600 text-sm">NT$ 12,500</td>
+                                    <td class="py-2 px-4">
+                                        <button class="text-primary hover:text-primary-dark text-sm"
+                                            onclick="confirmVoucher('ADJ-20240120-002')">
+                                            <i class="fas fa-check-circle mr-1"></i> 確認
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-4">
+                                        <div class="font-mono font-bold text-sm">EXP-20240120-001</div>
+                                        <div class="text-xs text-gray-500">辦公室用品採購</div>
+                                    </td>
+                                    <td class="py-2 px-4 text-sm">2024/01/20</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="voucher-type-expense px-2 py-1 rounded-full text-xs font-bold">支出</span>
+                                    </td>
+                                    <td class="py-2 px-4 font-bold text-red-600 text-sm">NT$ 8,300</td>
+                                    <td class="py-2 px-4">
+                                        <button class="text-primary hover:text-primary-dark text-sm"
+                                            onclick="confirmVoucher('EXP-20240120-001')">
+                                            <i class="fas fa-check-circle mr-1"></i> 確認
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-4">
+                                        <div class="font-mono font-bold text-sm">REV-20240120-003</div>
+                                        <div class="text-xs text-gray-500">雷射療程收入</div>
+                                    </td>
+                                    <td class="py-2 px-4 text-sm">2024/01/20</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="voucher-type-income px-2 py-1 rounded-full text-xs font-bold">收入</span>
+                                    </td>
+                                    <td class="py-2 px-4 font-bold text-green-600 text-sm">NT$ 45,000</td>
+                                    <td class="py-2 px-4">
+                                        <button class="text-primary hover:text-primary-dark text-sm"
+                                            onclick="confirmVoucher('REV-20240120-003')">
+                                            <i class="fas fa-check-circle mr-1"></i> 確認
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 最近傳票記錄 -->
+                <div class="bg-white rounded-xl shadow p-4 mb-6">
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                            <i class="fas fa-history text-primary"></i> 最近傳票記錄
+                        </h2>
+                        <a href="voucher.html"
+                            class="text-sm text-primary hover:text-primary-dark flex items-center gap-1">
+                            查看全部 <i class="fas fa-chevron-right text-xs"></i>
+                        </a>
+                    </div>
+                    <div class="overflow-x-auto scrollbar-thin">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">傳票號碼</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">日期</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">類型</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">金額</th>
+                                    <th class="py-2 px-4 text-left text-gray-600 font-medium text-sm">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-4">
+                                        <div class="font-mono font-bold text-sm">REV-20240120-002</div>
+                                        <div class="text-xs text-gray-500">音波拉提療程收入</div>
+                                    </td>
+                                    <td class="py-2 px-4 text-sm">2024/01/20</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="voucher-type-income px-2 py-1 rounded-full text-xs font-bold">收入</span>
+                                    </td>
+                                    <td class="py-2 px-4 font-bold text-green-600 text-sm">NT$ 50,000</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">已過帳</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-4">
+                                        <div class="font-mono font-bold text-sm">TRA-20240119-001</div>
+                                        <div class="text-xs text-gray-500">銀行轉帳</div>
+                                    </td>
+                                    <td class="py-2 px-4 text-sm">2024/01/19</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="voucher-type-transfer px-2 py-1 rounded-full text-xs font-bold">轉帳</span>
+                                    </td>
+                                    <td class="py-2 px-4 font-bold text-blue-600 text-sm">NT$ 320,000</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">已過帳</span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-2 px-4">
+                                        <div class="font-mono font-bold text-sm">EXP-20240119-003</div>
+                                        <div class="text-xs text-gray-500">保養品進貨</div>
+                                    </td>
+                                    <td class="py-2 px-4 text-sm">2024/01/19</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="voucher-type-expense px-2 py-1 rounded-full text-xs font-bold">支出</span>
+                                    </td>
+                                    <td class="py-2 px-4 font-bold text-red-600 text-sm">NT$ 28,500</td>
+                                    <td class="py-2 px-4">
+                                        <span
+                                            class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">已確認</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 會計報表 -->
+                <div class="bg-white rounded-xl shadow p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-purple-500"></i> 本月報表摘要
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600 text-sm">收入總計</span>
+                                <span class="text-green-600 font-bold">NT$ 856,200</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">較上月 +12%</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600 text-sm">支出總計</span>
+                                <span class="text-red-600 font-bold">NT$ 428,100</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 35%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">較上月 +8%</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600 text-sm">傳票總數</span>
+                                <span class="text-primary font-bold">128 筆</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">較上月 +15%</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-gray-600 text-sm">淨利潤</span>
+                                <span class="text-secondary font-bold">NT$ 428,100</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-secondary h-2 rounded-full" style="width: 50%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">利潤率 50%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側：會計功能選單 -->
+            <div class="space-y-6">
+                <!-- 快速操作 -->
+                <div class="bg-white rounded-xl shadow p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-bolt text-warning"></i> 快速操作
+                    </h2>
+                    <div class="grid grid-cols-2 gap-3">
+                        <a href="new_voucher.html"
+                            class="menu-icon bg-primary hover:bg-primary-dark text-white p-4 rounded-lg flex flex-col items-center justify-center transition duration-200">
+                            <i class="fas fa-plus-circle text-xl mb-2"></i>
+                            <span class="text-xs">新增傳票</span>
+                        </a>
+                        <a href="#"
+                            class="menu-icon bg-secondary hover:bg-emerald-600 text-white p-4 rounded-lg flex flex-col items-center justify-center transition duration-200">
+                            <i class="fas fa-search text-xl mb-2"></i>
+                            <span class="text-xs">查詢傳票</span>
+                        </a>
+                        <a href="#"
+                            class="menu-icon bg-info hover:bg-blue-600 text-white p-4 rounded-lg flex flex-col items-center justify-center transition duration-200">
+                            <i class="fas fa-file-export text-xl mb-2"></i>
+                            <span class="text-xs">匯出報表</span>
+                        </a>
+                        <a href="#"
+                            class="menu-icon bg-warning hover:bg-amber-600 text-white p-4 rounded-lg flex flex-col items-center justify-center transition duration-200">
+                            <i class="fas fa-calculator text-xl mb-2"></i>
+                            <span class="text-xs">結帳作業</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 待處理事項 -->
+                <div class="bg-white rounded-xl shadow p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-tasks text-red-500"></i> 待處理事項
+                    </h2>
+                    <ul class="space-y-3">
+                        <li
+                            class="flex justify-between items-center py-2 hover:bg-gray-50 rounded px-2 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-file-invoice text-red-600 text-sm"></i>
+                                </div>
+                                <span class="text-gray-700">待確認傳票</span>
+                            </div>
+                            <span class="bg-red-100 text-red-800 text-xs font-bold px-3 py-1 rounded-full">5</span>
+                        </li>
+                        <li
+                            class="flex justify-between items-center py-2 hover:bg-gray-50 rounded px-2 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-orange-600 text-sm"></i>
+                                </div>
+                                <span class="text-gray-700">傳票異常</span>
+                            </div>
+                            <span
+                                class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full">2</span>
+                        </li>
+                        <li
+                            class="flex justify-between items-center py-2 hover:bg-gray-50 rounded px-2 transition-colors">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-file-export text-blue-600 text-sm"></i>
+                                </div>
+                                <span class="text-gray-700">報表待生成</span>
+                            </div>
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">1</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 傳票類型分布 -->
+                <div class="bg-white rounded-xl shadow p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <i class="fas fa-chart-pie text-info"></i> 傳票類型分布
+                    </h2>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
+                                    <span>收入傳票</span>
+                                </div>
+                                <span class="font-bold">45%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-400 h-2 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-red-400 mr-2"></div>
+                                    <span>支出傳票</span>
+                                </div>
+                                <span class="font-bold">30%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-red-400 h-2 rounded-full" style="width: 30%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
+                                    <span>轉帳傳票</span>
+                                </div>
+                                <span class="font-bold">15%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-blue-400 h-2 rounded-full" style="width: 15%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
+                                    <span>調整傳票</span>
+                                </div>
+                                <span class="font-bold">10%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-yellow-400 h-2 rounded-full" style="width: 10%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 會計行事曆 -->
+                <div class="bg-white rounded-xl shadow p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+                        <i class="fas fa-calendar-alt text-purple-500"></i> 會計行事曆
+                    </h2>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                            <div>
+                                <div class="font-medium">1月25日</div>
+                                <div class="text-gray-600">薪資發放日</div>
+                            </div>
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">重要</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-green-50 rounded">
+                            <div>
+                                <div class="font-medium">1月31日</div>
+                                <div class="text-gray-600">月結截止日</div>
+                            </div>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">截止</span>
+                        </div>
+                        <div class="flex items-center justify-between p-2 bg-yellow-50 rounded">
+                            <div>
+                                <div class="font-medium">2月5日</div>
+                                <div class="text-gray-600">營業稅申報</div>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">提醒</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 會計功能模組 -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- 傳票管理 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">傳票管理</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="new_voucher.html"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-plus text-purple-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">新增傳票</span>
+                    </a>
+
+                    <a href="voucher.html"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-search text-blue-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">查詢傳票</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">確認傳票</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-trash-alt text-red-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">刪除傳票</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 帳務處理 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">帳務處理</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-exchange-alt text-indigo-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">過帳作業</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-undo-alt text-cyan-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">沖銷作業</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-adjust text-yellow-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">調整分錄</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-calculator text-pink-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">結帳作業</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 報表管理 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">報表管理</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-chart-line text-green-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">損益表</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-balance-scale text-blue-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">資產負債表</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-money-bill-wave text-purple-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">現金流量表</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-export text-orange-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">匯出報表</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 系統管理 -->
+            <div class="bg-white rounded-xl p-4 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-800">系統管理</h2>
+                    <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full font-medium">管理員</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-cogs text-gray-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">會計科目</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-cog text-red-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">權限設定</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-database text-indigo-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">資料備份</span>
+                    </a>
+
+                    <a href="#"
+                        class="menu-icon flex flex-col items-center gap-2 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-archive text-teal-600"></i>
+                        </div>
+                        <span class="text-xs text-gray-700 text-center font-medium">歸檔作業</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部導航 -->
+    <div
+        class="bottom-nav fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-around">
+        <a href="dashboard_accounting.html" class="flex flex-col items-center gap-1 text-primary">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-xs font-medium">儀表板</span>
+        </a>
+
+        <a href="voucher.html" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-file-invoice text-lg"></i>
+            <span class="text-xs">傳票</span>
+        </a>
+
+        <a href="new_voucher.html" class="flex flex-col items-center -mt-8">
+            <div class="new-order-btn bg-primary rounded-full p-5">
+                <i class="fas fa-plus text-white text-xl"></i>
+            </div>
+            <span class="text-xs mt-2 text-gray-700 font-medium">新增</span>
+        </a>
+
+        <a href="#" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-chart-bar text-lg"></i>
+            <span class="text-xs">報表</span>
+        </a>
+
+        <a href="#" class="flex flex-col items-center gap-1 text-gray-500">
+            <i class="fas fa-cog text-lg"></i>
+            <span class="text-xs">設定</span>
+        </a>
+    </div>
+
+    <script>
+        // 設定當前日期
+        const now = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('zh-TW', options);
+
+        // 模擬使用者資料
+        const mockUser = {
+            name: "張美華 會計",
+            role: "accounting_admin"
+        };
+
+        // 設定使用者名稱
+        document.getElementById('currentUserName').textContent = mockUser.name;
+
+        // 登出功能
+        document.getElementById('logoutBtn').addEventListener('click', function () {
+            if (confirm('確定要登出會計系統嗎？')) {
+                alert('登出成功！');
+                // 實際應用中應跳轉到登入頁面
+                // window.location.href = 'login.html';
+            }
+        });
+
+        // 確認傳票功能
+        function confirmVoucher(voucherNo) {
+            if (confirm(`確定要確認傳票 ${voucherNo} 嗎？`)) {
+                alert(`傳票 ${voucherNo} 已確認成功！`);
+                // 實際應用中這裡會發送確認請求到伺服器
+                // 並更新UI狀態
+            }
+        }
+
+        // 點擊底部導航時切換樣式
+        document.querySelectorAll('.bottom-nav a').forEach(link => {
+            link.addEventListener('click', function (e) {
+                // 防止連結跳轉（演示用）
+                e.preventDefault();
+
+                // 移除所有導航項目的活動狀態
+                document.querySelectorAll('.bottom-nav a').forEach(item => {
+                    item.classList.remove('text-primary', 'font-medium');
+                    item.classList.add('text-gray-500');
+                    item.querySelector('span').classList.remove('font-medium');
+                });
+
+                // 為當前點擊的項目添加活動狀態
+                this.classList.remove('text-gray-500');
+                this.classList.add('text-primary', 'font-medium');
+                this.querySelector('span').classList.add('font-medium');
+
+                // 如果是"新增"按鈕，保持特殊樣式
+                if (this.querySelector('.new-order-btn')) {
+                    this.classList.remove('text-primary', 'font-medium');
+                    this.classList.add('text-gray-700');
+                }
+            });
+        });
+
+        // 通知功能
+        document.getElementById('notificationBtn').addEventListener('click', function () {
+            alert('您有3則新通知：\n1. 待確認傳票: 5筆\n2. 傳票異常: 2筆\n3. 報表待生成: 1份');
+        });
+
+        // 點擊待處理事項時的處理
+        document.querySelectorAll('.hover\\:bg-gray-50').forEach(item => {
+            item.addEventListener('click', function (e) {
+                if (this.closest('li')) {
+                    e.preventDefault();
+                    const text = this.querySelector('.text-gray-700').textContent;
+                    alert(`處理: ${text}`);
+                }
+            });
+        });
+
+        // 點擊傳票記錄時的處理
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', function (e) {
+                // 如果點擊的是按鈕，則不觸發
+                if (!e.target.closest('button')) {
+                    const voucherNo = this.querySelector('.font-mono').textContent;
+                    const desc = this.querySelector('.text-gray-500').textContent;
+                    alert(`查看傳票詳情: ${voucherNo}\n${desc}`);
+                }
+            });
+        });
+
+        // 自動更新時間
+        function updateDateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-TW', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            // 如果頁面上有時間顯示元素，更新它
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = timeString;
+            }
+        }
+
+        // 每分鐘更新一次時間
+        setInterval(updateDateTime, 60000);
+
+        console.log('Clinext 會計後台系統載入完成');
+    </script>
+</body>
+
+</html>

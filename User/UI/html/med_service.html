@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專科服務</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-emerald-600 min-h-screen">
+    <!-- Status Bar -->
+    <div class="px-4 pt-2 pb-3 text-white flex items-center justify-between text-sm">
+        <div class="flex items-center gap-2">
+            <span>16:17</span>
+            <span class="font-semibold">K</span>
+            <span>⋯</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <span>📶</span>
+            <span>📶</span>
+            <span>📶</span>
+            <span class="text-xs border border-white rounded px-1">76</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="px-4 py-4 flex items-center justify-center relative">
+        <button class="absolute left-4 bg-white rounded-full w-12 h-12 flex items-center justify-center shadow-md">
+            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <h1 class="text-white text-2xl font-semibold">專科服務</h1>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="bg-gray-50 rounded-t-[2rem] min-h-[calc(100vh-120px)] pt-8 px-5">
+        <!-- Search Bar -->
+        <div class="bg-white rounded-full shadow-sm mb-6 px-5 py-4 flex items-center gap-3 border border-gray-200">
+            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input type="text" placeholder="尋找專科..." class="flex-1 outline-none text-gray-600 placeholder-gray-400">
+        </div>
+
+        <!-- Services List -->
+        <div class="space-y-3">
+            <!-- HPV Vaccine -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">💉</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">HPV 9價疫苗接種</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Vaccine Injection -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">💉</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">疫苗注射</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- TB Test -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">🫁</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">英國入境前肺結核檢查</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Oncology -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">⚕️</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">腫瘤科</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Pediatric Hematology -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">👶</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">兒童血液及腫瘤科</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Proton Therapy -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">⚛️</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">質子治療</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Radiation Therapy -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">☢️</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">放射治療</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Hematology -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">🩸</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">血液科及細胞治療</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Ophthalmology -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">👁️</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">眼科</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+
+            <!-- Vision Correction -->
+            <div class="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div class="bg-amber-50 rounded-full w-14 h-14 flex items-center justify-center flex-shrink-0">
+                    <span class="text-2xl">👓</span>
+                </div>
+                <span class="flex-1 text-gray-900 font-medium">視力矯正</span>
+                <svg class="w-6 h-6 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

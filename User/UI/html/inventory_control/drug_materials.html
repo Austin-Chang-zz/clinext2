@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>醫美治療項目與材料對照表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .treatment-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .treatment-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .material-badge {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin: 3px;
+        }
+
+        .injection-badge {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .device-badge {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .promotion-badge {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .table-header {
+            background-color: #1e293b;
+            color: white;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body class="text-gray-800 p-4 md:p-6">
+    <div class="max-w-6xl mx-auto">
+        <!-- 頁面標題 -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">醫美治療項目與材料對照表</h1>
+            <p class="text-gray-600 max-w-3xl mx-auto">以下為各類醫美治療項目及其對應使用的藥物與材料清單，便於庫存管理與療程規劃。</p>
+        </div>
+
+        <!-- A類：注射治療 -->
+        <div class="mb-12">
+            <div class="category-header">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-syringe mr-3"></i>
+                    A. 注射治療 / Injectable Treatments
+                </h2>
+                <p class="mt-2 opacity-90">此類治療涉及注射藥物或填充劑進入皮膚組織</p>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl shadow-md mb-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="table-header">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
+                                治療項目</th>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
+                                對應藥物/材料</th>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">類型
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">備註
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">皮秒蜂巢雷射</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">皮秒雷射設備</span>
+                                <span class="material-badge device-badge">蜂巢透鏡</span>
+                                <span class="material-badge">冷卻凝膠</span>
+                                <span class="material-badge">保護眼罩</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">雷射設備</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">雖列在注射類，但實際為雷射治療</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">薇貝拉 1cc</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">薇貝拉玻尿酸 (1cc)</span>
+                                <span class="material-badge">注射針頭</span>
+                                <span class="material-badge">局部麻醉劑</span>
+                                <span class="material-badge">消毒棉片</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">填充劑</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">玻尿酸填充劑，用於填補皺紋或增加體積</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">美國肉毒瘦小臉</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">美國肉毒桿菌素</span>
+                                <span class="material-badge">注射針頭 (細針)</span>
+                                <span class="material-badge">生理食鹽水</span>
+                                <span class="material-badge">消毒用品</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">神經調節劑</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">放鬆咀嚼肌，達到瘦臉效果</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">仙女玻尿酸 + 肉毒 30u</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">仙女玻尿酸</span>
+                                <span class="material-badge injection-badge">肉毒桿菌素 (30單位)</span>
+                                <span class="material-badge">兩種不同注射針頭</span>
+                                <span class="material-badge">局部麻醉劑</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium mr-1">填充劑</span>
+                                <span
+                                    class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">神經調節劑</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">複合式治療，同時進行填充與放鬆</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">猛健樂 + 容脂點滴</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">猛健樂 (維生素複方)</span>
+                                <span class="material-badge injection-badge">容脂點滴 (脂肪代謝配方)</span>
+                                <span class="material-badge">點滴輸液組</span>
+                                <span class="material-badge">靜脈注射針頭</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">營養點滴</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">靜脈營養補充與脂肪代謝促進</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">MCS 血漿置換術</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">血液採集管</span>
+                                <span class="material-badge injection-badge">離心耗材</span>
+                                <span class="material-badge">PRP試劑盒</span>
+                                <span class="material-badge">注射用PRP</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-rose-100 text-rose-800 rounded-full text-xs font-medium">自體生長因子</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">抽取自體血液，分離高濃度血小板血漿後回輸</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">韓國玻尿酸 2 支</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">韓國玻尿酸 (2支)</span>
+                                <span class="material-badge">注射針頭</span>
+                                <span class="material-badge">局部麻醉劑</span>
+                                <span class="material-badge">消毒用品</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-medium">填充劑</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">韓國品牌玻尿酸填充劑</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">韓國肉毒 100U + 容酷針</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge injection-badge">韓國肉毒桿菌素 (100單位)</span>
+                                <span class="material-badge injection-badge">容酷針 (脂肪溶解劑)</span>
+                                <span class="material-badge">兩種不同注射針頭</span>
+                                <span class="material-badge">消毒用品</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium mr-1">神經調節劑</span>
+                                <span
+                                    class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-medium">溶解劑</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">韓國品牌肉毒搭配脂肪溶解注射</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- B類：能量儀器治療 -->
+        <div class="mb-12">
+            <div class="category-header" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-microchip mr-3"></i>
+                    B. 能量儀器治療 / Energy-Based Device Treatments
+                </h2>
+                <p class="mt-2 opacity-90">此類治療使用能量設備作用於皮膚組織，非侵入性或微侵入性</p>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl shadow-md mb-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="table-header" style="background-color: #065f46;">
+                        <tr>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
+                                治療項目</th>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">
+                                對應藥物/材料</th>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">類型
+                            </th>
+                            <th scope="col" class="px-6 py-4 text-left text-sm font-medium uppercase tracking-wider">備註
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">美音 400 條</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">美音超音波設備</span>
+                                <span class="material-badge device-badge">400條治療探頭</span>
+                                <span class="material-badge">傳導凝膠</span>
+                                <span class="material-badge">探頭保護套</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">超音波</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">聚焦超音波拉提治療，400條為發數單位</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">美音 Plus 300 條</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">美音Plus超音波設備</span>
+                                <span class="material-badge device-badge">300條治療探頭</span>
+                                <span class="material-badge">傳導凝膠</span>
+                                <span class="material-badge">探頭保護套</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">超音波</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">升級版超音波設備，300條發數</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">海芙音波 1000 條</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">海芙音波設備</span>
+                                <span class="material-badge device-badge">1000條治療探頭</span>
+                                <span class="material-badge">專用傳導凝膠</span>
+                                <span class="material-badge">一次性探頭膜</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">超音波</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">海芙品牌超音波拉提，1000條高發數治療</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">鼻后電波 600 + 海芙音波 400</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">鼻后電波設備</span>
+                                <span class="material-badge device-badge">600發電波探頭</span>
+                                <span class="material-badge device-badge">海芙音波設備</span>
+                                <span class="material-badge device-badge">400條音波探頭</span>
+                                <span class="material-badge">複合傳導凝膠</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium mr-1">電波</span>
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">超音波</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">電波與音波複合治療，針對鼻子周圍區域</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">鳳凰電波 900 + 音波 300</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">鳳凰電波設備</span>
+                                <span class="material-badge device-badge">900發電波探頭</span>
+                                <span class="material-badge device-badge">音波設備</span>
+                                <span class="material-badge device-badge">300條音波探頭</span>
+                                <span class="material-badge">專用傳導凝膠</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-xs font-medium mr-1">電波</span>
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">超音波</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">鳳凰電波與音波雙重治療，全面拉提</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">美國音波 200 條</td>
+                            <td class="px-6 py-4">
+                                <span class="material-badge device-badge">美國音波設備</span>
+                                <span class="material-badge device-badge">200條治療探頭</span>
+                                <span class="material-badge">傳導凝膠</span>
+                                <span class="material-badge">探頭清潔液</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">超音波</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-600 text-sm">美國品牌超音波設備，200條發數</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- C類：促銷組合方案 -->
+        <div class="mb-12">
+            <div class="category-header" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                <h2 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-gift mr-3"></i>
+                    C. 促銷組合方案 / Promotion Bundle Programs
+                </h2>
+                <p class="mt-2 opacity-90">四選一方案，單一方案價格 10,000 元</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- 方案1 -->
+                <div class="treatment-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">方案 1</h3>
+                        <span class="promotion-badge px-3 py-1 rounded-full text-sm font-medium">四選一</span>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">皮秒蜂巢 / 淨膚雷射四堂</h4>
+                    <div class="mb-4">
+                        <p class="text-gray-600 text-sm mb-2">對應材料：</p>
+                        <div>
+                            <span class="material-badge device-badge">皮秒雷射設備</span>
+                            <span class="material-badge device-badge">蜂巢透鏡</span>
+                            <span class="material-badge device-badge">淨膚雷射設備</span>
+                            <span class="material-badge">冷卻凝膠</span>
+                            <span class="material-badge">保護眼罩</span>
+                            <span class="material-badge">雷射專用探頭</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <p class="text-sm text-gray-500">包含4次治療，可選擇皮秒蜂巢或淨膚雷射</p>
+                    </div>
+                </div>
+
+                <!-- 方案2 -->
+                <div class="treatment-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">方案 2</h3>
+                        <span class="promotion-badge px-3 py-1 rounded-full text-sm font-medium">四選一</span>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">韓國玻尿酸 2 支</h4>
+                    <div class="mb-4">
+                        <p class="text-gray-600 text-sm mb-2">對應材料：</p>
+                        <div>
+                            <span class="material-badge injection-badge">韓國玻尿酸 (2支)</span>
+                            <span class="material-badge">注射針頭</span>
+                            <span class="material-badge">局部麻醉劑</span>
+                            <span class="material-badge">消毒棉片</span>
+                            <span class="material-badge">注射器</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <p class="text-sm text-gray-500">韓國品牌玻尿酸填充劑，共2支</p>
+                    </div>
+                </div>
+
+                <!-- 方案3 -->
+                <div class="treatment-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">方案 3</h3>
+                        <span class="promotion-badge px-3 py-1 rounded-full text-sm font-medium">四選一</span>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">美國音波 200 條</h4>
+                    <div class="mb-4">
+                        <p class="text-gray-600 text-sm mb-2">對應材料：</p>
+                        <div>
+                            <span class="material-badge device-badge">美國音波設備</span>
+                            <span class="material-badge device-badge">200條治療探頭</span>
+                            <span class="material-badge">傳導凝膠</span>
+                            <span class="material-badge">探頭保護套</span>
+                            <span class="material-badge">消毒巾</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <p class="text-sm text-gray-500">美國品牌超音波拉提，200條發數</p>
+                    </div>
+                </div>
+
+                <!-- 方案4 -->
+                <div class="treatment-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-gray-900">方案 4</h3>
+                        <span class="promotion-badge px-3 py-1 rounded-full text-sm font-medium">四選一</span>
+                    </div>
+                    <h4 class="text-lg font-semibold text-gray-800 mb-4">韓國肉毒 100U + 容酷針</h4>
+                    <div class="mb-4">
+                        <p class="text-gray-600 text-sm mb-2">對應材料：</p>
+                        <div>
+                            <span class="material-badge injection-badge">韓國肉毒桿菌素 (100單位)</span>
+                            <span class="material-badge injection-badge">容酷針 (脂肪溶解劑)</span>
+                            <span class="material-badge">兩種不同注射針頭</span>
+                            <span class="material-badge">消毒用品</span>
+                            <span class="material-badge">生理食鹽水</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100">
+                        <p class="text-sm text-gray-500">韓國品牌肉毒搭配脂肪溶解注射</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 材料類型圖例 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">材料類型圖例</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-amber-100 border border-amber-300 rounded mr-3"></div>
+                    <span class="text-gray-700">填充劑 (玻尿酸等)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-purple-100 border border-purple-300 rounded mr-3"></div>
+                    <span class="text-gray-700">神經調節劑 (肉毒桿菌素)</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-green-100 border border-green-300 rounded mr-3"></div>
+                    <span class="text-gray-700">超音波設備</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-orange-100 border border-orange-300 rounded mr-3"></div>
+                    <span class="text-gray-700">電波設備</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-emerald-100 border border-emerald-300 rounded mr-3"></div>
+                    <span class="text-gray-700">營養/溶解劑</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-rose-100 border border-rose-300 rounded mr-3"></div>
+                    <span class="text-gray-700">自體生長因子</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-blue-100 border border-blue-300 rounded mr-3"></div>
+                    <span class="text-gray-700">雷射設備</span>
+                </div>
+                <div class="flex items-center">
+                    <div class="w-4 h-4 bg-gray-100 border border-gray-300 rounded mr-3"></div>
+                    <span class="text-gray-700">一般耗材</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 總結 -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+            <h3 class="text-xl font-bold text-gray-900 mb-3">總結</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <div class="text-3xl font-bold text-blue-600 mb-2">8</div>
+                    <div class="text-gray-700 font-medium">注射治療項目</div>
+                    <div class="text-gray-500 text-sm mt-1">包含玻尿酸、肉毒桿菌素等</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <div class="text-3xl font-bold text-green-600 mb-2">6</div>
+                    <div class="text-gray-700 font-medium">能量儀器項目</div>
+                    <div class="text-gray-500 text-sm mt-1">包含超音波、電波等設備</div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <div class="text-3xl font-bold text-purple-600 mb-2">4</div>
+                    <div class="text-gray-700 font-medium">促銷組合方案</div>
+                    <div class="text-gray-500 text-sm mt-1">四選一，單一方案10,000元</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 簡單的互動效果：點擊治療項目可顯示詳細材料
+        document.querySelectorAll('.treatment-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const title = this.querySelector('h4').textContent;
+                const materials = Array.from(this.querySelectorAll('.material-badge'))
+                    .map(badge => badge.textContent)
+                    .join(', ');
+
+                alert(`治療項目: ${title}\n\n使用材料: ${materials}`);
+            });
+        });
+
+        // 印出按鈕
+        const printButton = document.createElement('button');
+        printButton.className = 'fixed bottom-6 right-6 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition';
+        printButton.innerHTML = '<i class="fas fa-print text-xl"></i>';
+        printButton.title = '列印此表';
+        printButton.onclick = () => window.print();
+        document.body.appendChild(printButton);
+    </script>
+</body>
+
+</html>

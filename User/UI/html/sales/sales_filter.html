@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>篩選 - 銷售單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50">
+    <!-- Status Bar -->
+    <div class="bg-white px-4 py-2 flex items-center justify-between text-sm">
+        <div class="flex items-center gap-2">
+            <span class="font-medium">9:30</span>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M3 3h14a1 1 0 011 1v1a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1zm0 4h14a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V8a1 1 0 011-1z" />
+            </svg>
+            <span>...</span>
+        </div>
+        <div class="flex items-center gap-1">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6z" />
+            </svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                    d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+            </svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"
+                    clip-rule="evenodd" />
+            </svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd"
+                    d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.077 13.308-5.077 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zM12.12 13.88a3 3 0 00-4.242 0 1 1 0 01-1.415-1.415 5 5 0 017.072 0 1 1 0 01-1.415 1.415zM9 16a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
+                    clip-rule="evenodd" />
+            </svg>
+            <div class="border border-gray-400 rounded px-1 text-xs">99</div>
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <button class="text-2xl text-gray-800">×</button>
+        <h1 class="text-lg font-medium text-gray-900">篩選</h1>
+        <div class="w-6"></div>
+    </header>
+
+    <!-- Filter Content -->
+    <div class="px-4 py-6 space-y-6 pb-32">
+        <!-- Date Filter -->
+        <div>
+            <div class="flex gap-3 mb-4">
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">昨日</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">今日</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">上月</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">本月</button>
+            </div>
+            <div class="flex items-center gap-3">
+                <input type="text" value="2025-11-25"
+                    class="flex-1 px-4 py-3 bg-cyan-50 border-2 border-cyan-400 rounded-lg text-cyan-500 text-center text-base">
+                <span class="text-gray-600 text-base">至</span>
+                <input type="text" value="2026-01-01"
+                    class="flex-1 px-4 py-3 bg-cyan-50 border-2 border-cyan-400 rounded-lg text-cyan-500 text-center text-base">
+            </div>
+        </div>
+
+        <!-- Customer Filter -->
+        <div class="flex items-center justify-between py-4 bg-white rounded-lg px-4">
+            <span class="text-gray-900 text-base">客戶</span>
+            <button class="flex items-center gap-2 text-gray-600 text-base">
+                <span>零售客戶</span>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Staff Filter -->
+        <div>
+            <h3 class="text-gray-900 text-base mb-3">業務員</h3>
+            <div class="flex gap-3">
+                <button
+                    class="px-8 py-3 bg-cyan-50 border-2 border-cyan-400 rounded-lg text-cyan-500 text-base">全部</button>
+                <button class="px-8 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">老闆</button>
+            </div>
+        </div>
+
+        <!-- Creator Filter -->
+        <div>
+            <h3 class="text-gray-900 text-base mb-3">制單人</h3>
+            <div class="flex gap-3">
+                <button
+                    class="px-8 py-3 bg-cyan-50 border-2 border-cyan-400 rounded-lg text-cyan-500 text-base">全部</button>
+                <button class="px-8 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">老闆</button>
+            </div>
+        </div>
+
+        <!-- Payment Status Filter -->
+        <div>
+            <h3 class="text-gray-900 text-base mb-3">收款狀態</h3>
+            <div class="flex gap-3">
+                <button
+                    class="flex-1 py-3 bg-cyan-50 border-2 border-cyan-400 rounded-lg text-cyan-500 text-base">全部</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">已結清</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">未結清</button>
+            </div>
+        </div>
+
+        <!-- Invoice Status Filter -->
+        <div>
+            <h3 class="text-gray-900 text-base mb-3">開票狀態</h3>
+            <div class="flex gap-3">
+                <button
+                    class="flex-1 py-3 bg-cyan-50 border-2 border-cyan-400 rounded-lg text-cyan-500 text-base">全部</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">已開票</button>
+                <button
+                    class="flex-1 py-3 bg-white border border-gray-300 rounded-lg text-gray-700 text-base">未開票</button>
+            </div>
+        </div>
+
+        <!-- Hide Voided Orders Toggle -->
+        <div class="flex items-center justify-between py-4 bg-white rounded-lg px-4">
+            <span class="text-gray-900 text-base">隱藏作廢單據</span>
+            <div class="flex items-center gap-2">
+                <span class="text-gray-400 text-sm">隱藏</span>
+                <button class="relative inline-flex h-8 w-14 items-center rounded-full bg-cyan-400 transition-colors">
+                    <span
+                        class="inline-block h-7 w-7 transform translate-x-7 rounded-full bg-white transition-transform"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Action Buttons -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-4 pb-20">
+        <div class="flex gap-3">
+            <button
+                class="flex-1 py-4 bg-white border border-gray-300 rounded-xl text-gray-700 text-base font-medium">清空條件</button>
+            <button class="flex-1 py-4 bg-cyan-400 rounded-xl text-white text-base font-medium">確定</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar (Android) -->
+    <div class="fixed bottom-0 left-0 right-0 h-16 bg-black flex items-center justify-around">
+        <div class="w-12 h-12 bg-gray-600 rounded"></div>
+        <div class="w-14 h-14 border-2 border-white rounded-full"></div>
+        <div class="w-0 h-0 border-l-8 border-l-transparent border-t-12 border-t-white border-r-8 border-r-transparent"
+            style="border-top-width: 16px; transform: rotate(-90deg);"></div>
+    </div>
+</body>
+
+</html>

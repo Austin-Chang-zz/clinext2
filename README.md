@@ -1,2 +1,2 @@
-# clinext2
-clinext code at Trae platform
+# clinext1
+Clinic CRM & Patient Engagement Mobile Application
